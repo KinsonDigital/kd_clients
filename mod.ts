@@ -1,1 +1,1 @@
-import { Messenger } from "./Messenger.ts";
+export { Messenger } from "./Messenger.ts";
