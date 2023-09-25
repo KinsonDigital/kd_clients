@@ -1,6 +1,6 @@
 {
     "lint": {
-        "include": ["src/.*\\.ts$"],
+        "include": ["src/.*\\.ts$"]
     },
     "fmt": {
         "include": ["src/"],
