@@ -1,0 +1,14 @@
+{
+    "lint": {
+        "include": ["src/.*\\.ts$"],
+    },
+    "fmt": {
+        "include": ["src/"],
+        "exclude": ["**/*.md"],
+        "useTabs": true,
+        "lineWidth": 130,
+        "indentWidth": 4,
+        "semiColons": true,
+        "singleQuote": false
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/src/Messenger.ts",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+                "--allow-all"
+            ],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+        }
+    ],
+}
