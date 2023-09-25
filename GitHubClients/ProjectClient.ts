@@ -1,11 +1,11 @@
-import { createOrgProjectsQuery } from "../core/GraphQlQueries/GetOrgProjectsQueries.ts";
+import { createOrgProjectsQuery } from "../core/GraphQl/Queries/GetOrgProjectsQueries.ts";
 import { ProjectModel } from "../core/Models/ProjectModel.ts";
 import { GraphQlClient } from "../core/GraphQlClient.ts";
 import { Guard } from "../core/Guard.ts";
 import { Utils } from "../core/Utils.ts";
-import { createLinkItemToProjectMutation } from "../core/GraphQlMutations/AddToProjectMutation.ts";
-import { createGetIssueProjectsQuery } from "../core/GraphQlQueries/GetIssueProjectsQuery.ts";
-import { createGetPullRequestProjectsQuery } from "../core/GraphQlQueries/GetPullRequestProjectsQuery.ts";
+import { createLinkItemToProjectMutation } from "../core/GraphQl/Mutations/AddToProjectMutation.ts";
+import { createGetIssueProjectsQuery } from "../core/GraphQl/Queries/GetIssueProjectsQuery.ts";
+import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
 
 /**
  * Gets or saves data related to GitHub organization projects.
