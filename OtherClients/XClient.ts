@@ -1,4 +1,4 @@
-import { TwitterAuthValues } from "./TwitterAuthValue.ts";
+import { XAuthValues } from "./XAuthValue.ts";
 import { TweetV2PostTweetResult, TwitterApi } from "npm:twitter-api-v2@1.15.0";
 import { Utils } from "../core/Utils.ts";
 import { WebApiClient } from "../core/WebApiClient.ts";
@@ -6,17 +6,17 @@ import { WebApiClient } from "../core/WebApiClient.ts";
 /**
  * Provides twitter functionality.
  */
-export class TwitterClient extends WebApiClient {
-	private readonly twitterClientBase: TwitterApi;
+export class XClient extends WebApiClient {
+	private readonly xClientBase: TwitterApi;
 
 	/**
-	 * Creates a new instance of the TwitterClient class.
-	 * @param secrets The Twitter secrets and tokens.
+	 * Creates a new instance of the {@link XClient} class.
+	 * @param secrets The X secrets and tokens.
 	 */
-	constructor(authValues: TwitterAuthValues) {
+	constructor(authValues: XAuthValues) {
 		super();
 
-		this.twitterClientBase = new TwitterApi({
+		this.xClientBase = new TwitterApi({
 			appKey: authValues.consumer_api_key,
 			appSecret: authValues.consumer_api_secret,
 			accessToken: authValues.access_token_key,
@@ -29,7 +29,7 @@ export class TwitterClient extends WebApiClient {
 	 * @description Manage setting up and tweeting the given status
 	 */
 	public async tweet(message: string): Promise<void> {
-		const tweetResult: TweetV2PostTweetResult = await this.twitterClientBase.v2.tweet(message);
+		const tweetResult: TweetV2PostTweetResult = await this.xClientBase.v2.tweet(message);
 
 		if (tweetResult.errors) {
 			tweetResult.errors.forEach((error) => {

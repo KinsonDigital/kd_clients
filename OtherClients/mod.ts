@@ -1,1 +1,1 @@
-export { TwitterClient } from "./TwitterClient.ts";
+export { XClient } from "./XClient.ts";

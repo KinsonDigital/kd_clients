@@ -10,7 +10,7 @@ export { RepoClient } from "./GitHubClients/RepoClient.ts";
 export { TagClient } from "./GitHubClients/TagClient.ts";
 export { UsersClient } from "./GitHubClients/UsersClient.ts";
 export { WorkflowClient } from "./GitHubClients/WorkflowClient.ts";
-export { TwitterClient } from "./OtherClients/TwitterClient.ts";
+export { XClient } from "./OtherClients/XClient.ts";
 export { NuGetClient } from "./PackageClients/NuGetClient.ts";
 
 /**
