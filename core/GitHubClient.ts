@@ -1,6 +1,6 @@
 import { Utils } from "./Utils.ts";
 import { LinkHeaderParser } from "./LinkHeaderParser.ts";
-import { WebApiClient } from "./WebAPIClient.ts";
+import { WebApiClient } from "./WebApiClient.ts";
 import { GetDataFunc } from "./Types.ts";
 
 /**
