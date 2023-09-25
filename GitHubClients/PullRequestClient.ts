@@ -4,7 +4,7 @@ import { PullRequestModel } from "../core/Models/PullRequestModel.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
-import { IIssueOrPRRequestData } from "../core/IIssueOrPRRequestData.ts";
+import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
 
 /**
  * Provides a client for interacting with pull requests.
@@ -314,7 +314,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @param prNumber The pull request number.
 	 * @param prRequestData The data to update the pull request with.
 	 */
-	public async updatePullRequest(repoName: string, prNumber: number, prRequestData: IIssueOrPRRequestData): Promise<void> {
+	public async updatePullRequest(repoName: string, prNumber: number, prRequestData: IssueOrPRRequestData): Promise<void> {
 		Guard.isNullOrEmptyOrUndefined(repoName, "updatePullRequest", "repoName");
 		Guard.isLessThanOne(prNumber, "updatePullRequest", "prNumber");
 

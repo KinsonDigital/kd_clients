@@ -5,7 +5,7 @@ import { LabelModel } from "../core/Models/LabelModel.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
-import { IIssueOrPRRequestData } from "../core/IIssueOrPRRequestData.ts";
+import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
 
 /**
  * Provides a client for interacting with issues.
@@ -324,7 +324,7 @@ export class IssueClient extends GitHubClient {
 	 * @param issueNumber The issue number.
 	 * @param issueData The data to update the issue with.
 	 */
-	public async updateIssue(repoName: string, issueNumber: number, issueData: IIssueOrPRRequestData): Promise<void> {
+	public async updateIssue(repoName: string, issueNumber: number, issueData: IssueOrPRRequestData): Promise<void> {
 		Guard.isNullOrEmptyOrUndefined(repoName, "updateIssue", "repoName");
 		Guard.isLessThanOne(issueNumber, "updateIssue", "issueNumber");
 

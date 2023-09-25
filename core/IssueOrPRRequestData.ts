@@ -4,7 +4,7 @@ import { IssueState, StateReason } from "./Enums.ts";
  * Represents the body of an HTTP GitHub API issue request.
  * Used to update an issue or pull request.
  */
-export interface IIssueOrPRRequestData {
+export interface IssueOrPRRequestData {
 	/**
 	 * Gets or sets the title of the issue.
 	 */

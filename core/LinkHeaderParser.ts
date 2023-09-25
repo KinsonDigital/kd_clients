@@ -1,5 +1,5 @@
-import { ILinkHeader } from "./ILinkHeader.ts";
-import { IPageInfo } from "./IPageInfo.ts";
+import { LinkHeader } from "./LinkHeader.ts";
+import { IPageInfo } from "./PageInfo.ts";
 import { Utils } from "./Utils.ts";
 
 /**
@@ -8,7 +8,7 @@ import { Utils } from "./Utils.ts";
 export class LinkHeaderParser {
 	private readonly pageNumRegex = /page=[0-9]+/gm;
 
-	public toLinkHeader(responseOrHeaderString: Response | string): ILinkHeader | null {
+	public toLinkHeader(responseOrHeaderString: Response | string): LinkHeader | null {
 		const isString = typeof responseOrHeaderString === "string";
 
 		const doesNotContainLinkHeader = isString
@@ -22,7 +22,7 @@ export class LinkHeaderParser {
 		const linkHeader = isString ? responseOrHeaderString : <string> responseOrHeaderString.headers.get("Link");
 
 		const headerSections: string[] = Utils.splitByComma(linkHeader).map((i) => i.trim());
-		const linkHeaderInfo: ILinkHeader = {
+		const linkHeaderInfo: LinkHeader = {
 			prevPage: 0,
 			nextPage: 0,
 			totalPages: 0,

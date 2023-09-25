@@ -1,7 +1,7 @@
 /**
  * Represent a combination of a pagination URL with metadata.
  */
-export interface IPageInfo {
+export interface PageInfo {
 	/**
 	 * Gets or sets the pagination URL for the page.
 	 */

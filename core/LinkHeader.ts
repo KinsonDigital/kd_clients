@@ -1,10 +1,10 @@
-import { IPageInfo } from "./IPageInfo.ts";
+import { IPageInfo } from "./PageInfo.ts";
 
 /**
  * Represents a response link header from a GitHub API response
  * that contains pagination information.
  */
-export interface ILinkHeader {
+export interface LinkHeader {
 	/**
 	 * The previous page.
 	 */
