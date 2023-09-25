@@ -14,9 +14,15 @@ import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPu
 export class ProjectClient extends GraphQlClient {
 	/**
 	 * Initializes a new instance of the {@link ProjectClient} class.
+	 * @param ownerName The name of the owner of the repository to use.
+	 * @param repoName The name of a repository.
 	 * @param token The GitHub token.
 	 */
-	constructor(token: string) {
+	constructor(ownerName: string, repoName: string, token: string) {
+		const funcName = "ProjectClient.ctor";
+		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
+		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+
 		super(token);
 	}
 
@@ -25,7 +31,7 @@ export class ProjectClient extends GraphQlClient {
 	 * @returns The list of projects.
 	 */
 	public async getOrgProjects(): Promise<ProjectModel[]> {
-		const query = createOrgProjectsQuery(this.organization);
+		const query = createOrgProjectsQuery(this.ownerName);
 		const responseData = await this.executeQuery(query);
 
 		return <ProjectModel[]> responseData.data.organization.projectsV2.nodes;
@@ -75,18 +81,14 @@ export class ProjectClient extends GraphQlClient {
 	/**
 	 * Gets a list of the organizational projects for an issue that has the given {@link issueNumber},
 	 * in a repository with a name that matches the given {@link repoName}.
-	 * @param repoName The name of the repository.
 	 * @param issueNumber The issue number.
 	 * @returns The list of organizational projects that the issue is assigned to.
 	 */
-	public async getIssueProjects(repoName: string, issueNumber: number): Promise<ProjectModel[]> {
+	public async getIssueProjects(issueNumber: number): Promise<ProjectModel[]> {
 		const funcName = "getIssueProjects";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName);
 		Guard.isLessThanOne(issueNumber, funcName);
 
-		repoName = repoName.trim();
-
-		const query = createGetIssueProjectsQuery(this.organization, repoName, issueNumber);
+		const query = createGetIssueProjectsQuery(this.ownerName, this.repoName, issueNumber);
 		const responseData = await this.executeQuery(query);
 
 		return <ProjectModel[]> responseData.data.repository.issue.projectsV2.nodes;
@@ -95,18 +97,14 @@ export class ProjectClient extends GraphQlClient {
 	/**
 	 * Gets a list of the organizational projects for a pull request that has the given {@link prNumber},
 	 * in a repository with a name that matches the given {@link repoName}.
-	 * @param repoName The name of the repository.
 	 * @param prNumber The issue number.
 	 * @returns The list of organizational projects that the issue is assigned to.
 	 */
-	public async getPullRequestProjects(repoName: string, prNumber: number): Promise<ProjectModel[]> {
+	public async getPullRequestProjects(prNumber: number): Promise<ProjectModel[]> {
 		const funcName = "getPullRequestProjects";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName);
 		Guard.isLessThanOne(prNumber, funcName);
 
-		repoName = repoName.trim();
-
-		const query = createGetPullRequestProjectsQuery(this.organization, repoName, prNumber);
+		const query = createGetPullRequestProjectsQuery(this.ownerName, this.repoName, prNumber);
 		const responseData = await this.executeQuery(query);
 
 		return <ProjectModel[]> responseData.data.repository.pullRequest.projectsV2.nodes;

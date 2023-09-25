@@ -10,29 +10,33 @@ import { Guard } from "../core/Guard.ts";
 export class LabelClient extends GitHubClient {
 	/**
 	 * Initializes a new instance of the {@link LabelClient} class.
+	 * @param ownerName The name of the owner of the repository to use.
+	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no {@link token} is provided, then the client will not be authenticated.
 	 */
-	constructor(token?: string) {
+	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "LabelClient.ctor";
+		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
+		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+
 		super(token);
 	}
 
 	/**
-	 * Gets a page of labels with a set page size for a repository that matches the {@link repoName}.
-	 * @param repoName The name of the repo where the labels exist.
+	 * Gets the given {@link page} of labels where the size of each page is the given {@link qtyPerPage},
+	 * for a repository with a name that matches the {@link repoName}.
 	 * @param page The page of results to return.
 	 * @param qtyPerPage The total to return per {@link page}.
 	 * @returns A list of labels in the repo.
 	 * @remarks Does not require authentication.
 	 */
-	public async getLabels(repoName: string, page: number, qtyPerPage: number): Promise<[LabelModel[], Response]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getLabels", "repoName");
-
+	public async getLabels(page: number, qtyPerPage: number): Promise<[LabelModel[], Response]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
 		const queryParams = `?page=${page}&per_page${qtyPerPage}`;
-		const url = `${this.baseUrl}/repos/${this.organization}/${repoName}/labels${queryParams}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/labels${queryParams}`;
 		const response: Response = await this.requestGET(url);
 
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
@@ -44,17 +48,14 @@ export class LabelClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets a list of all the labels for a repository with a name that matches the {@link repoName}.
-	 * @param repoName The name of the repository that contains the labels.
+	 * Gets all of the labels for a repository with a name that matches the {@link LabelClient}.{@link repoName}.
 	 * @returns The list of repository labels.
 	 */
-	public async getAllLabels(repoName: string): Promise<LabelModel[]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getAllLabels", "repoName");
-
+	public async getAllLabels(): Promise<LabelModel[]> {
 		const result: LabelModel[] = [];
 
 		await this.getAllData(async (page, qtyPerPage) => {
-			const [labels, response] = await this.getLabels(repoName, page, qtyPerPage ?? 100);
+			const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
 
 			result.push(...labels);
 
@@ -65,19 +66,17 @@ export class LabelClient extends GitHubClient {
 	}
 
 	/**
-	 * Returns a value indicating whether or not given {@link label} exists in
-	 * a repo that matches the {@link repoName}.
-	 * @param repoName The name of the repo where the labels exist.
+	 * Returns a value indicating whether or not given {@link label} exists in a repository that matches
+	 * the {@link LabelClient}.{@link repoName}.
 	 * @param label The name of the label to check for.
 	 * @returns True if the label exists, false otherwise.
 	 * @remarks Does not require authentication.
 	 */
-	public async labelExists(repoName: string, label: string): Promise<boolean> {
+	public async labelExists(label: string): Promise<boolean> {
 		const funcName = "labelExists";
 		Guard.isNullOrEmptyOrUndefined(label, funcName, "label");
-		Guard.isNullOrEmptyOrUndefined(label, funcName, "label");
 
-		const url = `${this.baseUrl}/repos/${this.organization}/${repoName}/labels/${label}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/labels/${label}`;
 		const response: Response = await this.requestGET(url);
 
 		if (response.status === GitHubHttpStatusCodes.NotFound) {

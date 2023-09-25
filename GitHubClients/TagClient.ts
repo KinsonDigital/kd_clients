@@ -10,16 +10,21 @@ import { GitHubClient } from "../core/GitHubClient.ts";
 export class TagClient extends GitHubClient {
 	/**
 	 * Initializes a new instance of the {@link TagClient} class.
+	 * @param ownerName The name of the owner of a repository.
+	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(token?: string) {
-		super(token);
+	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "TagClient.ctor";
+		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
+		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+
+		super(ownerName, repoName, token);
 	}
 
 	/**
-	 * Gets a {@link page} of tags for a repository with a name that matches the given {@link repoName}.
-	 * @param repoName The name of the repository.
+	 * Gets a {@link page} of tags for a repository.
 	 * @param page The page number of the results to get.
 	 * @param qtyPerPage The quantity of results to get per page.
 	 * @returns The tags.
@@ -28,15 +33,14 @@ export class TagClient extends GitHubClient {
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 */
-	public async getTags(repoName: string, page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getTags", "repoName");
+	public async getTags(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
+		Guard.isNullOrEmptyOrUndefined(this.repoName, "getTags", "repoName");
 
-		repoName = repoName.trim();
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
 		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/repos/${this.organization}/${repoName}/tags${queryParams}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/tags${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
 
@@ -50,15 +54,14 @@ export class TagClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets all of the tags for a repository with a name that matches the given {@link repoName}.
-	 * @param repoName The name of the repository.
+	 * Gets all of the tags in a repository with a name that matches the {@link TagClient}.{@link repoName}.
 	 * @returns All of the tags.
 	 */
-	public async getAllTags(repoName: string): Promise<TagModel[]> {
+	public async getAllTags(): Promise<TagModel[]> {
 		const result: TagModel[] = [];
 
 		await this.getAllData(async (page: number, qtyPerPage?: number) => {
-			const [tags, response] = await this.getTags(repoName, page, qtyPerPage ?? 100);
+			const [tags, response] = await this.getTags(page, qtyPerPage ?? 100);
 
 			result.push(...tags);
 
@@ -69,22 +72,19 @@ export class TagClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets a tag with the given {@link tagName} for a repository with the given {@link repoName}.
-	 * @param repoName The name of the repository.
+	 * Gets a tag with the given {@link tagName} in a repository with a name that matches the {@link TagClient}.{@link repoName}.
 	 * @param tagName The name of the tag.
 	 * @returns Returns the tag with the given name.
 	 */
-	public async getTagByName(repoName: string, tagName: string): Promise<TagModel> {
+	public async getTagByName(tagName: string): Promise<TagModel> {
 		const funcName = "getTagByName";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(tagName, funcName, "tagName");
 
-		repoName = repoName.trim();
-		repoName = repoName.trim();
+		tagName = tagName.trim();
 
 		const foundTags = await this.getAllDataUntil<TagModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getTags(repoName, page, qtyPerPage ?? 100);
+				return await this.getTags(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -104,22 +104,19 @@ export class TagClient extends GitHubClient {
 	}
 
 	/**
-	 * Searches for a tag with the given {@link tagName} for a repository that matches the given {@link repoName}.
-	 * @param repoName The name of the repository.
+	 * Searches for a tag with the given {@link tagName} in a repository that matches the {@link TagClient}.{@link repoName}.
 	 * @param tagName The name of the tag.
 	 * @returns True if the tag exists, false otherwise.
 	 */
-	public async tagExists(repoName: string, tagName: string): Promise<boolean> {
+	public async tagExists(tagName: string): Promise<boolean> {
 		const funcName = "tagExists";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(tagName, funcName, "tagName");
 
-		repoName = repoName.trim();
 		tagName = tagName.trim();
 
 		const foundTags = await this.getAllDataUntil<TagModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getTags(repoName, page, qtyPerPage ?? 100);
+				return await this.getTags(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page

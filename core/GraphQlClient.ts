@@ -2,22 +2,59 @@ import { ErrorModel } from "../core/Models/GraphQLModels/ErrorModel.ts";
 import { RequestResponseModel } from "../core/Models/GraphQlModels/RequestResponseModel.ts";
 import { BadCredentials } from "./Types.ts";
 import { Utils } from "./Utils.ts";
+import { Guard } from "./Guard.ts";
 
 /**
  * Provides a base class for HTTP clients.
  */
 export abstract class GraphQlClient {
 	private baseUrl = "https://api.github.com/graphql";
-	protected readonly organization = "KinsonDigital";
+	private _repoName = "";
+	private _ownerName = "";
 	protected readonly headers: Headers = new Headers();
 
 	/**
 	 * Initializes a new instance of the {@link GraphQLClient} class.
 	 * @param token The GitHub token to use for authentication.
+	 * @param ownerName The name of the owner of the repository to use.
+	 * @param repoName The name of a repository.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(token: string) {
+	constructor(token: string, ownerName?: string, repoName?: string) {
+		this.ownerName = Utils.isNullOrEmptyOrUndefined(ownerName) ? "" : ownerName.trim();
+		this.repoName = Utils.isNullOrEmptyOrUndefined(repoName) ? "" : repoName.trim();
+
 		this.headers.append("Authorization", `Bearer ${token}`);
+	}
+
+	/**
+	 * Gets the name of the owner of the repository.
+	 */
+	public get ownerName(): string {
+		return this._ownerName;
+	}
+
+	/**
+	 * Sets the name of the owner of the repository.
+	 */
+	public set ownerName(v: string) {
+		Guard.isNullOrEmptyOrUndefined("ownerName", v, "v");
+		this._ownerName = v.trim();
+	}
+	
+	/**
+	 * Gets the name of the repository.
+	*/
+	public get repoName() : string {
+		return this._repoName;
+	}
+	
+	/**
+	 * Sets the name of the repository.
+	*/
+	public set repoName(v : string) {
+		Guard.isNullOrEmptyOrUndefined("repoName", v, "v");
+		this._repoName = v.trim();
 	}
 
 	/**

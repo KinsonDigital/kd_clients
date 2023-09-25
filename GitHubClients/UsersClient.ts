@@ -14,7 +14,7 @@ export class UsersClient extends GitHubClient {
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
 	constructor(token?: string) {
-		super(token);
+		super("", "", token);
 	}
 
 	/**

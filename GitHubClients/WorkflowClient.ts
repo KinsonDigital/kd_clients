@@ -15,17 +15,22 @@ export class WorkflowClient extends GitHubClient {
 
 	/**
 	 * Initializes a new instance of the {@link WorkflowClient} class.
+	 * @param ownerName The name of the owner of a repository.
+	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(token?: string) {
-		super(token);
+	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "ProjectClient.ctor";
+		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
+		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		
+		super(ownerName, repoName, token);
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} for the given {@link branch},
-	 * that was triggered by the given {@link event}, and has the given {@link status}.
-	 * @param repoName The name of the repository.
+	 * Gets all workflow runs for the given {@link branch}, with the given {@link event} and {@link status},
+	 * for a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param branch The branch that contains the workflow runs.
 	 * @param event The event that triggered the workflow runs.
 	 * @param status The status of the workflow runs.
@@ -38,16 +43,12 @@ export class WorkflowClient extends GitHubClient {
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 */
 	public async getWorkflowRuns(
-		repoName: string,
 		branch: string | null | AnyBranch,
 		event: WorkflowEvent,
 		status: WorkflowRunStatus,
 		page = 1,
 		qtyPerPage = 100,
 	): Promise<[WorkflowRunModel[], Response]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getWorkflowRuns", "repoName");
-
-		repoName = repoName.trim();
 		branch = branch?.trim() ?? "";
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
@@ -57,13 +58,13 @@ export class WorkflowClient extends GitHubClient {
 		const eventParam = event === WorkflowEvent.any ? "" : `&event=${event}`;
 		const statusParam = status === WorkflowRunStatus.any ? "" : `&status=${status}`;
 		const queryParams = `?page=${page}&per_page=${qtyPerPage}${branchParam}${eventParam}${statusParam}`;
-		const url = `${this.baseUrl}/repos/${this.organization}/${repoName}/actions/runs${queryParams}`;
+		const url = `${this.baseUrl}/repos/${this.repoName}/${this.repoName}/actions/runs${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `An error occurred trying to get the workflow runs for the repository '${repoName}'.`;
+			let errorMsg = `An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`;
 			errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
 			Utils.printAsGitHubError(errorMsg);
 			Deno.exit(1);
@@ -74,12 +75,15 @@ export class WorkflowClient extends GitHubClient {
 		return [workflowRuns.workflow_runs, response];
 	}
 
-	public async getAllWorkflowRuns(repoName: string): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getAllWorkflowRuns", "repoName");
+	/**
+	 * Gets a list of all the workflow runs for a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
+	 * @returns The list of workflow runs.
+	 */
+	public async getAllWorkflowRuns(): Promise<WorkflowRunModel[]> {
+		Guard.isNullOrEmptyOrUndefined(this.repoName, "getAllWorkflowRuns", "repoName");
 
 		return await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
 			return await this.getWorkflowRuns(
-				repoName,
 				this.AnyBranch,
 				WorkflowEvent.any,
 				WorkflowRunStatus.any,
@@ -90,120 +94,99 @@ export class WorkflowClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} and for the given {@link branch},
-	 * that matches the given trigger {@link event}.
-	 * @param repoName The name of the repository.
+	 * Gets all completed workflow runs for the given {@link branch}, with the given {@link event},
+	 * for a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param branch The name of the branch where the workflow runs are located.
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
 	 */
 	public async getCompletedWorkflowRunsByBranch(
-		repoName: string,
 		branch: string,
 		event: WorkflowEvent,
 	): Promise<WorkflowRunModel[]> {
 		const funcName = "getCompletedWorkflowRunsByBranch";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(branch, funcName, "branch");
 
-		repoName = repoName.trim();
 		branch = branch.trim();
 
 		const workflowRuns = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(repoName, branch, event, WorkflowRunStatus.completed, page, qtyPerPage);
+			return await this.getWorkflowRuns(branch, event, WorkflowRunStatus.completed, page, qtyPerPage);
 		});
 
 		return workflowRuns;
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} and
-	 * that matches the given trigger {@link event}.
-	 * @param repoName The name of the repository.
+	 * Gets all completed workflow runs that match the given {@link event}, for a repository with a name that
+	 * matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
 	 */
-	public async getCompletedWorkflowRuns(repoName: string, event: WorkflowEvent): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getCompletedWorkflowRuns", "repoName");
-
-		repoName = repoName.trim();
-
+	public async getCompletedWorkflowRuns(event: WorkflowEvent): Promise<WorkflowRunModel[]> {
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(repoName, this.AnyBranch, event, WorkflowRunStatus.completed, page, qtyPerPage);
+			return await this.getWorkflowRuns(this.AnyBranch, event, WorkflowRunStatus.completed, page, qtyPerPage);
 		});
 
 		return result;
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} and for the given {@link branch},
+	 * Gets all failed workflow runs for the given {@link branch}, with the given {@link event},
+	 * for a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
 	 * that matches the given trigger {@link event}.
-	 * @param repoName The name of the repository.
 	 * @param branch The name of the branch where the workflow runs are located.
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
 	 */
 	public async getFailedWorkflowRunsByBranch(
-		repoName: string,
 		branch: string,
 		event: WorkflowEvent,
 	): Promise<WorkflowRunModel[]> {
 		const funcName = "getFailedWorkflowRunsByBranch";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(branch, funcName, "branch");
 
-		repoName = repoName.trim();
 		branch = branch.trim();
 
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(repoName, branch, event, WorkflowRunStatus.failure, page, qtyPerPage);
+			return await this.getWorkflowRuns(branch, event, WorkflowRunStatus.failure, page, qtyPerPage);
 		});
 
 		return result;
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} and
-	 * that matches the given trigger {@link event}.
-	 * @param repoName The name of the repository.
+	 * Gets all failed workflow runs that match the given {@link event}, for a repository with a name that matches
+	 * the {@link WorkflowClient}.{@link repoName}.
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
 	 */
-	public async getFailedWorkflowRuns(repoName: string, event: WorkflowEvent): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getFailedWorkflowRuns", "repoName");
-
-		repoName = repoName.trim();
+	public async getFailedWorkflowRuns(event: WorkflowEvent): Promise<WorkflowRunModel[]> {
+		Guard.isNullOrEmptyOrUndefined("getFailedWorkflowRuns", "repoName");
 
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(repoName, this.AnyBranch, event, WorkflowRunStatus.failure, page, qtyPerPage);
+			return await this.getWorkflowRuns(this.AnyBranch, event, WorkflowRunStatus.failure, page, qtyPerPage);
 		});
 
 		return result;
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} and
-	 * that matches the given trigger {@link event}.
-	 * @param repoName The name of the repository.
+	 * Gets all workflow runs between the given {@link startDate} and {@link endDate} for a repository with a name
+	 * that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param event The event that triggered the workflow runs.
 	 * @param startDate The start date of when the workflow run was created.
 	 * @param endDate The end date of when the workflow run was created.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
 	 */
-	public async getWorkflowRunsBetweenDates(repoName: string, startDate: Date, endDate: Date): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getWorkflowRunsBetweenDates", "repoName");
-
-		repoName = repoName.trim();
-
+	public async getWorkflowRunsBetweenDates(startDate: Date, endDate: Date): Promise<WorkflowRunModel[]> {
 		const result = await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(
-					repoName,
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -228,24 +211,20 @@ export class WorkflowClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets all workflow runs for a repository with a name that matches the given {@link repoName} and
-	 * that matches the given {@link title}.
-	 * @param repoName The name of the repository.
+	 * Gets all workflow with the given {@link title} for a repository with a name that matches
+	 * the {@link WorkflowClient}.{@link repoName}.
 	 * @param title The title of the workflow runs.
 	 * @returns The workflow runs.
 	 */
-	public async getAllWorkflowRunsByTitle(repoName: string, title: string): Promise<WorkflowRunModel[]> {
+	public async getAllWorkflowRunsByTitle(title: string): Promise<WorkflowRunModel[]> {
 		const funcName = "getAllWorkflowRunsByTitle";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(title, funcName, "title");
 
-		repoName = repoName.trim();
 		title = title.trim();
 
 		return await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(
-					repoName,
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -262,24 +241,20 @@ export class WorkflowClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets the first workflow run for a repository with a name that matches the given {@link repoName} and
-	 * that matches the given {@link title}.
-	 * @param repoName The name of the repository.
+	 * Gets the first workflow with the given {@link title} for a repository with a name that matches
+	 * the {@link WorkflowClient}.{@link repoName}.
 	 * @param title The title of the workflow run.
 	 * @returns The workflow run.
 	 */
-	public async getWorkflowRunByTitle(repoName: string, title: string): Promise<WorkflowRunModel> {
+	public async getWorkflowRunByTitle(title: string): Promise<WorkflowRunModel> {
 		const funcName = "getWorkflowRunByTitle";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(title, funcName, "title");
 
-		repoName = repoName.trim();
 		title = title.trim();
 
 		const workflowRuns = await this.getAllDataUntil<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(
-					repoName,
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -305,22 +280,19 @@ export class WorkflowClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets all workflow runs for a repository that matches the given {@link repoName} and for a pull request
-	 * number that matches the given {@link prNumber}.
-	 * @param repoName The name of the repository.
+	 * Gets all workflow runs for a pull request with a number that matches the given {@link prNumber}, for a repository
+	 * with a name that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param prNumber The number of the pull request.
 	 * @returns The workflow runs for a pull request number that matches the given {@link prNumber}.
 	 * @remarks Does not require authentication.
 	 */
-	public async getWorkflowRunsForPR(repoName: string, prNumber: number): Promise<WorkflowRunModel[]> {
+	public async getWorkflowRunsForPR(prNumber: number): Promise<WorkflowRunModel[]> {
 		const funcName = "getWorkflowRunsForPR";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isLessThanOne(prNumber, funcName, "prNumber");
 
 		const result = await this.getAllDataUntil<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(
-					repoName,
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -345,18 +317,15 @@ export class WorkflowClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets all of the workflow runs for a repository with a name that matches the given {@link repoName} and
-	 * that are for a pull request.
-	 * @param repoName The name of the repository.
+	 * Gets all of the workflow runs for pull requests for a repository with a name that matches the
+	 * {@link WorkflowClient}.{@link repoName}.
 	 * @returns All of the workflow runs that are for a pull request.
 	 */
-	public async getPullRequestWorkflowRuns(repoName: string): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "getPullRequestWorkflowRuns", "repoName");
+	public async getPullRequestWorkflowRuns(): Promise<WorkflowRunModel[]> {
 
 		return await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(
-					repoName,
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -375,14 +344,11 @@ export class WorkflowClient extends GitHubClient {
 	}
 
 	/**
-	 * Deletes the given {@link workflowRun}.
-	 * @param repoName The name of the repository.
+	 * Deletes the given {@link workflowRun} in a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @remarks Requires authentication.
 	 */
-	public async deleteWorkflow(repoName: string, workflowRun: WorkflowRunModel): Promise<void> {
-		Guard.isNullOrEmptyOrUndefined(repoName, "deleteWorkflow", "repoName");
-
-		const url = `${this.baseUrl}/repos/${this.organization}/${repoName}/actions/runs/${workflowRun.id}`;
+	public async deleteWorkflow(workflowRun: WorkflowRunModel): Promise<void> {
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/actions/runs/${workflowRun.id}`;
 
 		const response: Response = await this.requestDELETE(url);
 
@@ -399,19 +365,16 @@ export class WorkflowClient extends GitHubClient {
 
 	/**
 	 * Executes a workflow that matches the given {@link workflowFileName} on a branch that matches the
-	 * given {@link branchName} in a repository with a name that matches the given {@link repoName}.
-	 * @param repoName The name of the repository.
+	 * given {@link branchName} for a repository that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param branchName The name of the branch.
 	 * @param workflowFileName The file name of the workflow.
 	 */
 	public async executeWorkflow(
-		repoName: string,
 		branchName: string,
 		workflowFileName: string,
 		inputs?: [string, string][],
 	): Promise<void> {
 		const funcName = "executeWorkflow";
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
 		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
 		Guard.isNullOrEmptyOrUndefined(workflowFileName, funcName, "workflowFileName");
 
@@ -441,7 +404,7 @@ export class WorkflowClient extends GitHubClient {
 					let errorMsg = `The workflow input '${workflowInput}' is duplicated.`;
 					errorMsg += `\n\tWorkflow: ${workflowFileName}`;
 					errorMsg += `\n\tBranch: ${branchName}`;
-					errorMsg += `\n\tRepository: ${repoName}`;
+					errorMsg += `\n\tRepository: ${this.repoName}`;
 					Utils.printAsGitHubError(errorMsg);
 					Deno.exit(1);
 				}
@@ -453,7 +416,7 @@ export class WorkflowClient extends GitHubClient {
 			};
 		}
 
-		const url = `${this.baseUrl}/repos/${this.organization}/${repoName}/actions/workflows/${workflowFileName}/dispatches`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/actions/workflows/${workflowFileName}/dispatches`;
 
 		const requestResponse: Response = await this.requestPOST(url, body);
 
@@ -462,13 +425,13 @@ export class WorkflowClient extends GitHubClient {
 			switch (requestResponse.status) {
 				case GitHubHttpStatusCodes.NotFound: {
 					errorMsg = `The workflow '${workflowFileName}' could not be found on branch `;
-					errorMsg += `'${branchName}' in the repository '${repoName}'.'`;
+					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
 					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
 					break;
 				}
 				case GitHubHttpStatusCodes.UnprocessableContent: {
 					errorMsg = `The workflow '${workflowFileName}' on branch '${branchName}' in the repository `;
-					errorMsg += `'${repoName}' was not processable.`;
+					errorMsg += `'${this.repoName}' was not processable.`;
 					const githubResponse: GithubResponse = JSON.parse(await requestResponse.text());
 
 					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
@@ -477,7 +440,7 @@ export class WorkflowClient extends GitHubClient {
 				}
 				default: {
 					errorMsg = `An error occurred trying to execute the workflow '${workflowFileName}' on branch `;
-					errorMsg += `'${branchName}' in the repository '${repoName}'.'`;
+					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
 					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
 					Utils.printAsGitHubError(errorMsg);
 					break;
