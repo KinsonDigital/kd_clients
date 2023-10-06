@@ -1,10 +1,28 @@
 {
     "lint": {
-        "include": ["src/.*\\.ts$"]
+        "include": [
+            "core/",
+            "GitHubClients/",
+            "OtherClients/",
+            "PackageClients/",
+            "tests/"    
+        ]
     },
     "fmt": {
-        "include": ["src/"],
-        "exclude": ["**/*.md"],
+        "include": [
+            "core/",
+            "GitHubClients/",
+            "OtherClients/",
+            "PackageClients/",
+            "tests/"
+        ],
+        "exclude": [
+            "**/*.md",
+            "**/*.json",
+            "**/*.js",
+            "**/*.yml",
+            "**/*.yaml"
+        ],
         "useTabs": true,
         "lineWidth": 130,
         "indentWidth": 4,
