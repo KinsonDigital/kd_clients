@@ -28,5 +28,15 @@
         "indentWidth": 4,
         "semiColons": true,
         "singleQuote": false
+    },
+    "imports": {
+        "core/": "./core/",
+        "github/": "./GitHubClients/",
+        "other/": "./OtherClients/",
+        "package/": "./PackageClients/",
+        "models/": "./core/Models/",
+        "encoding/": "https://deno.land/std@0.203.0/encoding/",
+        "twitter": "npm:twitter-api-v2@1.15.0",
+        "assertions/": "https://deno.land/std@0.203.0/assert/"
     }
 }
