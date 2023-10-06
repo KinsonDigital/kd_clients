@@ -1,0 +1,89 @@
+name: 🚀Release
+run-name: ${{ vars.PROJECT_NAME }} ${{ inputs.release-type }} Release
+
+
+defaults:
+  run:
+    shell: pwsh
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: The type of release.  Choose 'Preview' or 'Production'.
+        required: true
+        type: choice
+        options: [Preview, Production]
+      version: 
+        description: The version number of the release.
+        required: true
+        type: string
+
+
+jobs:
+  validate_inputs:
+    name: Validate Workflow Inputs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Inputs
+        run: |
+          $branch = "${{ github.ref }}".TrimStart('refs/heads/');
+          $expectedBranch = "${{ vars.PROD_RELEASE_BRANCH }}".Trim();
+
+          if ($branch -eq $expectedBranch) {
+            Write-Host "::error::Releases are only allowed to be run on the '$expectedBranch' branch.";
+            exit 1;
+          }
+
+          $releaseType = "${{ inputs.release-type }}";
+          $version = "${{ inputs.version }}".Trim();
+
+          if ($version -eq "") {
+            Write-Host "::error::The release version is required.";
+            exit 1;
+          }
+          
+          
+          if ($releaseType -eq "Preview") {
+            if ($version -notmatch "^v[0-9]+\.[0-9]+\.[0-9]+-preview\.[0-9]+$") {
+              Write-Host "::error::The preview version '$version' is invalid.";
+              exit 1;
+            }
+          } elseif ($releaseType -eq "Production") {
+            if ($version -notmatch "^v[0-9]+\.[0-9]+\.[0-9]+$") {
+              Write-Host "::error::The production version '$version' is invalid.";
+              exit 1;
+            }
+          }
+
+          # TODO: Need to check if the version already exists in the remote repository
+
+
+  release:
+    name: Run ${{ inputs.release-type }} Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ vars.DENO_VERSION }}
+
+      - name: Run Lint
+        run: deno lint
+
+      - name: Run Tests
+        run: deno tests ./tests/*.ts
+
+      - name: Create Commit & Release Tag (${{ inputs.version }})
+        run: |
+          $tag = "${{ inputs.version }}";
+          
+          git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
+          git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
+          
+          git commit --allow-empty -m "🚀Production Release";
+          git push;
+
+          git tag -a $tag -m "Production Release";
+          git push origin $tag;
