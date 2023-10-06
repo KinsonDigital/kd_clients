@@ -1,15 +1,16 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Debug",
+		{
+            "name": "Debug Test File",
             "request": "launch",
             "type": "node",
-            "program": "${workspaceFolder}/src/Messenger.ts",
+            "cwd": "${workspaceFolder}/tests",
             "runtimeArgs": [
-                "run",
-                "--inspect-wait",
-                "--allow-all"
+                "test",
+                "--inspect-brk",
+                "--allow-all",
+				"${fileBasename}",
             ],
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
