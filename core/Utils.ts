@@ -79,7 +79,13 @@ import { PullRequestModel } from "./Models/PullRequestModel.ts";
 	 * @returns A value that is clamped between the given {@link min} and {@link max} values.
 	 */
 	public static clamp(value: number, min: number, max: number): number {
-		return Math.min(Math.max(value, min), max);
+		if (value < min) {
+			return min;
+		} else if (value > max) {
+			return max;
+		} else {
+			return value;
+		}
 	}
 
 	/**
