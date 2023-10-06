@@ -1,7 +1,7 @@
-import { WebApiClient } from "../core/WebApiClient.ts";
-import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
-import { NuGetHttpStatusCodes } from "../core/Enums.ts";
+import { WebApiClient } from "core/WebApiClient.ts";
+import { Guard } from "core/Guard.ts";
+import { Utils } from "core/Utils.ts";
+import { NuGetHttpStatusCodes } from "core/Enums.ts";
 
 /**
  * References:

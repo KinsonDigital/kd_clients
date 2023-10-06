@@ -1,4 +1,4 @@
-import { Guard } from "./Guard.ts";
+import { Guard } from "core/Guard.ts";
 
 /**
  * Provides a base class for HTTP clients.

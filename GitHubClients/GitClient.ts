@@ -1,21 +1,19 @@
-import { GraphQlClient } from "../core/GraphQlClient.ts";
-import { createGetBranchesQuery } from "../core/GraphQl/Queries/GetBranchesQuery.ts";
-import { Guard } from "../core/Guard.ts";
-import { PageInfoModel } from "../core/Models/GraphQlModels/PageInfoModel.ts";
-import { GitBranchModel } from "../core/Models/GraphQlModels/GitBranchModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { RepoClient } from "./RepoClient.ts";
-import { getCreateBranchMutation } from "../core/GraphQl/Mutations/CreateBranchMutation.ts";
-import { RawRefsGetBranchModel } from "../core/Models/GraphQlModels/RawModels/RawRefsGetBranchModel.ts";
-import { RawGitBranchModel } from "../core/Models/GraphQlModels/RawModels/RawGitBranchModel.ts";
-import { addCommitMutation } from "../core/GraphQl/Mutations/AddCommitMutation.ts";
+import { GraphQlClient } from "core/GraphQlClient.ts";
+import { createGetBranchesQuery } from "core/GraphQl/Queries/GetBranchesQuery.ts";
+import { Guard } from "core/Guard.ts";
+import { PageInfoModel } from "models/GraphQlModels/PageInfoModel.ts";
+import { GitBranchModel } from "models/GraphQlModels/GitBranchModel.ts";
+import { Utils } from "core/Utils.ts";
+import { RepoClient } from "github/RepoClient.ts";
+import { getCreateBranchMutation } from "core/GraphQl/Mutations/CreateBranchMutation.ts";
+import { RawRefsGetBranchModel } from "models/GraphQlModels/RawModels/RawRefsGetBranchModel.ts";
+import { RawGitBranchModel } from "models/GraphQlModels/RawModels/RawGitBranchModel.ts";
+import { addCommitMutation } from "core/GraphQl/Mutations/AddCommitMutation.ts";
 
 /**
  * Provides a client for to perform git operations for a GitHub repository.
  */
 export class GitClient extends GraphQlClient {
-	private readonly repoOwner: string;
-	private readonly repoName: string;
 	private readonly repoClient: RepoClient;
 
 	/**
@@ -31,9 +29,7 @@ export class GitClient extends GraphQlClient {
 
 		super(token);
 
-		this.repoOwner = repoOwner;
-		this.repoName = repoName;
-		this.repoClient = new RepoClient(token);
+		this.repoClient = new RepoClient(this.ownerName, repoName, token);
 	}
 
 	/**
@@ -69,8 +65,8 @@ export class GitClient extends GraphQlClient {
 			const cursor: string = Utils.isNullOrEmptyOrUndefined(pageInfo.endCursor) ? "" : <string> pageInfo.endCursor;
 
 			const query: string = result.length <= 0
-				? createGetBranchesQuery(this.repoOwner, this.repoName)
-				: createGetBranchesQuery(this.repoOwner, this.repoName, 100, cursor);
+				? createGetBranchesQuery(this.ownerName, this.repoName)
+				: createGetBranchesQuery(this.ownerName, this.repoName, 100, cursor);
 
 			const responseData = await this.executeQuery(query);
 
@@ -135,7 +131,7 @@ export class GitClient extends GraphQlClient {
 
 		const fromBranch = await this.getBranch(branchFromName);
 
-		const repo = await this.repoClient.getRepoByName(this.repoName);
+		const repo = await this.repoClient.getRepoByName();
 
 		if (Utils.isNullOrEmptyOrUndefined(repo.node_id)) {
 			const errorMsg = `The repository '${this.repoName}' did not return a required node ID.`;
@@ -167,7 +163,7 @@ export class GitClient extends GraphQlClient {
 
 		const branch = await this.getBranch(branchName);
 
-		const mutation = addCommitMutation(this.repoOwner, this.repoName, branchName, branch.oid, commitMessage);
+		const mutation = addCommitMutation(this.ownerName, this.repoName, branchName, branch.oid, commitMessage);
 
 		await this.executeQuery(mutation);
 	}

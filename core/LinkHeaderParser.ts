@@ -1,6 +1,6 @@
-import { LinkHeader } from "./LinkHeader.ts";
-import { IPageInfo } from "./PageInfo.ts";
-import { Utils } from "./Utils.ts";
+import { LinkHeader } from "core/LinkHeader.ts";
+import { PageInfo } from "core/PageInfo.ts";
+import { Utils } from "core/Utils.ts";
 
 /**
  * Parses link headers to collect pagination information.
@@ -23,7 +23,7 @@ export class LinkHeaderParser {
 
 		const headerSections: string[] = Utils.splitByComma(linkHeader).map((i) => i.trim());
 		const linkHeaderInfo: LinkHeader = {
-			prevPage: 0,
+		prevPage: 0,
 			nextPage: 0,
 			totalPages: 0,
 			pageData: [],
@@ -34,7 +34,7 @@ export class LinkHeaderParser {
 			const pageUrl: string = pageInfoSections[0].trim();
 			const metadata: string = pageInfoSections[1].trim();
 
-			const pageInfo: IPageInfo = {
+			const pageInfo: PageInfo = {
 				pageUrl: pageUrl,
 				metadata: metadata,
 			};
@@ -53,15 +53,15 @@ export class LinkHeaderParser {
 		return linkHeaderInfo;
 	}
 
-	private isPrev(pageInfo: IPageInfo): boolean {
+	private isPrev(pageInfo: PageInfo): boolean {
 		return pageInfo.metadata.includes('rel="prev"');
 	}
 
-	private isNext(pageInfo: IPageInfo): boolean {
+	private isNext(pageInfo: PageInfo): boolean {
 		return pageInfo.metadata.includes('rel="next"');
 	}
 
-	private isLast(pageInfo: IPageInfo): boolean {
+	private isLast(pageInfo: PageInfo): boolean {
 		return pageInfo.metadata.includes('rel="last"');
 	}
 

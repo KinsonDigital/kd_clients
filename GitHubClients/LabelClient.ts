@@ -1,8 +1,8 @@
-import { LabelModel } from "../core/Models/LabelModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { Guard } from "../core/Guard.ts";
+import { LabelModel } from "core/Models/LabelModel.ts";
+import { Utils } from "core/Utils.ts";
+import { GitHubHttpStatusCodes } from "core/Enums.ts";
+import { GitHubClient } from "core/GitHubClient.ts";
+import { Guard } from "core/Guard.ts";
 
 /**
  * Provides a client for interacting with labels.

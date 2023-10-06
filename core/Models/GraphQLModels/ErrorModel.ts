@@ -1,4 +1,4 @@
-import { LocationModel } from "./LocationModel.ts";
+import { LocationModel } from "models/GraphQlModels/LocationModel.ts";
 
 /**
  * Represents an error.

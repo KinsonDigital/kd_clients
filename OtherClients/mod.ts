@@ -1,1 +1,1 @@
-export { XClient } from "./XClient.ts";
+export { XClient } from "other/XClient.ts";

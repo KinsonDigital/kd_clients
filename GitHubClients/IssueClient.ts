@@ -1,11 +1,11 @@
-import { Guard } from "../core/Guard.ts";
-import { LabelClient } from "./LabelClient.ts";
-import { IssueModel } from "../core/Models/IssueModel.ts";
-import { LabelModel } from "../core/Models/LabelModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { GitHubHttpStatusCodes, IssueOrPRState } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
+import { Guard } from "core/Guard.ts";
+import { LabelClient } from "github/LabelClient.ts";
+import { IssueModel } from "models/IssueModel.ts";
+import { LabelModel } from "models/LabelModel.ts";
+import { Utils } from "core/Utils.ts";
+import { GitHubHttpStatusCodes, IssueOrPRState } from "core/Enums.ts";
+import { GitHubClient } from "core/GitHubClient.ts";
+import { IssueOrPRRequestData } from "core/IssueOrPRRequestData.ts";
 
 /**
  * Provides a client for interacting with issues.

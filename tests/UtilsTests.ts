@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.203.0/assert/mod.ts";
-import { Utils } from "../core/Utils.ts";
+import { assertEquals } from "assertions/mod.ts";
+import { Utils } from "core/Utils.ts";
 
 Deno.test("clamp_when-num-is-larger-than-max_returns-max-value", () => {
 	// Arrange

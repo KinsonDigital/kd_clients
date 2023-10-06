@@ -1,12 +1,12 @@
-import { decode, encode } from "https://deno.land/std@0.194.0/encoding/base64.ts";
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { Guard } from "../core/Guard.ts";
-import { FileContentModel } from "../core/Models/FileContentModel.ts";
-import { RepoModel } from "../core/Models/RepoModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { GitHubVarModel } from "../core/Models/GitHubVarModel.ts";
-import { GitHubVariablesModel } from "../core/Models/GitHubVariablesModel.ts";
+import { decodeBase64, encodeBase64 } from "encoding/base64.ts";
+import { GitHubHttpStatusCodes } from "core/Enums.ts";
+import { GitHubClient } from "core/GitHubClient.ts";
+import { Guard } from "core/Guard.ts";
+import { FileContentModel } from "models/FileContentModel.ts";
+import { RepoModel } from "models/RepoModel.ts";
+import { Utils } from "core/Utils.ts";
+import { GitHubVarModel } from "models/GitHubVarModel.ts";
+import { GitHubVariablesModel } from "models/GitHubVariablesModel.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.
@@ -125,7 +125,7 @@ export class RepoClient extends GitHubClient {
 			Deno.exit(1);
 		}
 
-		const decodedContent = decode(fileContentModel.content);
+		const decodedContent = decodeBase64(fileContentModel.content);
 
 		// Return the file content after it has been decoded from base64
 		const decodedFileContent = new TextDecoder().decode(decodedContent);
@@ -263,7 +263,7 @@ export class RepoClient extends GitHubClient {
 
 		const body = {
 			message: commitMessage,
-			content: encode(fileContent),
+			content: encodeBase64(fileContent),
 			branch: branchName,
 		};
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}`;
@@ -316,7 +316,7 @@ export class RepoClient extends GitHubClient {
 
 		const body = {
 			message: commitMessage,
-			content: encode(fileContent),
+			content: encodeBase64(fileContent),
 			branch: branchName,
 			sha: fileContentModel.sha,
 		};

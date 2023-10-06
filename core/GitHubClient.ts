@@ -1,8 +1,8 @@
-import { Utils } from "./Utils.ts";
-import { LinkHeaderParser } from "./LinkHeaderParser.ts";
-import { WebApiClient } from "./WebApiClient.ts";
-import { GetDataFunc } from "./Types.ts";
-import { Guard } from "./Guard.ts";
+import { Utils } from "core/Utils.ts";
+import { LinkHeaderParser } from "core/LinkHeaderParser.ts";
+import { WebApiClient } from "core/WebApiClient.ts";
+import { GetDataFunc } from "core/Types.ts";
+import { Guard } from "core/Guard.ts";
 
 /**
  * Provides a base class for HTTP clients.
