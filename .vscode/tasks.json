@@ -9,7 +9,7 @@
 				"run",
 				"--allow-read",
 				"--allow-run",
-				"${workspaceFolder}/.github/cicd/deno-check.ts"
+				"${workspaceFolder}/.github/cicd/scripts/deno-check.ts"
 			],
 			"problemMatcher": [
 				"$tsc"

@@ -1,5 +1,5 @@
-import { CLI } from "./CLI.ts";
-import { Directory } from "./Directory.ts";
+import { CLI } from "../core/CLI.ts";
+import { Directory } from "../core/Directory.ts";
 
 const files: string[] = Directory
 	.getFiles("/", true)
