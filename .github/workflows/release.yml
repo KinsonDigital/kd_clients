@@ -15,18 +15,14 @@ on:
         required: true
         type: choice
         options: [Preview, Production]
-      version: 
-        description: The version number of the release.
-        required: true
-        type: string
 
 
 jobs:
-  validate_inputs:
+  validate_release:
     name: Validate Workflow Inputs
     runs-on: ubuntu-latest
     steps:
-      - name: Validate Inputs
+      - name: Validate Workflow Inputs
         run: |
           $branch = "${{ github.ref }}".TrimStart('refs/heads/');
           $expectedBranch = "${{ vars.PROD_RELEASE_BRANCH }}".Trim();
@@ -37,7 +33,6 @@ jobs:
           }
 
           $releaseType = "${{ inputs.release-type }}";
-          $version = "${{ inputs.version }}".Trim();
 
           if ($version -eq "") {
             Write-Host "::error::The release version is required.";
@@ -56,8 +51,6 @@ jobs:
               exit 1;
             }
           }
-
-          # TODO: Need to check if the version already exists in the remote repository
 
 
   release:
