@@ -25,10 +25,10 @@
             },
         },
 		{
-            "name": "Run Deno Check",
+            "name": "Playground",
             "request": "launch",
             "type": "node",
-            "program": "${workspaceFolder}/.github/cicd/deno-check.ts",
+            "program": "${workspaceFolder}/.github/cicd/playground.ts",
 			"cwd": "${workspaceFolder}",
             "runtimeArgs": [
                 "run",
