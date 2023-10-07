@@ -1,0 +1,31 @@
+name: ✅Build Status Check
+run-name: ✅Build Status Check (${{ github.base_ref }} branch)
+
+
+defaults:
+  run:
+    shell: pwsh
+
+
+on:
+  pull_request_target:
+    branches: main
+
+
+jobs:
+  build_status_check:
+    name: Build Status Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+        repository: ${{ github.repository }}
+
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: ${{ vars.DENO_VERSION }}
+
+    - name: Run Lint
+      run: deno run --allow-read --allow-run ./.github/cicd/deno-check.ts
