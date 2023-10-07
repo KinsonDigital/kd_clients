@@ -23,6 +23,30 @@
             "linux": {
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
+        },
+		{
+            "name": "Run Deno Check",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/deno-check.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+                "--allow-all",
+            ],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
         }
     ],
 }
