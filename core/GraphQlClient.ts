@@ -1,4 +1,4 @@
-import { ErrorModel } from "models/GraphQLModels/ErrorModel.ts";
+import { ErrorModel } from "models/GraphQlModels/ErrorModel.ts";
 import { RequestResponseModel } from "models/GraphQlModels/RequestResponseModel.ts";
 import { BadCredentials } from "core/Types.ts";
 import { Utils } from "core/Utils.ts";

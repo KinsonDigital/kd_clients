@@ -22,7 +22,7 @@ export class IssueClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		super(ownerName, repoName, token);
-		this.labelClient = new LabelClient(token);
+		this.labelClient = new LabelClient(ownerName, repoName, token);
 	}
 
 	/**
@@ -34,7 +34,7 @@ export class IssueClient extends GitHubClient {
 		Guard.isNullOrEmptyOrUndefined(this.repoName, "getAllOpenIssues", "this.repoName");
 
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getIssues(this.repoName, page, qtyPerPage);
+			return await this.getIssues(page, qtyPerPage);
 		});
 	}
 
@@ -188,7 +188,7 @@ export class IssueClient extends GitHubClient {
 		}
 
 		// First check that the label trying to be added exists in the repo
-		const labelDoesNotExist = !(await this.labelClient.labelExists(this.repoName, label));
+		const labelDoesNotExist = !(await this.labelClient.labelExists(label));
 
 		if (labelDoesNotExist) {
 			const labelsUrl = `https://github.com/KinsonDigital/${this.repoName}/labels`;
