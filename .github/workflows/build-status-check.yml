@@ -27,5 +27,5 @@ jobs:
       with:
         deno-version: ${{ vars.DENO_VERSION }}
 
-    - name: Run Lint
+    - name: Run Build
       run: deno run --allow-read --allow-run ./.github/cicd/deno-check.ts
