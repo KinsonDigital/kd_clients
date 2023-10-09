@@ -98,7 +98,7 @@ jobs:
         run: deno lint
 
       - name: Run Tests
-        run: deno test ./tests/*.ts
+        run: deno test
 
       - name: Create Commit & Release Tag (${{ needs.get_version.outputs.version }})
         run: |
