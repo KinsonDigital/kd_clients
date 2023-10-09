@@ -18,9 +18,28 @@ on:
 
 
 jobs:
+  get_version:
+    name: Get Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ vars.DENO_VERSION }}
+
+      - name: Get Version
+        id: get_version
+        run: |
+          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/get-version.ts";
+          deno run --allow-read --allow-write --allow-env "$scriptPath";
+
+
   validate_release:
     name: Validate Workflow Inputs
     runs-on: ubuntu-latest
+    needs: get_version
     steps:
       - name: Validate Workflow Inputs
         run: |
@@ -32,30 +51,23 @@ jobs:
             exit 1;
           }
 
-          $releaseType = "${{ inputs.release-type }}";
+      - name: Version Does Not Exist
+        run: |
+          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/version-checker.ts";
 
-          if ($version -eq "") {
-            Write-Host "::error::The release version is required.";
-            exit 1;
-          }
-          
-          
-          if ($releaseType -eq "Preview") {
-            if ($version -notmatch "^v[0-9]+\.[0-9]+\.[0-9]+-preview\.[0-9]+$") {
-              Write-Host "::error::The preview version '$version' is invalid.";
-              exit 1;
-            }
-          } elseif ($releaseType -eq "Production") {
-            if ($version -notmatch "^v[0-9]+\.[0-9]+\.[0-9]+$") {
-              Write-Host "::error::The production version '$version' is invalid.";
-              exit 1;
-            }
-          }
+          deno run `
+            "--allow-net" `
+            "$scriptPath" `
+            "${{ vars.ORGANIZATION_NAME }}" `
+            "${{ vars.PROJECT_NAME }}" `
+            "${{ needs.get_version.outputs.version }}" `
+            "${{ secrets.CICD_TOKEN }}";
 
 
   release:
     name: Run ${{ inputs.release-type }} Release
     runs-on: ubuntu-latest
+    needs: get_version
     steps:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -71,15 +83,17 @@ jobs:
       - name: Run Tests
         run: deno tests ./tests/*.ts
 
-      - name: Create Commit & Release Tag (${{ inputs.version }})
+      - name: Create Commit & Release Tag (${{ needs.get_version.outputs.version }})
         run: |
-          $tag = "${{ inputs.version }}";
+          $tag = "${{ needs.get_version.outputs.version }}";
           
-          git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
-          git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
-          
-          git commit --allow-empty -m "🚀Production Release";
-          git push;
+          Write-Host "The version is: $tag"; # TODO: REMOVE ME
 
-          git tag -a $tag -m "Production Release";
-          git push origin $tag;
+          # git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
+          # git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
+          
+          # git commit --allow-empty -m "🚀Production Release";
+          # git push;
+
+          # git tag -a $tag -m "Production Release";
+          # git push origin $tag;
