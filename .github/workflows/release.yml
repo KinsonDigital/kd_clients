@@ -99,13 +99,11 @@ jobs:
         run: |
           $tag = "${{ needs.get_version.outputs.version }}";
           
-          Write-Host "The version is: $tag"; # TODO: REMOVE ME
-
-          # git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
-          # git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
+          git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
+          git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
           
-          # git commit --allow-empty -m "🚀Production Release";
-          # git push;
+          git commit --allow-empty -m "🚀${{ inputs.release-type }} Release";
+          git push;
 
-          # git tag -a $tag -m "Production Release";
-          # git push origin $tag;
+          git tag -a $tag -m "Production Release";
+          git push origin $tag;
