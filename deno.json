@@ -36,6 +36,7 @@
     },
 	"imports": {
 		"core/": "./core/",
+        "cicd-core/": "./.github/cicd/core/",
 		"github/": "./GitHubClients/",
 		"other/": "./OtherClients/",
 		"package/": "./PackageClients/",

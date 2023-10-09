@@ -1,5 +1,5 @@
 import { Utils } from "core/Utils.ts";
-import { Directory } from "./Directory.ts";
+import { Directory } from "cicd-core/Directory.ts";
 
 /**
  * Pulls the version from a json file.
