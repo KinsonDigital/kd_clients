@@ -17,8 +17,8 @@ export class TagClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "TagClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(ownerName, repoName, token);
 	}
@@ -34,7 +34,7 @@ export class TagClient extends GitHubClient {
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 */
 	public async getTags(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "getTags", "repoName");
+		Guard.isNothing(this.repoName, "getTags", "repoName");
 
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
@@ -78,7 +78,7 @@ export class TagClient extends GitHubClient {
 	 */
 	public async getTagByName(tagName: string): Promise<TagModel> {
 		const funcName = "getTagByName";
-		Guard.isNullOrEmptyOrUndefined(tagName, funcName, "tagName");
+		Guard.isNothing(tagName, funcName, "tagName");
 
 		tagName = tagName.trim();
 
@@ -110,7 +110,7 @@ export class TagClient extends GitHubClient {
 	 */
 	public async tagExists(tagName: string): Promise<boolean> {
 		const funcName = "tagExists";
-		Guard.isNullOrEmptyOrUndefined(tagName, funcName, "tagName");
+		Guard.isNothing(tagName, funcName, "tagName");
 
 		tagName = tagName.trim();
 

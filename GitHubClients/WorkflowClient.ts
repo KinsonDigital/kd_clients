@@ -22,8 +22,8 @@ export class WorkflowClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "ProjectClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
 		
 		super(ownerName, repoName, token);
 	}
@@ -54,7 +54,7 @@ export class WorkflowClient extends GitHubClient {
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
 		// GitHub API: https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-repository
-		const branchParam = Utils.isNullOrEmptyOrUndefined(branch) ? "" : `&branch=${branch}`;
+		const branchParam = Utils.isNothing(branch) ? "" : `&branch=${branch}`;
 		const eventParam = event === WorkflowEvent.any ? "" : `&event=${event}`;
 		const statusParam = status === WorkflowRunStatus.any ? "" : `&status=${status}`;
 		const queryParams = `?page=${page}&per_page=${qtyPerPage}${branchParam}${eventParam}${statusParam}`;
@@ -80,7 +80,7 @@ export class WorkflowClient extends GitHubClient {
 	 * @returns The list of workflow runs.
 	 */
 	public async getAllWorkflowRuns(): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "getAllWorkflowRuns", "repoName");
+		Guard.isNothing(this.repoName, "getAllWorkflowRuns", "repoName");
 
 		return await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
 			return await this.getWorkflowRuns(
@@ -106,7 +106,7 @@ export class WorkflowClient extends GitHubClient {
 		event: WorkflowEvent,
 	): Promise<WorkflowRunModel[]> {
 		const funcName = "getCompletedWorkflowRunsByBranch";
-		Guard.isNullOrEmptyOrUndefined(branch, funcName, "branch");
+		Guard.isNothing(branch, funcName, "branch");
 
 		branch = branch.trim();
 
@@ -146,7 +146,7 @@ export class WorkflowClient extends GitHubClient {
 		event: WorkflowEvent,
 	): Promise<WorkflowRunModel[]> {
 		const funcName = "getFailedWorkflowRunsByBranch";
-		Guard.isNullOrEmptyOrUndefined(branch, funcName, "branch");
+		Guard.isNothing(branch, funcName, "branch");
 
 		branch = branch.trim();
 
@@ -165,7 +165,7 @@ export class WorkflowClient extends GitHubClient {
 	 * @remarks Does not require authentication.
 	 */
 	public async getFailedWorkflowRuns(event: WorkflowEvent): Promise<WorkflowRunModel[]> {
-		Guard.isNullOrEmptyOrUndefined("getFailedWorkflowRuns", "repoName");
+		Guard.isNothing("getFailedWorkflowRuns", "repoName");
 
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
 			return await this.getWorkflowRuns(this.AnyBranch, event, WorkflowRunStatus.failure, page, qtyPerPage);
@@ -218,7 +218,7 @@ export class WorkflowClient extends GitHubClient {
 	 */
 	public async getAllWorkflowRunsByTitle(title: string): Promise<WorkflowRunModel[]> {
 		const funcName = "getAllWorkflowRunsByTitle";
-		Guard.isNullOrEmptyOrUndefined(title, funcName, "title");
+		Guard.isNothing(title, funcName, "title");
 
 		title = title.trim();
 
@@ -248,7 +248,7 @@ export class WorkflowClient extends GitHubClient {
 	 */
 	public async getWorkflowRunByTitle(title: string): Promise<WorkflowRunModel> {
 		const funcName = "getWorkflowRunByTitle";
-		Guard.isNullOrEmptyOrUndefined(title, funcName, "title");
+		Guard.isNothing(title, funcName, "title");
 
 		title = title.trim();
 
@@ -375,8 +375,8 @@ export class WorkflowClient extends GitHubClient {
 		inputs?: [string, string][],
 	): Promise<void> {
 		const funcName = "executeWorkflow";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(workflowFileName, funcName, "workflowFileName");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(workflowFileName, funcName, "workflowFileName");
 
 		branchName = branchName.trim().toLowerCase();
 		workflowFileName = workflowFileName.trim().toLowerCase();

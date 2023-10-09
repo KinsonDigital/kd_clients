@@ -31,7 +31,7 @@ export class IssueClient extends GitHubClient {
 	 * @remarks Does not require authentication.
 	 */
 	public async getAllOpenIssues(): Promise<IssueModel[]> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "getAllOpenIssues", "this.repoName");
+		Guard.isNothing(this.repoName, "getAllOpenIssues", "this.repoName");
 
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
 			return await this.getIssues(page, qtyPerPage);
@@ -44,7 +44,7 @@ export class IssueClient extends GitHubClient {
 	 * @remarks Does not require authentication.
 	 */
 	public async getAllClosedIssues(): Promise<IssueModel[]> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "getAllClosedIssues", "this.repoName");
+		Guard.isNothing(this.repoName, "getAllClosedIssues", "this.repoName");
 
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
 			return await this.getIssues(page, qtyPerPage, IssueOrPRState.closed);
@@ -78,18 +78,18 @@ export class IssueClient extends GitHubClient {
 		milestoneNumber?: number | null,
 	): Promise<[IssueModel[], Response]> {
 		const functionName = "getIssues";
-		Guard.isNullOrEmptyOrUndefined(this.repoName, functionName, "this.repoName");
+		Guard.isNothing(this.repoName, functionName, "this.repoName");
 
 		this.repoName = this.repoName.trim();
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
 		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
-		const labelList = Utils.isNullOrEmptyOrUndefined(labels)
-			? labels?.filter((l) => Utils.isNullOrEmptyOrUndefined(l)).map((l) => l.trim()).join(",") ?? ""
+		const labelList = Utils.isNothing(labels)
+			? labels?.filter((l) => Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
 			: "";
 
-		const milestoneNumberQueryParam = Utils.isNullOrEmptyOrUndefined(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
+		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
 		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
 
 		const queryParams =
@@ -131,7 +131,7 @@ export class IssueClient extends GitHubClient {
 	 * @returns The issue.
 	 */
 	public async getIssue(issueNumber: number): Promise<IssueModel> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "getIssue", "this.repoName");
+		Guard.isNothing(this.repoName, "getIssue", "this.repoName");
 		Guard.isLessThanOne(issueNumber, "getIssue", "issueNumber");
 
 		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#get-an-issue
@@ -178,9 +178,9 @@ export class IssueClient extends GitHubClient {
 	 * @remarks Requires authentication.
 	 */
 	public async addLabel(issueNumber: number, label: string): Promise<void> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "addLabel", "this.repoName");
+		Guard.isNothing(this.repoName, "addLabel", "this.repoName");
 		Guard.isLessThanOne(issueNumber, "addLabel", "issueNumber");
-		Guard.isNullOrEmptyOrUndefined(label, "addLabel", "this.repoName");
+		Guard.isNothing(label, "addLabel", "this.repoName");
 
 		if (!this.containsToken()) {
 			Utils.printAsGitHubError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
@@ -242,7 +242,7 @@ export class IssueClient extends GitHubClient {
 	 * @remarks Does not require authentication.
 	 */
 	public async getLabels(issueNumber: number): Promise<string[]> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "getLabels", "this.repoName");
+		Guard.isNothing(this.repoName, "getLabels", "this.repoName");
 		Guard.isLessThanOne(issueNumber, "getLabels", "issueNumber");
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/issues/${issueNumber}/labels`;
@@ -316,7 +316,7 @@ export class IssueClient extends GitHubClient {
 	 * @param issueData The data to update the issue with.
 	 */
 	public async updateIssue(issueNumber: number, issueData: IssueOrPRRequestData): Promise<void> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "updateIssue", "this.repoName");
+		Guard.isNothing(this.repoName, "updateIssue", "this.repoName");
 		Guard.isLessThanOne(issueNumber, "updateIssue", "issueNumber");
 
 		this.repoName = this.repoName.trim();
@@ -357,7 +357,7 @@ export class IssueClient extends GitHubClient {
 	 * @returns True if the issue exists, otherwise false.
 	 */
 	private async openOrClosedIssueExists(issueNumber: number, state: IssueOrPRState): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(this.repoName, "openOrClosedIssueExists", "this.repoName");
+		Guard.isNothing(this.repoName, "openOrClosedIssueExists", "this.repoName");
 		Guard.isLessThanOne(issueNumber, "openOrClosedIssueExists", "issueNumber");
 
 		this.repoName = this.repoName.toLowerCase();

@@ -23,14 +23,14 @@ export abstract class GitHubClient extends WebApiClient {
 	constructor(ownerName?: string, repoName?: string, token?: string) {
 		super();
 
-		this.ownerName = Utils.isNullOrEmptyOrUndefined(ownerName) ? "" : ownerName.trim();
-		this.repoName = Utils.isNullOrEmptyOrUndefined(repoName) ? "" : repoName.trim();
+		this.ownerName = Utils.isNothing(ownerName) ? "" : ownerName.trim();
+		this.repoName = Utils.isNothing(repoName) ? "" : repoName.trim();
 
 		this.baseUrl = "https://api.github.com";
 		this.headers.append("Accept", "application/vnd.github+json");
 		this.headers.append("X-GitHub-Api-Version", "2022-11-28");
 
-		if (!Utils.isNullOrEmptyOrUndefined(token)) {
+		if (!Utils.isNothing(token)) {
 			this.headers.append("Authorization", `Bearer ${token}`);
 		}
 	}	
@@ -46,7 +46,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * Sets the name of the owner of the repository.
 	 */
 	public set ownerName(v: string) {
-		Guard.isNullOrEmptyOrUndefined("ownerName", v, "v");
+		Guard.isNothing("ownerName", v, "v");
 		this._ownerName = v.trim();
 	}
 	
@@ -61,7 +61,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * Sets the name of the repository.
 	*/
 	public set repoName(v : string) {
-		Guard.isNullOrEmptyOrUndefined("repoName", v, "v");
+		Guard.isNothing("repoName", v, "v");
 		this._repoName = v.trim();
 	}
 

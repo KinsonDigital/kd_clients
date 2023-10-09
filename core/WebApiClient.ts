@@ -26,7 +26,7 @@ export abstract class WebApiClient {
 	 * @returns The response from the request.
 	 */
 	protected async requestGET(url: string): Promise<Response> {
-		Guard.isNullOrEmptyOrUndefined(url, "fetchGET", "url");
+		Guard.isNothing(url, "fetchGET", "url");
 
 		return await fetch(url, {
 			method: "GET",
@@ -42,8 +42,8 @@ export abstract class WebApiClient {
 	 */
 	protected async requestPOST(url: string, body: string | object): Promise<Response> {
 		const funcName = "fetchPOST";
-		Guard.isNullOrEmptyOrUndefined(url, funcName, "url");
-		Guard.isNullOrEmptyOrUndefined(body, funcName, "body");
+		Guard.isNothing(url, funcName, "url");
+		Guard.isNothing(body, funcName, "body");
 
 		const requestBody = typeof body === "string" ? body : JSON.stringify(body);
 
@@ -62,8 +62,8 @@ export abstract class WebApiClient {
 	 */
 	protected async requestPATCH(url: string, body: string): Promise<Response> {
 		const funcName = "fetchPATCH";
-		Guard.isNullOrEmptyOrUndefined(url, funcName, "url");
-		Guard.isNullOrEmptyOrUndefined(body, funcName, "body");
+		Guard.isNothing(url, funcName, "url");
+		Guard.isNothing(body, funcName, "body");
 
 		return await fetch(url, {
 			method: "PATCH",
@@ -78,7 +78,7 @@ export abstract class WebApiClient {
 	 * @returns The response from the request.
 	 */
 	protected async requestDELETE(url: string): Promise<Response> {
-		Guard.isNullOrEmptyOrUndefined(url, "fetchDELETE", "url");
+		Guard.isNothing(url, "fetchDELETE", "url");
 
 		return await fetch(url, {
 			method: "DELETE",
@@ -94,8 +94,8 @@ export abstract class WebApiClient {
 	 */
 	protected async requestPUT(url: string, body: string): Promise<Response> {
 		const funcName = "fetchPUT";
-		Guard.isNullOrEmptyOrUndefined(url, funcName, "url");
-		Guard.isNullOrEmptyOrUndefined(body, funcName, "body");
+		Guard.isNothing(url, funcName, "url");
+		Guard.isNothing(body, funcName, "body");
 
 		return await fetch(url, {
 			method: "PUT",

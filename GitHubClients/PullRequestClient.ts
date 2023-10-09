@@ -21,8 +21,8 @@ export class PullRequestClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "TagClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(ownerName, repoName, token);
 		this.labelClient = new LabelClient(ownerName, repoName, token);
@@ -87,11 +87,11 @@ export class PullRequestClient extends GitHubClient {
 
 		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
 
-		const labelList = Utils.isNullOrEmptyOrUndefined(labels)
-			? labels?.filter((l) => Utils.isNullOrEmptyOrUndefined(l)).map((l) => l.trim()).join(",") ?? ""
+		const labelList = Utils.isNothing(labels)
+			? labels?.filter((l) => Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
 			: "";
 
-		const milestoneNumberQueryParam = Utils.isNullOrEmptyOrUndefined(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
+		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
 		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
 
 		const queryParams =
@@ -202,7 +202,7 @@ export class PullRequestClient extends GitHubClient {
 	 */
 	public async addLabel(prNumber: number, label: string): Promise<void> {
 		Guard.isLessThanOne(prNumber, "addLabel", "prNumber");
-		Guard.isNullOrEmptyOrUndefined(label, "addLabel", "label");
+		Guard.isNothing(label, "addLabel", "label");
 
 		if (!this.containsToken()) {
 			Utils.printAsGitHubError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
@@ -356,7 +356,7 @@ export class PullRequestClient extends GitHubClient {
 	 */
 	public async requestReviewer(prNumber: number, reviewer: string): Promise<void> {
 		Guard.isLessThanOne(prNumber, "requestReviewer", "prNumber");
-		Guard.isNullOrEmptyOrUndefined(reviewer, "requestReviewer", "reviewer");
+		Guard.isNothing(reviewer, "requestReviewer", "reviewer");
 
 		this.repoName = this.repoName.trim();
 		reviewer = reviewer.trim();
@@ -408,9 +408,9 @@ export class PullRequestClient extends GitHubClient {
 		isDraft = true,
 	): Promise<PullRequestModel> {
 		const funcName = "createPullRequest";
-		Guard.isNullOrEmptyOrUndefined(title, funcName, "title");
-		Guard.isNullOrEmptyOrUndefined(headBranch, funcName, "headBranch");
-		Guard.isNullOrEmptyOrUndefined(baseBranch, funcName, "baseBranch");
+		Guard.isNothing(title, funcName, "title");
+		Guard.isNothing(headBranch, funcName, "headBranch");
+		Guard.isNothing(baseBranch, funcName, "baseBranch");
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/pulls`;
 		const body = {

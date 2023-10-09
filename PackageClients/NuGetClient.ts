@@ -29,7 +29,7 @@ export class NuGetClient extends WebApiClient {
 	 * @returns True if the package exists, otherwise false.
 	 */
 	public async packageExists(packageName: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(packageName, "packageExists", "packageName");
+		Guard.isNothing(packageName, "packageExists", "packageName");
 
 		packageName = packageName.trim().toLowerCase();
 		const url = this.buildUrl(packageName);
@@ -54,7 +54,7 @@ export class NuGetClient extends WebApiClient {
 	 * @returns The versions of the given NuGet package.
 	 */
 	public async getPackageVersions(packageName: string): Promise<string[]> {
-		Guard.isNullOrEmptyOrUndefined(packageName, "getPackageVersions", "packageName");
+		Guard.isNothing(packageName, "getPackageVersions", "packageName");
 
 		packageName = packageName.trim().toLowerCase();
 		const url = this.buildUrl(packageName);
@@ -82,7 +82,7 @@ export class NuGetClient extends WebApiClient {
 	 * @returns True if the package exists with the given version, otherwise false.
 	 */
 	public async packageWithVersionExists(packageName: string, version: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(packageName, "getPackageVersions", "packageName");
+		Guard.isNothing(packageName, "getPackageVersions", "packageName");
 
 		packageName = packageName.trim().toLowerCase();
 		version = version.trim().toLowerCase();

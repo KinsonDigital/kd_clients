@@ -24,8 +24,8 @@ export class GitClient extends GraphQlClient {
 	 */
 	constructor(repoOwner: string, repoName: string, token: string) {
 		const funcName = "GitClient.Ctor";
-		Guard.isNullOrEmptyOrUndefined(repoOwner, funcName, "repoOwner");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(token);
 
@@ -38,7 +38,7 @@ export class GitClient extends GraphQlClient {
 	 * @returns The branch.
 	 */
 	public async getBranch(name: string): Promise<GitBranchModel> {
-		Guard.isNullOrEmptyOrUndefined(name, "getBranch", "name");
+		Guard.isNothing(name, "getBranch", "name");
 
 		const branches: GitBranchModel[] = await this.getBranches((branch) => branch.name === name);
 
@@ -62,7 +62,7 @@ export class GitClient extends GraphQlClient {
 
 		// As long as there is another page worth of information
 		while (pageInfo.hasNextPage) {
-			const cursor: string = Utils.isNullOrEmptyOrUndefined(pageInfo.endCursor) ? "" : <string> pageInfo.endCursor;
+			const cursor: string = Utils.isNothing(pageInfo.endCursor) ? "" : <string> pageInfo.endCursor;
 
 			const query: string = result.length <= 0
 				? createGetBranchesQuery(this.ownerName, this.repoName)
@@ -106,7 +106,7 @@ export class GitClient extends GraphQlClient {
 	 * @returns True if the branch exists; otherwise, false.
 	 */
 	public async branchExists(name: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(name, "branchExists", "name");
+		Guard.isNothing(name, "branchExists", "name");
 
 		const branches: GitBranchModel[] = await this.getBranches((branch) => branch.name === name);
 
@@ -120,8 +120,8 @@ export class GitClient extends GraphQlClient {
 	 */
 	public async createBranch(newBranchName: string, branchFromName: string): Promise<GitBranchModel> {
 		const funcName = "createBranch";
-		Guard.isNullOrEmptyOrUndefined(newBranchName, funcName, "newBranchName");
-		Guard.isNullOrEmptyOrUndefined(branchFromName, funcName, "branchFromName");
+		Guard.isNothing(newBranchName, funcName, "newBranchName");
+		Guard.isNothing(branchFromName, funcName, "branchFromName");
 
 		if (await this.branchExists(newBranchName)) {
 			const errorMsg = `A branch with the name '${newBranchName}' already exists.`;
@@ -133,7 +133,7 @@ export class GitClient extends GraphQlClient {
 
 		const repo = await this.repoClient.getRepoByName();
 
-		if (Utils.isNullOrEmptyOrUndefined(repo.node_id)) {
+		if (Utils.isNothing(repo.node_id)) {
 			const errorMsg = `The repository '${this.repoName}' did not return a required node ID.`;
 			Utils.printAsGitHubError(errorMsg);
 			Deno.exit(1);
@@ -158,8 +158,8 @@ export class GitClient extends GraphQlClient {
 	 */
 	public async addCommit(branchName: string, commitMessage: string): Promise<void> {
 		const funcName = "addCommit";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(commitMessage, funcName, "commitMessage");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
 		const branch = await this.getBranch(branchName);
 

@@ -5,7 +5,7 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 /**
  * Provides utility functions.
  */
- export class Utils {
+export class Utils {
 	private static readonly prodVersionRegex = /^v[0-9]+\.[0-9]+\.[0-9]+$/;
 	private static readonly prevVersionRegex = /^v[0-9]+\.[0-9]+\.[0-9]+-preview\.[0-9]+$/;
 	private static readonly featureBranchRegex = /^feature\/[1-9][0-9]*-(?!-)[a-z-]+/gm;
@@ -15,7 +15,7 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 * @param value The value to check.
 	 * @returns True if the value is null, undefined, or empty, otherwise false.
 	 */
-	public static isNullOrEmptyOrUndefined<T>(
+	public static isNothing<T>(
 		value: undefined | null | string | number | boolean | T[] | (() => T) | object,
 	): value is undefined | null | "" | number | T[] | (() => T) {
 		if (value === undefined || value === null) {
@@ -34,44 +34,6 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	}
 
 	/**
-	 * Returns a value indicating whether or not the given {@link issueOrPr} is an issue.
-	 * @param issueOrPr The issue or pull request to check.
-	 * @returns True if the given issue or pull request is an issue, otherwise false.
-	 */
-	public static isIssue(issueOrPr: IssueModel | PullRequestModel): issueOrPr is IssueModel {
-		return !("pull_request" in issueOrPr);
-	}
-
-	/**
-	 * Returns a value indicating whether or not the given {@link issueOrPr} is a pull request.
-	 * @param issueOrPr The issue or pull request to check.
-	 * @returns True if the given issue or pull request is a pull request, otherwise false.
-	 */
-	public static isPr(issueOrPr: PullRequestModel | IssueModel): issueOrPr is PullRequestModel {
-		return "pull_request" in issueOrPr;
-	}
-
-	/**
-	 * Prints the given {@link message} as a GitHub notice.
-	 * @param message The message to print.
-	 */
-	public static printAsGitHubNotice(message: string): void {
-		Utils.printEmptyLine();
-		console.log(`::notice::${message}`);
-		Utils.printEmptyLine();
-	}
-
-	/**
-	 * Prints the given {@link message} as a GitHub error.
-	 * @param message The message to print.
-	 */
-	public static printAsGitHubError(message: string): void {
-		Utils.printEmptyLine();
-		console.log(`::error::${message}`);
-		Utils.printEmptyLine();
-	}
-
-	/**
 	 * Splits the given {@link value} by the given {@link separator}.
 	 * @param value The value to split.
 	 * @param separator The separator to split the value by.
@@ -79,11 +41,11 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 * @remarks Only the first character will be used by the given {@link separator}.
 	 */
 	public static splitBy(value: string, separator: string): string[] {
-		if (Utils.isNullOrEmptyOrUndefined(value)) {
+		if (Utils.isNothing(value)) {
 			return [];
 		}
 
-		if (Utils.isNullOrEmptyOrUndefined(separator)) {
+		if (Utils.isNothing(separator)) {
 			return [value];
 		}
 
@@ -92,7 +54,7 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 
 		return value.indexOf(separator) === -1 ? [value] : value.split(separator)
 			.map((v) => v.trim())
-			.filter((i) => !Utils.isNullOrEmptyOrUndefined(i));
+			.filter((i) => !Utils.isNothing(i));
 	}
 
 	/**
@@ -101,7 +63,7 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 * @returns The values split by comma.
 	 */
 	public static splitByComma(value: string): string[] {
-		if (Utils.isNullOrEmptyOrUndefined(value)) {
+		if (Utils.isNothing(value)) {
 			return [];
 		}
 
@@ -126,6 +88,87 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	}
 
 	/**
+	 * Checks if the given {@link version} is a valid production version.
+	 * @param version The version to check.
+	 * @returns True if the version is a valid production version, otherwise false.
+	 */
+	public static validProdVersion(version: string): boolean {
+		return this.prodVersionRegex.test(version.trim().toLowerCase());
+	}
+
+	/**
+	 * Checks if the given {@link version} is not valid production version.
+	 * @param version The version to check.
+	 * @returns True if the version is not a valid production version, otherwise false.
+	 */
+	public static isNotValidProdVersion(version: string): boolean {
+		return !Utils.validProdVersion(version);
+	}
+
+	/**
+	 * Checks if the given {@link version} is a valid preview version.
+	 * @param version The version to check.
+	 * @returns True if the version is a valid preview version, otherwise false.
+	 */
+	public static validPreviewVersion(version: string): boolean {
+		return this.prevVersionRegex.test(version.trim().toLowerCase());
+	}
+
+	/**
+	 * Checks if the given {@link version} is not a valid preview version.
+	 * @param version The version to check.
+	 * @returns True if the version is not a valid preview version, otherwise false.
+	 */
+	public static isNotValidPreviewVersion(version: string): boolean {
+		return !Utils.validPreviewVersion(version);
+	}
+
+	/**
+	 * Prints an empty line to the console.
+	 */
+	public static printEmptyLine(): void {
+		console.log();
+	}
+
+	/**
+	 * Prints the given {@link message} as a GitHub notice.
+	 * @param message The message to print.
+	 */
+	public static printAsGitHubNotice(message: string): void {
+		Utils.printEmptyLine();
+		console.log(`::notice::${message}`);
+		Utils.printEmptyLine();
+	}
+
+	/**
+	 * Prints the given {@link message} as a GitHub error.
+	 * @param message The message to print.
+	 */
+	public static printAsGitHubError(message: string): void {
+		Utils.printEmptyLine();
+		console.log(`::error::${message}`);
+		Utils.printEmptyLine();
+	}
+
+	/**
+	 * Returns a value indicating whether or not the given {@link issueOrPr} is an issue.
+	 * @param issueOrPr The issue or pull request to check.
+	 * @returns True if the given issue or pull request is an issue, otherwise false.
+	 */
+	public static isIssue(issueOrPr: IssueModel | PullRequestModel): issueOrPr is IssueModel {
+		return !("pull_request" in issueOrPr);
+	}
+
+	/**
+	 * Returns a value indicating whether or not the given {@link issueOrPr} is a pull request.
+	 * @param issueOrPr The issue or pull request to check.
+	 * @returns True if the given issue or pull request is a pull request, otherwise false.
+	 */
+	public static isPr(issueOrPr: PullRequestModel | IssueModel): issueOrPr is PullRequestModel {
+		return "pull_request" in issueOrPr;
+	}
+
+	/**
 	 * Builds a URL to a pull request that matches the given {@link prNumber} in a repository with a
 	 * name that matches the given {@link repoName} and is owned by the given {@link repoOwner}.
 	 * @param repoOwner The owner of the repository.
@@ -135,8 +178,8 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 */
 	public static buildPullRequestUrl(repoOwner: string, repoName: string, prNumber: number): string {
 		const funcName = "buildPullRequestUrl";
-		Guard.isNullOrEmptyOrUndefined(repoOwner, funcName, "repoOwner");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(repoName, funcName, "repoName");
 		Guard.isLessThanOne(prNumber, funcName, "prNumber");
 
 		return `https://github.com/${repoOwner}/${repoName}/pull/${prNumber}`;
@@ -151,17 +194,10 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 */
 	public static buildLabelsUrl(repoOwner: string, repoName: string): string {
 		const funcName = "buildLabelsUrl";
-		Guard.isNullOrEmptyOrUndefined(repoOwner, funcName, "repoOwner");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		return `https://github.com/${repoOwner}/${repoName}/labels`;
-	}
-
-	/**
-	 * Prints an empty line to the console.
-	 */
-	public static printEmptyLine(): void {
-		console.log();
 	}
 
 	/**
@@ -172,11 +208,11 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 * @returns The given {@link valueToTrim} with the starting value trimmed.
 	 */
 	public static trimAllStartingValue(valueToTrim: string, valueToRemove: string): string {
-		if (Utils.isNullOrEmptyOrUndefined(valueToTrim)) {
+		if (Utils.isNothing(valueToTrim)) {
 			return valueToTrim;
 		}
 
-		if (Utils.isNullOrEmptyOrUndefined(valueToRemove)) {
+		if (Utils.isNothing(valueToRemove)) {
 			return valueToTrim;
 		}
 
@@ -195,11 +231,11 @@ import { PullRequestModel } from "models/PullRequestModel.ts";
 	 * @returns The given {@link valueToTrim} with the ending value trimmed.
 	 */
 	public static trimAllEndingValue(valueToTrim: string, valueToRemove: string): string {
-		if (Utils.isNullOrEmptyOrUndefined(valueToTrim)) {
+		if (Utils.isNothing(valueToTrim)) {
 			return valueToTrim;
 		}
 
-		if (Utils.isNullOrEmptyOrUndefined(valueToRemove)) {
+		if (Utils.isNothing(valueToRemove)) {
 			return valueToTrim;
 		}
 

@@ -113,7 +113,7 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async getFileContent(branchName: string, relativeFilePath: string): Promise<string> {
 		const funcName = "getFileContent";
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
 		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
@@ -143,8 +143,8 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async fileExists(branchName: string, relativeFilePath: string): Promise<boolean> {
 		const funcName = "fileExists";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
 		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
@@ -193,7 +193,7 @@ export class RepoClient extends GitHubClient {
 	 * @returns True if the variable exists; otherwise, false.
 	 */
 	public async repoVariableExists(variableName: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(variableName, "repoVariableExists", "variableName");
+		Guard.isNothing(variableName, "repoVariableExists", "variableName");
 
 		const variables = await this.getVariables();
 
@@ -210,8 +210,8 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async updateVariable(variableName: string, variableValue: string): Promise<void> {
 		const funcName = "updateVariable";
-		Guard.isNullOrEmptyOrUndefined(variableName, funcName, "variableName");
-		Guard.isNullOrEmptyOrUndefined(variableValue, funcName, "variableValue");
+		Guard.isNothing(variableName, funcName, "variableName");
+		Guard.isNothing(variableValue, funcName, "variableValue");
 
 		if (!(await this.repoVariableExists(variableName))) {
 			Utils.printAsGitHubError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
@@ -253,10 +253,10 @@ export class RepoClient extends GitHubClient {
 		commitMessage: string,
 	): Promise<void> {
 		const funcName = "createFile";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
-		Guard.isNullOrEmptyOrUndefined(fileContent, funcName, "fileContent");
-		Guard.isNullOrEmptyOrUndefined(commitMessage, funcName, "commitMessage");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(fileContent, funcName, "fileContent");
+		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
@@ -297,10 +297,10 @@ export class RepoClient extends GitHubClient {
 		commitMessage: string,
 	): Promise<void> {
 		const funcName = "updateFile";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
-		Guard.isNullOrEmptyOrUndefined(fileContent, funcName, "fileContent");
-		Guard.isNullOrEmptyOrUndefined(commitMessage, funcName, "commitMessage");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(fileContent, funcName, "fileContent");
+		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
@@ -346,8 +346,8 @@ export class RepoClient extends GitHubClient {
 		relativeFilePath: string,
 	): Promise<FileContentModel | null> {
 		const funcName = "getFileContentWithResult";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
 		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;

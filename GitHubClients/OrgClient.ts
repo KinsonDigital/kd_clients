@@ -17,7 +17,7 @@ export class OrgClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, token?: string) {
 		const funcName = "OrgClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
 
 		super(ownerName, "", token);
 	}

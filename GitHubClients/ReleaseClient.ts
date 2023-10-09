@@ -18,8 +18,8 @@ export class ReleaseClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "ReleaseClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(ownerName, repoName, token);
 	}
@@ -66,7 +66,7 @@ export class ReleaseClient extends GitHubClient {
 	 */
 	public async getReleaseByTag(tagName: string): Promise<ReleaseModel> {
 		const funcName = "getReleaseByTag";
-		Guard.isNullOrEmptyOrUndefined(tagName, funcName, "tagName");
+		Guard.isNothing(tagName, funcName, "tagName");
 
 		tagName = tagName.trim();
 
@@ -101,7 +101,7 @@ export class ReleaseClient extends GitHubClient {
 	 */
 	public async getReleaseByName(releaseName: string): Promise<ReleaseModel> {
 		const funcName = "getReleaseByName";
-		Guard.isNullOrEmptyOrUndefined(releaseName, funcName, "releaseName");
+		Guard.isNothing(releaseName, funcName, "releaseName");
 
 		releaseName = releaseName.trim();
 
@@ -136,7 +136,7 @@ export class ReleaseClient extends GitHubClient {
 	 */
 	public async releaseExists(tagName: string): Promise<boolean> {
 		const funcName = "releaseExists";
-		Guard.isNullOrEmptyOrUndefined(tagName, funcName, "releaseName");
+		Guard.isNothing(tagName, funcName, "releaseName");
 
 		tagName = tagName.trim();
 

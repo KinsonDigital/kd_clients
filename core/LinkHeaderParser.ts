@@ -12,7 +12,7 @@ export class LinkHeaderParser {
 		const isString = typeof responseOrHeaderString === "string";
 
 		const doesNotContainLinkHeader = isString
-			? Utils.isNullOrEmptyOrUndefined(responseOrHeaderString)
+			? Utils.isNothing(responseOrHeaderString)
 			: !responseOrHeaderString.headers.has("Link");
 
 		if (doesNotContainLinkHeader) {
