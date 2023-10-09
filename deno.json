@@ -1,43 +1,44 @@
 {
-    "version": "v1.0.0-preview.1",
-    "lint": {
-        "include": [
-            "core/",
-            "GitHubClients/",
-            "OtherClients/",
-            "PackageClients/",
-            "tests/"    
-        ]
-    },
-    "fmt": {
-        "include": [
-            "core/",
-            "GitHubClients/",
-            "OtherClients/",
-            "PackageClients/",
-            "tests/"
-        ],
-        "exclude": [
-            "**/*.md",
-            "**/*.json",
-            "**/*.js",
-            "**/*.yml",
-            "**/*.yaml"
-        ],
-        "useTabs": true,
-        "lineWidth": 130,
-        "indentWidth": 4,
-        "semiColons": true,
-        "singleQuote": false
-    },
-    "imports": {
-        "core/": "./core/",
-        "github/": "./GitHubClients/",
-        "other/": "./OtherClients/",
-        "package/": "./PackageClients/",
-        "models/": "./core/Models/",
-        "encoding/": "https://deno.land/std@0.203.0/encoding/",
-        "twitter": "npm:twitter-api-v2@1.15.0",
-        "assertions/": "https://deno.land/std@0.203.0/assert/"
-    }
+	"version": "v1.0.0-preview.1",
+	"lint": {
+		"include": [
+			"core/",
+			"GitHubClients/",
+			"OtherClients/",
+			"PackageClients/",
+			"tests/"
+		]
+	},
+	"fmt": {
+		"include": [
+			"core/",
+			"GitHubClients/",
+			"OtherClients/",
+			"PackageClients/",
+			"tests/"
+		],
+		"exclude": [
+			"**/*.md",
+			"**/*.json",
+			"**/*.js",
+			"**/*.yml",
+			"**/*.yaml"
+		],
+		"useTabs": true,
+		"lineWidth": 130,
+		"indentWidth": 4,
+		"semiColons": true,
+		"singleQuote": false
+	},
+	"imports": {
+		"core/": "./core/",
+		"github/": "./GitHubClients/",
+		"other/": "./OtherClients/",
+		"package/": "./PackageClients/",
+		"models/": "./core/Models/",
+		"twitter": "npm:twitter-api-v2@1.15.0",
+		"assertions/": "https://deno.land/std@0.203.0/assert/",
+		"std-encoding/": "https://deno.land/std@0.203.0/encoding/",
+		"std-fs/": "https://deno.land/std@0.194.0/fs/"
+	}
 }

@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64 } from "encoding/base64.ts";
+import { decodeBase64, encodeBase64 } from "std-encoding/base64.ts";
 import { GitHubHttpStatusCodes } from "core/Enums.ts";
 import { GitHubClient } from "core/GitHubClient.ts";
 import { Guard } from "core/Guard.ts";
