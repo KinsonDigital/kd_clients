@@ -69,6 +69,7 @@ jobs:
             "$scriptPath" `
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
+            "${{ inputs.release-type }}" `
             "${{ needs.get_version.outputs.version }}" `
             "${{ secrets.CICD_TOKEN }}";
 
