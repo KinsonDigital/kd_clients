@@ -30,13 +30,13 @@
 		"semiColons": true,
 		"singleQuote": false
 	},
-    "test": {
-        "exclude": ["*.js"],
-        "include": ["tests/*Tests.ts"]
-    },
+	"test": {
+		"exclude": ["*.js"],
+		"include": ["tests/*Tests.ts"]
+	},
 	"imports": {
 		"core/": "./core/",
-        "cicd-core/": "./.github/cicd/core/",
+		"cicd-core/": "./.github/cicd/core/",
 		"github/": "./GitHubClients/",
 		"other/": "./OtherClients/",
 		"package/": "./PackageClients/",
