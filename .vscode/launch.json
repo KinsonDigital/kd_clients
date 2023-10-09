@@ -1,15 +1,40 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Debug",
+		{
+            "name": "Playground",
             "request": "launch",
             "type": "node",
-            "program": "${workspaceFolder}/src/Messenger.ts",
+            "program": "${workspaceFolder}/.github/cicd/playground.ts",
+			"cwd": "${workspaceFolder}",
             "runtimeArgs": [
                 "run",
                 "--inspect-wait",
-                "--allow-all"
+                "--allow-all",
+            ],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+        },
+		{
+            "name": "Debug Test File",
+            "request": "launch",
+            "type": "node",
+            "cwd": "${workspaceFolder}/tests",
+            "runtimeArgs": [
+                "test",
+                "--inspect-brk",
+                "--allow-all",
+				"${fileBasename}",
             ],
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
@@ -22,6 +47,91 @@
             "linux": {
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
-        }
+        },
+		{
+            "name": "Version Checker",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/version-checker.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+                "--allow-net"
+            ],
+			"args": [
+				"KinsonDigital",
+				"kd_clients",
+				"preview",
+				"v0.0.6",
+				"${env:CICD_TOKEN}"
+			],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+        },
+		{
+            "name": "Get Version",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/get-version.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+				"--allow-read",
+				"--allow-write",
+				"--allow-env",
+            ],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+		},
+		{
+            "name": "Check Release Notes",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/check-release-notes.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+				"--allow-read",
+            ],
+			"args": [
+				"preview",
+				"v1.0.0-preview.1"
+			],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+		}
     ],
 }

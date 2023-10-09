@@ -1,12 +1,12 @@
-import { decode, encode } from "https://deno.land/std@0.194.0/encoding/base64.ts";
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { Guard } from "../core/Guard.ts";
-import { FileContentModel } from "../core/Models/FileContentModel.ts";
-import { RepoModel } from "../core/Models/RepoModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { GitHubVarModel } from "../core/Models/GitHubVarModel.ts";
-import { GitHubVariablesModel } from "../core/Models/GitHubVariablesModel.ts";
+import { decodeBase64, encodeBase64 } from "std/encoding/base64.ts";
+import { GitHubHttpStatusCodes } from "core/Enums.ts";
+import { GitHubClient } from "core/GitHubClient.ts";
+import { Guard } from "core/Guard.ts";
+import { FileContentModel } from "models/FileContentModel.ts";
+import { RepoModel } from "models/RepoModel.ts";
+import { Utils } from "core/Utils.ts";
+import { GitHubVarModel } from "models/GitHubVarModel.ts";
+import { GitHubVariablesModel } from "models/GitHubVariablesModel.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.
@@ -113,7 +113,7 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async getFileContent(branchName: string, relativeFilePath: string): Promise<string> {
 		const funcName = "getFileContent";
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
 		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
@@ -125,7 +125,7 @@ export class RepoClient extends GitHubClient {
 			Deno.exit(1);
 		}
 
-		const decodedContent = decode(fileContentModel.content);
+		const decodedContent = decodeBase64(fileContentModel.content);
 
 		// Return the file content after it has been decoded from base64
 		const decodedFileContent = new TextDecoder().decode(decodedContent);
@@ -143,8 +143,8 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async fileExists(branchName: string, relativeFilePath: string): Promise<boolean> {
 		const funcName = "fileExists";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
 		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
@@ -193,7 +193,7 @@ export class RepoClient extends GitHubClient {
 	 * @returns True if the variable exists; otherwise, false.
 	 */
 	public async repoVariableExists(variableName: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(variableName, "repoVariableExists", "variableName");
+		Guard.isNothing(variableName, "repoVariableExists", "variableName");
 
 		const variables = await this.getVariables();
 
@@ -210,8 +210,8 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async updateVariable(variableName: string, variableValue: string): Promise<void> {
 		const funcName = "updateVariable";
-		Guard.isNullOrEmptyOrUndefined(variableName, funcName, "variableName");
-		Guard.isNullOrEmptyOrUndefined(variableValue, funcName, "variableValue");
+		Guard.isNothing(variableName, funcName, "variableName");
+		Guard.isNothing(variableValue, funcName, "variableValue");
 
 		if (!(await this.repoVariableExists(variableName))) {
 			Utils.printAsGitHubError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
@@ -253,17 +253,17 @@ export class RepoClient extends GitHubClient {
 		commitMessage: string,
 	): Promise<void> {
 		const funcName = "createFile";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
-		Guard.isNullOrEmptyOrUndefined(fileContent, funcName, "fileContent");
-		Guard.isNullOrEmptyOrUndefined(commitMessage, funcName, "commitMessage");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(fileContent, funcName, "fileContent");
+		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
 
 		const body = {
 			message: commitMessage,
-			content: encode(fileContent),
+			content: encodeBase64(fileContent),
 			branch: branchName,
 		};
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}`;
@@ -297,10 +297,10 @@ export class RepoClient extends GitHubClient {
 		commitMessage: string,
 	): Promise<void> {
 		const funcName = "updateFile";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
-		Guard.isNullOrEmptyOrUndefined(fileContent, funcName, "fileContent");
-		Guard.isNullOrEmptyOrUndefined(commitMessage, funcName, "commitMessage");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(fileContent, funcName, "fileContent");
+		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
@@ -316,7 +316,7 @@ export class RepoClient extends GitHubClient {
 
 		const body = {
 			message: commitMessage,
-			content: encode(fileContent),
+			content: encodeBase64(fileContent),
 			branch: branchName,
 			sha: fileContentModel.sha,
 		};
@@ -346,8 +346,8 @@ export class RepoClient extends GitHubClient {
 		relativeFilePath: string,
 	): Promise<FileContentModel | null> {
 		const funcName = "getFileContentWithResult";
-		Guard.isNullOrEmptyOrUndefined(branchName, funcName, "branchName");
-		Guard.isNullOrEmptyOrUndefined(relativeFilePath, funcName, "relativeFilePath");
+		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
 		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;

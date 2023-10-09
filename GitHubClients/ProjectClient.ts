@@ -1,11 +1,11 @@
-import { createOrgProjectsQuery } from "../core/GraphQl/Queries/GetOrgProjectsQueries.ts";
-import { ProjectModel } from "../core/Models/ProjectModel.ts";
-import { GraphQlClient } from "../core/GraphQlClient.ts";
-import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
-import { createLinkItemToProjectMutation } from "../core/GraphQl/Mutations/AddToProjectMutation.ts";
-import { createGetIssueProjectsQuery } from "../core/GraphQl/Queries/GetIssueProjectsQuery.ts";
-import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
+import { createOrgProjectsQuery } from "core/GraphQl/Queries/GetOrgProjectsQueries.ts";
+import { ProjectModel } from "core/Models/ProjectModel.ts";
+import { GraphQlClient } from "core/GraphQlClient.ts";
+import { Guard } from "core/Guard.ts";
+import { Utils } from "core/Utils.ts";
+import { createLinkItemToProjectMutation } from "core/GraphQl/Mutations/AddToProjectMutation.ts";
+import { createGetIssueProjectsQuery } from "core/GraphQl/Queries/GetIssueProjectsQuery.ts";
+import { createGetPullRequestProjectsQuery } from "core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
 
 /**
  * Gets or saves data related to GitHub organization projects.
@@ -20,8 +20,8 @@ export class ProjectClient extends GraphQlClient {
 	 */
 	constructor(ownerName: string, repoName: string, token: string) {
 		const funcName = "ProjectClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(token);
 	}
@@ -43,7 +43,7 @@ export class ProjectClient extends GraphQlClient {
 	 * @returns True if the project exists, otherwise false.
 	 */
 	public async exists(projectName: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(projectName, "projectExists");
+		Guard.isNothing(projectName, "projectExists");
 
 		projectName = projectName.trim();
 		const projects = await this.getOrgProjects();
@@ -59,8 +59,8 @@ export class ProjectClient extends GraphQlClient {
 	 */
 	public async addToProject(contentId: string, projectName: string): Promise<void> {
 		const funcName = "addToProject";
-		Guard.isNullOrEmptyOrUndefined(contentId, funcName);
-		Guard.isNullOrEmptyOrUndefined(projectName, funcName);
+		Guard.isNothing(contentId, funcName);
+		Guard.isNothing(projectName, funcName);
 
 		contentId = contentId.trim();
 		projectName = projectName.trim();

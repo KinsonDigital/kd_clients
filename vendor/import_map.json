@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "package/": "../PackageClients/",
+    "other/": "../OtherClients/",
+    "models/": "../core/Models/",
+    "github/": "../GitHubClients/",
+    "core/": "../core/",
+    "std/encoding/base64.ts": "./deno.land/std@0.203.0/encoding/base64.ts",
+    "std/fs/exists.ts": "./deno.land/std@0.203.0/fs/exists.ts",
+    "https://deno.land/": "./deno.land/"
+  }
+}

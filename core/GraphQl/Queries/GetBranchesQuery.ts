@@ -1,4 +1,4 @@
-import { Utils } from "../Utils.ts";
+import { Utils } from "core/Utils.ts";
 
 /**
  * Get a list of branches for a GitHub repository.
@@ -9,12 +9,12 @@ import { Utils } from "../Utils.ts";
  * @returns The list of branches.
  */
 export const createGetBranchesQuery = (repoOwner: string, repoName: string, first?: number, cursor?: string): string => {
-	first = !Utils.isNullOrEmptyOrUndefined(first) && first > 100 ? 100 : first;
+	first = !Utils.isNothing(first) && first > 100 ? 100 : first;
 
-	first = !Utils.isNullOrEmptyOrUndefined(first) && first <= 0 ? 1 : first;
+	first = !Utils.isNothing(first) && first <= 0 ? 1 : first;
 
-	const firstValue = Utils.isNullOrEmptyOrUndefined(first) ? ", first: 100" : `, first: ${first}`;
-	const cursorValue = Utils.isNullOrEmptyOrUndefined(cursor) ? "" : `, after: "${cursor}"`;
+	const firstValue = Utils.isNothing(first) ? ", first: 100" : `, first: ${first}`;
+	const cursorValue = Utils.isNothing(cursor) ? "" : `, after: "${cursor}"`;
 
 	return `{
         repository (owner: "${repoOwner}", name: "${repoName}") {

@@ -1,0 +1,125 @@
+name: 🚀Release
+run-name: ${{ vars.PROJECT_NAME }} ${{ inputs.release-type }} Release
+
+
+defaults:
+  run:
+    shell: pwsh
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: The type of release.  Choose 'Preview' or 'Production'.
+        required: true
+        type: choice
+        options: [Preview, Production]
+
+
+jobs:
+  get_version:
+    name: Get Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ vars.DENO_VERSION }}
+
+      - uses: actions/checkout@v4
+
+      - name: Get Version
+        id: get_version
+        run: |
+          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/get-version.ts";
+          deno run --allow-read --allow-write --allow-env `
+            --no-remote `
+            --import-map=${{ github.workspace }}/vendor/import_map.json `
+            "$scriptPath";
+
+
+  validate_release:
+    name: Validate Workflow Inputs
+    runs-on: ubuntu-latest
+    needs: get_version
+    steps:
+      - name: Validate Workflow Inputs
+        run: |
+          $branch = "${{ github.ref }}".TrimStart('refs/heads/');
+          $expectedBranch = "${{ vars.PROD_RELEASE_BRANCH }}".Trim();
+
+          if ($branch -eq $expectedBranch) {
+            Write-Host "::error::Releases are only allowed to be run on the '$expectedBranch' branch.";
+            exit 1;
+          }
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ vars.DENO_VERSION }}
+
+      - uses: actions/checkout@v4
+
+      - name: Version Does Not Exist
+        run: |
+          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/version-checker.ts";
+
+          deno run `
+            --allow-net `
+            --no-remote `
+            --import-map=${{ github.workspace }}/vendor/import_map.json `
+            "$scriptPath" `
+            "${{ vars.ORGANIZATION_NAME }}" `
+            "${{ vars.PROJECT_NAME }}" `
+            "${{ inputs.release-type }}" `
+            "${{ needs.get_version.outputs.version }}" `
+            "${{ secrets.CICD_TOKEN }}";
+
+      - name: Release Notes Exist
+        run: |
+          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
+
+          deno run `
+            --allow-read `
+            --no-remote `
+            --import-map=${{ github.workspace }}/vendor/import_map.json `
+            "$scriptPath" `
+            "${{ inputs.release-type }}" `
+            "${{ needs.get_version.outputs.version }}";
+
+  release:
+    name: Run ${{ inputs.release-type }} Release
+    runs-on: ubuntu-latest
+    needs: get_version
+    steps:
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ vars.DENO_VERSION }}
+
+      - uses: actions/checkout@v4
+
+      - name: Run Build
+        run: deno run --allow-read --allow-run ./.github/cicd/scripts/deno-check.ts
+
+      - name: Run Lint
+        run: deno lint
+
+      - name: Run Tests
+        run: deno test
+
+      - name: Create Commit & Release Tag (${{ needs.get_version.outputs.version }})
+        run: |
+          $tag = "${{ needs.get_version.outputs.version }}";
+          
+          git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
+          git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
+          
+          git commit --allow-empty -m "🚀${{ inputs.release-type }} Release";
+          git push;
+
+          git tag -a $tag -m "Production Release";
+          git push origin $tag;

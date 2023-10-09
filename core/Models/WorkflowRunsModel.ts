@@ -1,4 +1,4 @@
-import { WorkflowRunModel } from "./WorkflowRunModel.ts";
+import { WorkflowRunModel } from "models/WorkflowRunModel.ts";
 
 /**
  * Represents a list of workflow runs.

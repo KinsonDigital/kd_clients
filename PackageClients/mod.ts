@@ -1,1 +1,1 @@
-export { NuGetClient } from "./NuGetClient.ts";
+export { NuGetClient } from "package/NuGetClient.ts";

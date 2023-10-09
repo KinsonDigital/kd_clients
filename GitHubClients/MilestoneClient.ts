@@ -1,13 +1,13 @@
-import { Guard } from "../core/Guard.ts";
-import { IssueModel } from "../core/Models/IssueModel.ts";
-import { MilestoneModel } from "../core/Models/MilestoneModel.ts";
-import { PullRequestModel } from "../core/Models/PullRequestModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { IssueClient } from "./IssueClient.ts";
-import { PullRequestClient } from "./PullRequestClient.ts";
-import { IssueOrPR } from "../core/Types.ts";
+import { Guard } from "core/Guard.ts";
+import { IssueModel } from "core/Models/IssueModel.ts";
+import { MilestoneModel } from "core/Models/MilestoneModel.ts";
+import { PullRequestModel } from "core/Models/PullRequestModel.ts";
+import { Utils } from "core/Utils.ts";
+import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "core/Enums.ts";
+import { GitHubClient } from "core/GitHubClient.ts";
+import { IssueClient } from "github/IssueClient.ts";
+import { PullRequestClient } from "github/PullRequestClient.ts";
+import { IssueOrPR } from "core/Types.ts";
 
 /**
  * Provides a client for interacting with milestones.
@@ -25,8 +25,8 @@ export class MilestoneClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "MilestoneClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "this.repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "this.repoName");
 
 		super(token);
 
@@ -46,7 +46,7 @@ export class MilestoneClient extends GitHubClient {
 		labels?: string[],
 	): Promise<IssueOrPR[]> {
 		const funcName = "getIssuesAndPullRequests";
-		Guard.isNullOrEmptyOrUndefined(milestoneName, funcName, "milestoneName");
+		Guard.isNothing(milestoneName, funcName, "milestoneName");
 
 		const issuesAndPullRequests: (IssueOrPR)[] = [];
 
@@ -73,7 +73,7 @@ export class MilestoneClient extends GitHubClient {
 	 */
 	public async getIssues(milestoneName: string, labels?: string[]): Promise<IssueModel[]> {
 		const funcName = "getIssues";
-		Guard.isNullOrEmptyOrUndefined(milestoneName, funcName, "milestoneName");
+		Guard.isNothing(milestoneName, funcName, "milestoneName");
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
@@ -102,7 +102,7 @@ export class MilestoneClient extends GitHubClient {
 		labels?: string[],
 	): Promise<PullRequestModel[]> {
 		const funcName = "getPullRequests";
-		Guard.isNullOrEmptyOrUndefined(milestoneName, funcName, "milestoneName");
+		Guard.isNothing(milestoneName, funcName, "milestoneName");
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
@@ -127,7 +127,7 @@ export class MilestoneClient extends GitHubClient {
 	 */
 	public async getMilestoneByName(milestoneName: string): Promise<MilestoneModel> {
 		const funcName = "getMilestoneByName";
-		Guard.isNullOrEmptyOrUndefined(milestoneName, funcName, "milestoneName");
+		Guard.isNothing(milestoneName, funcName, "milestoneName");
 
 		milestoneName = milestoneName.trim();
 
@@ -189,7 +189,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @remarks Does not require authentication.
 	 */
 	public async milestoneExists(milestoneName: string): Promise<boolean> {
-		Guard.isNullOrEmptyOrUndefined(milestoneName, "milestoneExists", "milestoneName");
+		Guard.isNothing(milestoneName, "milestoneExists", "milestoneName");
 
 		milestoneName = milestoneName.trim();
 
@@ -214,7 +214,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @remarks Requires authentication.
 	 */
 	public async closeMilestone(milestoneName: string): Promise<void> {
-		Guard.isNullOrEmptyOrUndefined(milestoneName, "closeMilestone", "milestoneName");
+		Guard.isNothing(milestoneName, "closeMilestone", "milestoneName");
 
 		milestoneName = milestoneName.trim();
 

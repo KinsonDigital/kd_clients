@@ -1,8 +1,8 @@
-import { LabelModel } from "../core/Models/LabelModel.ts";
-import { Utils } from "../core/Utils.ts";
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { Guard } from "../core/Guard.ts";
+import { LabelModel } from "core/Models/LabelModel.ts";
+import { Utils } from "core/Utils.ts";
+import { GitHubHttpStatusCodes } from "core/Enums.ts";
+import { GitHubClient } from "core/GitHubClient.ts";
+import { Guard } from "core/Guard.ts";
 
 /**
  * Provides a client for interacting with labels.
@@ -17,8 +17,8 @@ export class LabelClient extends GitHubClient {
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "LabelClient.ctor";
-		Guard.isNullOrEmptyOrUndefined(ownerName, funcName, "ownerName");
-		Guard.isNullOrEmptyOrUndefined(repoName, funcName, "repoName");
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(token);
 	}
@@ -74,7 +74,7 @@ export class LabelClient extends GitHubClient {
 	 */
 	public async labelExists(label: string): Promise<boolean> {
 		const funcName = "labelExists";
-		Guard.isNullOrEmptyOrUndefined(label, funcName, "label");
+		Guard.isNothing(label, funcName, "label");
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/labels/${label}`;
 		const response: Response = await this.requestGET(url);

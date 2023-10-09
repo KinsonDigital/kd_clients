@@ -1,4 +1,4 @@
-import { Utils } from "./Utils.ts";
+import { Utils } from "core/Utils.ts";
 
 /**
  * A class that contains functions to check if values are invalid.
@@ -9,12 +9,12 @@ export class Guard {
 	 * @param value The value to check.
 	 * @returns True if the value is null, undefined, or empty, otherwise false.
 	 */
-	public static isNullOrEmptyOrUndefined<T>(
+	public static isNothing<T>(
 		value: undefined | null | string | T[] | object,
 		funcName = "",
 		paramName = "",
 	): void {
-		if (Utils.isNullOrEmptyOrUndefined(value)) {
+		if (Utils.isNothing(value)) {
 			Utils.printAsGitHubError("The value is null, undefined, or empty.");
 
 			if (funcName != "") {
