@@ -35,7 +35,10 @@ jobs:
         id: get_version
         run: |
           $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/get-version.ts";
-          deno run --allow-read --allow-write --allow-env "$scriptPath";
+          deno run --allow-read --allow-write --allow-env `
+            --no-remote `
+            --import-map=${{ github.workspace }}/vendor/import_map.json `
+            "$scriptPath";
 
 
   validate_release:
@@ -65,7 +68,9 @@ jobs:
           $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/version-checker.ts";
 
           deno run `
-            "--allow-net" `
+            --allow-net `
+            --no-remote `
+            --import-map=${{ github.workspace }}/vendor/import_map.json `
             "$scriptPath" `
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
