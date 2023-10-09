@@ -30,6 +30,10 @@
 		"semiColons": true,
 		"singleQuote": false
 	},
+    "test": {
+        "exclude": ["*.js"],
+        "include": ["tests/*Tests.ts"]
+    },
 	"imports": {
 		"core/": "./core/",
 		"github/": "./GitHubClients/",
