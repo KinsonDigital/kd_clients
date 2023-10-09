@@ -5,7 +5,8 @@
     "models/": "../core/Models/",
     "github/": "../GitHubClients/",
     "core/": "../core/",
-    "std-fs/exists.ts": "./deno.land/std@0.194.0/fs/exists.ts",
+    "std/encoding/base64.ts": "./deno.land/std@0.203.0/encoding/base64.ts",
+    "std/fs/exists.ts": "./deno.land/std@0.203.0/fs/exists.ts",
     "https://deno.land/": "./deno.land/"
   }
 }

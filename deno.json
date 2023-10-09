@@ -38,7 +38,6 @@
 		"models/": "./core/Models/",
 		"twitter": "npm:twitter-api-v2@1.15.0",
 		"assertions/": "https://deno.land/std@0.203.0/assert/",
-		"std-encoding/": "https://deno.land/std@0.203.0/encoding/",
-		"std-fs/": "https://deno.land/std@0.194.0/fs/"
+		"std/": "https://deno.land/std@0.203.0/"
 	}
 }
