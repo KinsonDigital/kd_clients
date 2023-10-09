@@ -1,3 +1,4 @@
+import { Utils } from "core/Utils.ts";
 import { Directory } from "./Directory.ts";
 
 /**
@@ -15,7 +16,7 @@ export class VersionPuller {
 
 		if (denoJsonFilePath === undefined) {
 			const errorMsg = `The file '${fileName}' could not be found when pulling the version number.`;
-			console.error(`::error::${errorMsg}`);
+			Utils.printAsGitHubError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -25,7 +26,7 @@ export class VersionPuller {
 		// If the object contains a property with the name version
 		if (jsonObj.version === undefined) {
 			const errorMsg = `The file '${fileName}' does not contain a version property.`;
-			console.log(`::error::${errorMsg}`);
+			Utils.printAsGitHubError(errorMsg);
 			Deno.exit(1);
 		}
 
