@@ -78,6 +78,17 @@ jobs:
             "${{ needs.get_version.outputs.version }}" `
             "${{ secrets.CICD_TOKEN }}";
 
+      - name: Release Notes Exist
+        run: |
+          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
+
+          deno run `
+            --allow-read `
+            --no-remote `
+            --import-map=${{ github.workspace }}/vendor/import_map.json `
+            "$scriptPath" `
+            "${{ inputs.release-type }}" `
+            "${{ needs.get_version.outputs.version }}";
 
   release:
     name: Run ${{ inputs.release-type }} Release
