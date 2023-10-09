@@ -104,6 +104,34 @@
             "linux": {
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
+		},
+		{
+            "name": "Check Release Notes",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/check-release-notes.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+				"--allow-read",
+            ],
+			"args": [
+				"preview",
+				"v1.0.0-preview.1"
+			],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
 		}
     ],
 }
