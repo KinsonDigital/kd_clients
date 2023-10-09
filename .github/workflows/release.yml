@@ -1,5 +1,5 @@
 name: 🚀Release
-run-name: ${{ vars.PROJECT_NAME }} ${{ inputs.release-type }} Release
+run-name: ${{ vars.PROJECT_NAME }} ${{ inputs.release-type }} Release ${{ inputs.dry-run == true && '(Dry Run)' || '' }}
 
 
 defaults:
@@ -15,7 +15,11 @@ on:
         required: true
         type: choice
         options: [Preview, Production]
-
+      dry-run:
+        required: false
+        description: If true, the release will not be created.
+        default: false
+        type: boolean
 
 jobs:
   get_version:
@@ -111,15 +115,35 @@ jobs:
       - name: Run Tests
         run: deno test
 
-      - name: Create Commit & Release Tag (${{ needs.get_version.outputs.version }})
-        run: |
-          $tag = "${{ needs.get_version.outputs.version }}";
-          
-          git config --global user.email "${{ vars.GIT_CONFIG_EMAIL }}";
-          git config --global user.name "Prod Release - (On behalf of Calvin Wilkinson)"; 
-          
-          git commit --allow-empty -m "🚀${{ inputs.release-type }} Release";
-          git push;
+      - name: Creating ${{ inputs.release-type }} GitHub Release
+        if: ${{ inputs.dry-run == false }}
+        uses: softprops/action-gh-release@v1
+        with: 
+          name: "🚀${{ inputs.release-type }} Release - ${{ needs.get_version.outputs.version }}" 
+          body_path: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-${{ needs.get_version.outputs.version }}.md"
+          files: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-${{ needs.get_version.outputs.version }}.md"
+          tag_name: "${{ needs.get_version.outputs.version }}"
+          prerelease: ${{ inputs.release-type == 'Preview' }}
+          draft: false
 
-          git tag -a $tag -m "Production Release";
-          git push origin $tag;
+      - name: Close Milestone
+        if: ${{ inputs.dry-run == false }}
+        run: |
+          $scriptUrl = "${{ vars.SCRIPT_BASE_URL }}/${{ vars.CICD_SCRIPTS_VERSION }}/${{ vars.SCRIPT_RELATIVE_DIR_PATH }}";
+          $scriptUrl = $scriptUrl.Replace("\", "/").Replace("//", "/");
+          $scriptUrl = $scriptUrl.EndsWith("/") ? $scriptUrl.Substring(0, $scriptUrl.Length - 1) : $scriptUrl;
+          $scriptUrl = "$scriptUrl/close-milestone.ts";
+
+          Write-Host "::notice::Close milestone script URL: $scriptUrl";
+
+          <# Deno Args:
+            1. Project name
+            2. Milestone name - This is the version
+            3. PAT
+          #>
+          deno run `
+            --allow-read --allow-net `
+            "$scriptUrl" `
+            "${{ vars.PROJECT_NAME }}" `
+            "${{ needs.get_version.outputs.version }}" `
+            "${{ secrets.CICD_TOKEN }}";
