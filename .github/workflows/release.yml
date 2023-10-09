@@ -51,7 +51,7 @@ jobs:
           $branch = "${{ github.ref }}".TrimStart('refs/heads/');
           $expectedBranch = "${{ vars.PROD_RELEASE_BRANCH }}".Trim();
 
-          if ($branch -eq $expectedBranch) {
+          if ($branch -ne $expectedBranch) {
             Write-Host "::error::Releases are only allowed to be run on the '$expectedBranch' branch.";
             exit 1;
           }
@@ -93,7 +93,7 @@ jobs:
   release:
     name: Run ${{ inputs.release-type }} Release
     runs-on: ubuntu-latest
-    needs: get_version
+    needs: [get_version, validate_release]
     steps:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
