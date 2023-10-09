@@ -29,6 +29,8 @@ jobs:
         with:
           deno-version: ${{ vars.DENO_VERSION }}
 
+      - uses: actions/checkout@v4
+
       - name: Get Version
         id: get_version
         run: |
@@ -50,6 +52,13 @@ jobs:
             Write-Host "::error::Releases are only allowed to be run on the '$expectedBranch' branch.";
             exit 1;
           }
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ vars.DENO_VERSION }}
+
+      - uses: actions/checkout@v4
 
       - name: Version Does Not Exist
         run: |
@@ -73,6 +82,8 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ vars.DENO_VERSION }}
+
+      - uses: actions/checkout@v4
 
       - name: Run Build
         run: deno run --allow-read --allow-run ./.github/cicd/scripts/deno-check.ts
