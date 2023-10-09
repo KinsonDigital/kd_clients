@@ -1,6 +1,6 @@
 <div align="center">
 
-  ![logo](https://raw.githubusercontent.com/KinsonDigital/kd_clients/preview/Images/kd_clients-logo.png)
+  ![logo](https://raw.githubusercontent.com/KinsonDigital/kd_clients/main/Images/kd_clients-logo.png)
 </div>
 
 
