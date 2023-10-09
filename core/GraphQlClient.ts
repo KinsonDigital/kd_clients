@@ -14,7 +14,7 @@ export abstract class GraphQlClient {
 	protected readonly headers: Headers = new Headers();
 
 	/**
-	 * Initializes a new instance of the {@link GraphQLClient} class.
+	 * Initializes a new instance of the {@link GraphQlClient} class.
 	 * @param token The GitHub token to use for authentication.
 	 * @param ownerName The name of the owner of the repository to use.
 	 * @param repoName The name of a repository.
