@@ -2,7 +2,8 @@ import { CLI } from "../core/CLI.ts";
 import { Directory } from "../core/Directory.ts";
 
 const ignoreDirectories = [
-	"./vendor/"
+	"./vendor/",
+	"./node_modules/"
 ];
 
 const files: string[] = Directory
