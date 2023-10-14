@@ -108,12 +108,12 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred trying to get the pull requests for the repository '${this.repoName}'.`;
 					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound: {
 					const errorMsg = `The organization '${this.ownerName}' or repository '${this.repoName}' does not exist.`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 			}
@@ -179,11 +179,11 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred trying to get the pull request '${prNumber}'.`;
 					errorMsg += `\n\tError '${response.status}(${response.statusText})'`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`The pull request number '${prNumber}' does not exist.`);
+					Utils.printError(`The pull request number '${prNumber}' does not exist.`);
 					break;
 			}
 
@@ -205,7 +205,7 @@ export class PullRequestClient extends GitHubClient {
 		Guard.isNothing(label, "addLabel", "label");
 
 		if (!this.containsToken()) {
-			Utils.printAsGitHubError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
+			Utils.printError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
 			Deno.exit(1);
 		}
 
@@ -220,7 +220,7 @@ export class PullRequestClient extends GitHubClient {
 			errorMsg += `\nRepo Labels: ${labelsUrl}`;
 			errorMsg += `\nPull Request: ${prUrl}`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -242,11 +242,11 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred trying to add the label '${label}' to pull request '${prNumber}'.`;
 					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`The pull request number '${prNumber}' does not exist.`);
+					Utils.printError(`The pull request number '${prNumber}' does not exist.`);
 					break;
 			}
 
@@ -277,7 +277,7 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred checking if pull request '${prNumber}' exists.`;
 					errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound:
@@ -313,7 +313,7 @@ export class PullRequestClient extends GitHubClient {
 
 		if (prDoesNotExist) {
 			const errorMsg = `A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -326,7 +326,7 @@ export class PullRequestClient extends GitHubClient {
 
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
-				Utils.printAsGitHubError(`An pull request with the number '${prNumber}' does not exist.`);
+				Utils.printError(`An pull request with the number '${prNumber}' does not exist.`);
 			} else {
 				switch (response.status) {
 					case GitHubHttpStatusCodes.MovedPermanently:
@@ -338,7 +338,7 @@ export class PullRequestClient extends GitHubClient {
 						let errorMsg = `An error occurred trying to update pull request '${prNumber}'.`;
 						errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
 
-						Utils.printAsGitHubError(errorMsg);
+						Utils.printError(errorMsg);
 						break;
 					}
 				}
@@ -372,7 +372,7 @@ export class PullRequestClient extends GitHubClient {
 			errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
 			errorMsg += `\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -429,7 +429,7 @@ export class PullRequestClient extends GitHubClient {
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorMsg = `Error: ${response.status}(${response.statusText})`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 

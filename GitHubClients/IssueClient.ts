@@ -106,12 +106,12 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred trying to get the issues for the repository '${this.repoName}'.`;
 					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound: {
 					const errorMsg = `The organization '${this.ownerName}' or repository '${this.repoName}' does not exist.`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 			}
@@ -148,11 +148,11 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Gone: {
 					let errorMsg = `An error occurred trying to get issue '${issueNumber}'.`;
 					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`The repository '${this.repoName}' or issue '${issueNumber}' does not exist.`);
+					Utils.printError(`The repository '${this.repoName}' or issue '${issueNumber}' does not exist.`);
 					break;
 			}
 
@@ -165,7 +165,7 @@ export class IssueClient extends GitHubClient {
 			return issue;
 		} else {
 			const errorMsg = `The issue '${issueNumber}' in the repository '${this.repoName}' is not an issue.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -183,7 +183,7 @@ export class IssueClient extends GitHubClient {
 		Guard.isNothing(label, "addLabel", "this.repoName");
 
 		if (!this.containsToken()) {
-			Utils.printAsGitHubError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
+			Utils.printError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
 			Deno.exit(1);
 		}
 
@@ -199,7 +199,7 @@ export class IssueClient extends GitHubClient {
 			errorMsg += `\nRepo Labels: ${labelsUrl}`;
 			errorMsg += `\nIssue: ${issueUrl}`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -222,11 +222,11 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred trying to add the label '${label}' to issue '${issueNumber}'.`;
 					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`An issue with the number '${issueNumber}' does not exist.`);
+					Utils.printError(`An issue with the number '${issueNumber}' does not exist.`);
 					break;
 			}
 
@@ -257,11 +257,11 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `There was an issue getting the labels for issue '${issueNumber}'.`;
 					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`An issue with the number '${issueNumber}' does not exist.`);
+					Utils.printError(`An issue with the number '${issueNumber}' does not exist.`);
 					break;
 			}
 
@@ -328,7 +328,7 @@ export class IssueClient extends GitHubClient {
 
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
-				Utils.printAsGitHubError(`An issue with the number '${issueNumber}' does not exist.`);
+				Utils.printError(`An issue with the number '${issueNumber}' does not exist.`);
 			} else {
 				switch (response.status) {
 					case GitHubHttpStatusCodes.MovedPermanently:
@@ -340,7 +340,7 @@ export class IssueClient extends GitHubClient {
 						let errorMsg = `An error occurred trying to update issue '${issueNumber}'.`;
 						errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
 
-						Utils.printAsGitHubError(errorMsg);
+						Utils.printError(errorMsg);
 						break;
 					}
 				}

@@ -41,7 +41,7 @@ export class RepoClient extends GitHubClient {
 		const foundRepo: RepoModel | undefined = foundRepos.find((repo) => repo.name.trim().toLowerCase() === this.repoName);
 
 		if (foundRepo === undefined) {
-			Utils.printAsGitHubError(`The repository '${this.repoName}' was not found.`);
+			Utils.printError(`The repository '${this.repoName}' was not found.`);
 			Deno.exit(1);
 		}
 
@@ -70,7 +70,7 @@ export class RepoClient extends GitHubClient {
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
 			let errorMsg = `Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 
 			Deno.exit(1);
 		}
@@ -96,7 +96,7 @@ export class RepoClient extends GitHubClient {
 			case GitHubHttpStatusCodes.MovedPermanently:
 			case GitHubHttpStatusCodes.Forbidden: {
 				const errorMsg = `Error: ${response.status} (${response.statusText})`;
-				Utils.printAsGitHubError(errorMsg);
+				Utils.printError(errorMsg);
 				Deno.exit(1);
 			}
 		}
@@ -121,7 +121,7 @@ export class RepoClient extends GitHubClient {
 		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
 
 		if (fileContentModel === undefined || fileContentModel === null) {
-			Utils.printAsGitHubError("Error: 404(Not Found)");
+			Utils.printError("Error: 404(Not Found)");
 			Deno.exit(1);
 		}
 
@@ -176,7 +176,7 @@ export class RepoClient extends GitHubClient {
 				let errorMsg = `An error occurred when getting the variables for the organization '${this.ownerName}'.`;
 				errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-				Utils.printAsGitHubError(errorMsg);
+				Utils.printError(errorMsg);
 				Deno.exit(1);
 			}
 
@@ -214,7 +214,7 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(variableValue, funcName, "variableValue");
 
 		if (!(await this.repoVariableExists(variableName))) {
-			Utils.printAsGitHubError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
+			Utils.printError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
 			Deno.exit(1);
 		}
 
@@ -232,7 +232,7 @@ export class RepoClient extends GitHubClient {
 			errorMsg += ` for the repository '${this.repoName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -276,7 +276,7 @@ export class RepoClient extends GitHubClient {
 			errorMsg += ` for branch '${branchName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -311,7 +311,7 @@ export class RepoClient extends GitHubClient {
 		if (fileContentModel === undefined || fileContentModel === null) {
 			let errorMsg = `The file '${relativeFilePath}' does not exist in the repository`;
 			errorMsg += `\n '${this.repoName}', in branch '${branchName}'.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -330,7 +330,7 @@ export class RepoClient extends GitHubClient {
 			errorMsg += ` for branch '${branchName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -363,7 +363,7 @@ export class RepoClient extends GitHubClient {
 				return null;
 			case GitHubHttpStatusCodes.TemporaryRedirect:
 			case GitHubHttpStatusCodes.Forbidden:
-				Utils.printAsGitHubError(`Error: ${response.status} (${response.statusText})`);
+				Utils.printError(`Error: ${response.status} (${response.statusText})`);
 				Deno.exit(1);
 		}
 

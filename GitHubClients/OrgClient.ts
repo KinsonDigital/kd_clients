@@ -60,7 +60,7 @@ export class OrgClient extends GitHubClient {
 			let errorMsg = `An error occurred when getting the private members for the organization '${this.ownerName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -93,7 +93,7 @@ export class OrgClient extends GitHubClient {
 			let errorMsg = `An error occurred when getting the public members for the organization '${this.ownerName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -248,7 +248,7 @@ export class OrgClient extends GitHubClient {
 				let errorMsg = `An error occurred when getting the variables for the organization '${this.ownerName}'.`;
 				errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-				Utils.printAsGitHubError(errorMsg);
+				Utils.printError(errorMsg);
 				Deno.exit(1);
 			}
 

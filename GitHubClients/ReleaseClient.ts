@@ -50,7 +50,7 @@ export class ReleaseClient extends GitHubClient {
 			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
 			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 
 			Deno.exit(1);
 		}
@@ -86,7 +86,7 @@ export class ReleaseClient extends GitHubClient {
 
 		if (foundRelease === undefined) {
 			const errorMsg = `A release with the tag '${tagName}' for the repository '${this.repoName}' could not be found.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -121,7 +121,7 @@ export class ReleaseClient extends GitHubClient {
 
 		if (foundRelease === undefined) {
 			const errorMsg = `A release with the name '${releaseName}' for the repository '${this.repoName}' could not be found.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 

@@ -43,7 +43,7 @@ export class GitClient extends GraphQlClient {
 		const branches: GitBranchModel[] = await this.getBranches((branch) => branch.name === name);
 
 		if (branches.length <= 0) {
-			Utils.printAsGitHubError(`The branch '${name}' does not exist.`);
+			Utils.printError(`The branch '${name}' does not exist.`);
 			Deno.exit(1);
 		}
 
@@ -125,7 +125,7 @@ export class GitClient extends GraphQlClient {
 
 		if (await this.branchExists(newBranchName)) {
 			const errorMsg = `A branch with the name '${newBranchName}' already exists.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -135,7 +135,7 @@ export class GitClient extends GraphQlClient {
 
 		if (Utils.isNothing(repo.node_id)) {
 			const errorMsg = `The repository '${this.repoName}' did not return a required node ID.`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 

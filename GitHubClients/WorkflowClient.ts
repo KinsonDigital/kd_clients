@@ -66,7 +66,7 @@ export class WorkflowClient extends GitHubClient {
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			let errorMsg = `An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`;
 			errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -272,7 +272,7 @@ export class WorkflowClient extends GitHubClient {
 		const workflowRun = workflowRuns.find((run) => run.display_title.trim() === title);
 
 		if (workflowRun === undefined) {
-			Utils.printAsGitHubError(`A workflow run with the title '${title}' was not found.`);
+			Utils.printError(`A workflow run with the title '${title}' was not found.`);
 			Deno.exit(1);
 		}
 
@@ -356,7 +356,7 @@ export class WorkflowClient extends GitHubClient {
 			case GitHubHttpStatusCodes.Forbidden:
 			case GitHubHttpStatusCodes.NotFound: {
 				let errorMsg = `An error occurred trying to delete the workflow run '${workflowRun.name}(${workflowRun.id})'`;
-				errorMsg += `Error: ${response.status}(${response.statusText})`, Utils.printAsGitHubError(errorMsg);
+				errorMsg += `Error: ${response.status}(${response.statusText})`, Utils.printError(errorMsg);
 				Deno.exit(1);
 			}
 		}
@@ -404,7 +404,7 @@ export class WorkflowClient extends GitHubClient {
 					errorMsg += `\n\tWorkflow: ${workflowFileName}`;
 					errorMsg += `\n\tBranch: ${branchName}`;
 					errorMsg += `\n\tRepository: ${this.repoName}`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					Deno.exit(1);
 				}
 			});
@@ -441,12 +441,12 @@ export class WorkflowClient extends GitHubClient {
 					errorMsg = `An error occurred trying to execute the workflow '${workflowFileName}' on branch `;
 					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
 					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					Utils.printError(errorMsg);
 					break;
 				}
 			}
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}

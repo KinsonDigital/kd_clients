@@ -40,7 +40,7 @@ export class LabelClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printAsGitHubError(`${response.status} - ${response.statusText}`);
+			Utils.printError(`${response.status} - ${response.statusText}`);
 			Deno.exit(1);
 		}
 
@@ -87,7 +87,7 @@ export class LabelClient extends GitHubClient {
 			let errorMsg = `There was an issue getting the repository label '${label}'.`;
 			errorMsg += `Error: ${response.status} - ${response.statusText}`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}

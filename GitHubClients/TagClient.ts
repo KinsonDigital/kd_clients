@@ -46,7 +46,7 @@ export class TagClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printAsGitHubError(`${response.status} - ${response.statusText}`);
+			Utils.printError(`${response.status} - ${response.statusText}`);
 			Deno.exit(1);
 		}
 
@@ -96,7 +96,7 @@ export class TagClient extends GitHubClient {
 		const foundTag = foundTags.find((tag: TagModel) => tag.name.trim() === tagName);
 
 		if (foundTag === undefined) {
-			Utils.printAsGitHubError(`The tag '${tagName}' could not be found.`);
+			Utils.printError(`The tag '${tagName}' could not be found.`);
 			Deno.exit(1);
 		}
 

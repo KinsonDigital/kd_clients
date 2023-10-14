@@ -96,10 +96,10 @@ export abstract class GraphQlClient {
 			const errorMessages: string[] = errors.map((e) => e.message);
 			const error = `${errorMessages.join("\n")}`;
 
-			Utils.printAsGitHubError(error);
+			Utils.printError(error);
 			Deno.exit(1);
 		} else if (this.isBadCredentialError(responseData)) {
-			Utils.printAsGitHubError(`There was an issue making your GraphQL request.\nError: ${responseData.message}`);
+			Utils.printError(`There was an issue making your GraphQL request.\nError: ${responseData.message}`);
 			Deno.exit(1);
 		}
 

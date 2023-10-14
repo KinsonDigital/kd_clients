@@ -43,7 +43,7 @@ export class NuGetClient extends WebApiClient {
 			let errorMsg = `There was an issue checking for the '${packageName}' NuGet package.`;
 			errorMsg += `\n${this.getErrorMsg(response)}}`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -70,7 +70,7 @@ export class NuGetClient extends WebApiClient {
 			let errorMsg = `There was an issue getting the versions for the '${packageName}' NuGet package.`;
 			errorMsg += `\n${this.getErrorMsg(response)}}`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
@@ -106,7 +106,7 @@ export class NuGetClient extends WebApiClient {
 			let errorMsg = `There was an issue getting information about the '${packageName}' NuGet package.`;
 			errorMsg += `\n${this.getErrorMsg(response)}}`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}

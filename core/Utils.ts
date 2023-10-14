@@ -2,6 +2,7 @@ import { Guard } from "./Guard.ts";
 import { ReleaseType } from "./Enums.ts";
 import { IssueModel } from "./Models/IssueModel.ts";
 import { PullRequestModel } from "./Models/PullRequestModel.ts";
+import { chalk } from "../deps.ts";
 
 /**
  * Provides utility functions.
@@ -145,9 +146,9 @@ export class Utils {
 	 * Prints the given {@link message} as a GitHub error.
 	 * @param message The message to print.
 	 */
-	public static printAsGitHubError(message: string): void {
+	public static printError(message: string): void {
 		Utils.printEmptyLine();
-		console.log(`::error::${message}`);
+		console.log(chalk.red(message));
 		Utils.printEmptyLine();
 	}
 

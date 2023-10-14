@@ -70,7 +70,7 @@ export class ProjectClient extends GraphQlClient {
 		const project: ProjectModel | undefined = projects.find((project) => project.title.trim() === projectName);
 
 		if (project === undefined) {
-			Utils.printAsGitHubError(`The project '${projectName}' does not exist.`);
+			Utils.printError(`The project '${projectName}' does not exist.`);
 			Deno.exit(1);
 		}
 

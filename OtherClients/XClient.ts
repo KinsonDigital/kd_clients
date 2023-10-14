@@ -36,7 +36,7 @@ export class XClient extends WebApiClient {
 				let errorMsg = `Error Title: ${error.title}`;
 				errorMsg += `\nError Detail: ${error.detail}`;
 
-				Utils.printAsGitHubError(errorMsg);
+				Utils.printError(errorMsg);
 			});
 		} else {
 			Utils.printAsGitHubNotice(`${tweetResult.data.id}\n${tweetResult.data.text}`);

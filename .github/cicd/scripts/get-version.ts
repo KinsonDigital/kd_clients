@@ -9,7 +9,7 @@ const outputFilePath = Deno.env.get("GITHUB_OUTPUT") ?? "";
 
 if (outputFilePath === "") {
 	const errorMsg = `The environment variable 'GITHUB_OUTPUT' does not exist or is not set.`;
-	Utils.printAsGitHubError(errorMsg);
+	Utils.printError(errorMsg);
 	Deno.exit(1);
 }
 

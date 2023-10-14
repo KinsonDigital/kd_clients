@@ -32,7 +32,7 @@ export class UsersClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printAsGitHubError(`The user '${userName}' does not exist.`);
+			Utils.printError(`The user '${userName}' does not exist.`);
 			Deno.exit(1);
 		}
 

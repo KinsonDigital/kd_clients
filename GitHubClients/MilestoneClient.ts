@@ -56,7 +56,7 @@ export class MilestoneClient extends GitHubClient {
 		await Promise.all([issuesPromise, pullRequestsPromise]).then((values) => {
 			issuesAndPullRequests.push(...values[0], ...values[1]);
 		}).catch((error) => {
-			Utils.printAsGitHubError(`The request to get issues returned error '${error}'`);
+			Utils.printError(`The request to get issues returned error '${error}'`);
 			Deno.exit(1);
 		});
 
@@ -147,7 +147,7 @@ export class MilestoneClient extends GitHubClient {
 		if (milestone === undefined) {
 			const errorMsg = `The milestone '${milestoneName}' could not be found.`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -175,7 +175,7 @@ export class MilestoneClient extends GitHubClient {
 			let errorMsg = `The milestones for the repository owner '${this.ownerName}'`;
 			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 
@@ -227,13 +227,13 @@ export class MilestoneClient extends GitHubClient {
 		if (response.status === GitHubHttpStatusCodes.OK) {
 			Utils.printAsGitHubNotice(`✅The milestone '${milestoneName}' has been closed.✅`);
 		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printAsGitHubError(`The organization '${this.ownerName}' or repo '${this.repoName}' does not exist.`);
+			Utils.printError(`The organization '${this.ownerName}' or repo '${this.repoName}' does not exist.`);
 			Deno.exit(1);
 		} else {
 			let errorMsg = `An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printAsGitHubError(errorMsg);
+			Utils.printError(errorMsg);
 			Deno.exit(1);
 		}
 	}
