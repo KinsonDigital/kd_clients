@@ -312,7 +312,8 @@ export class PullRequestClient extends GitHubClient {
 		const prDoesNotExist = !(await this.pullRequestExists(prNumber));
 
 		if (prDoesNotExist) {
-			Utils.printAsGitHubError(`A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`);
+			const errorMsg = `A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`;
+			Utils.printAsGitHubError(errorMsg);
 			Deno.exit(1);
 		}
 

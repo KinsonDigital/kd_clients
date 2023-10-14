@@ -13,7 +13,6 @@ Deno.test("clamp |> when_num_is_larger_than_max |> returns_max_value", () => {
 	assertEquals(actual, expected);
 });
 
-
 Deno.test("clamp |> when_num_is_smaller_than_max |> returns_min_value", () => {
 	// Arrange
 	const expected = 100;
@@ -25,7 +24,6 @@ Deno.test("clamp |> when_num_is_smaller_than_max |> returns_min_value", () => {
 	// Assert
 	assertEquals(actual, expected);
 });
-
 
 Deno.test("invalidReleaseType |> with_invalid_type |> returns_true", () => {
 	// Arrange
@@ -48,7 +46,6 @@ Deno.test("invalidReleaseType |> with_valid_preview_type |> returns_false", () =
 	// Assert
 	assertEquals(actual, false);
 });
-
 
 Deno.test("invalidReleaseType |> with_valid_prod_type |> returns_false", () => {
 	// Arrange

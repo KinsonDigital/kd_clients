@@ -228,7 +228,8 @@ export class RepoClient extends GitHubClient {
 		const response = await this.requestPATCH(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.NoContent) {
-			let errorMsg = `An error occurred when updating the variable '${variableName}' for the repository '${this.repoName}'.`;
+			let errorMsg = `An error occurred when updating the variable '${variableName}'`;
+			errorMsg += ` for the repository '${this.repoName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
 			Utils.printAsGitHubError(errorMsg);

@@ -222,7 +222,7 @@ export class OrgClient extends GitHubClient {
 
 	/**
 	 * Gets a value indicating whether or not a user with a name that matches the
-	 * given {@link username} is a member of an organization with a name that matches, 
+	 * given {@link username} is a member of an organization with a name that matches,
 	 * the {@link OrgClient}.{@link ownerName} and has an admin role.
 	 * @param username The username of the user that might exist in the organization.
 	 * @returns True if the user is a member of the organization, false otherwise.

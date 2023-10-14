@@ -33,7 +33,7 @@ export abstract class GitHubClient extends WebApiClient {
 		if (!Utils.isNothing(token)) {
 			this.headers.append("Authorization", `Bearer ${token}`);
 		}
-	}	
+	}
 
 	/**
 	 * Gets the name of the owner of the repository.
@@ -49,18 +49,18 @@ export abstract class GitHubClient extends WebApiClient {
 		Guard.isNothing("ownerName", v, "v");
 		this._ownerName = v.trim();
 	}
-	
+
 	/**
 	 * Gets the name of the repository.
-	*/
-	public get repoName() : string {
+	 */
+	public get repoName(): string {
 		return this._repoName;
 	}
-	
+
 	/**
 	 * Sets the name of the repository.
-	*/
-	public set repoName(v : string) {
+	 */
+	public set repoName(v: string) {
 		Guard.isNothing("repoName", v, "v");
 		this._repoName = v.trim();
 	}

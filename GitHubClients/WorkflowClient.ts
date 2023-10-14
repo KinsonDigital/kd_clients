@@ -24,7 +24,7 @@ export class WorkflowClient extends GitHubClient {
 		const funcName = "ProjectClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
-		
+
 		super(ownerName, repoName, token);
 	}
 
@@ -322,7 +322,6 @@ export class WorkflowClient extends GitHubClient {
 	 * @returns All of the workflow runs that are for a pull request.
 	 */
 	public async getPullRequestWorkflowRuns(): Promise<WorkflowRunModel[]> {
-
 		return await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(

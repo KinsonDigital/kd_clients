@@ -23,7 +23,7 @@ export class LinkHeaderParser {
 
 		const headerSections: string[] = Utils.splitByComma(linkHeader).map((i) => i.trim());
 		const linkHeaderInfo: LinkHeader = {
-		prevPage: 0,
+			prevPage: 0,
 			nextPage: 0,
 			totalPages: 0,
 			pageData: [],
