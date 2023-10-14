@@ -1,9 +1,19 @@
 import { CLI } from "../core/CLI.ts";
 import { Directory } from "../core/Directory.ts";
 
+const ignoreDirectories = [
+	"./vendor/"
+];
+
 const files: string[] = Directory
 	.getFiles("/", true)
-	.filter(f => f.endsWith(".ts"));
+	.filter(f => {
+		const isTypeScriptFile = f.endsWith(".ts");
+
+		const shouldNotIgnore = ignoreDirectories.every(ignoreDir => !f.startsWith(ignoreDir))
+
+		return isTypeScriptFile && shouldNotIgnore;
+	});
 
 const cli: CLI = new CLI();
 let failed = false;
