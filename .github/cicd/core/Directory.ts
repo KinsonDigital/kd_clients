@@ -1,4 +1,4 @@
-import { existsSync } from "std/fs/exists.ts";
+import { existsSync } from "../../../deps.ts";
 
 /**
  * Provides directory functionality.

@@ -1,4 +1,4 @@
-import { RepoModel } from "models/RepoModel.ts";
+import { RepoModel } from "./RepoModel.ts";
 
 /**
  * Holds information about a pull requests head or base branches.

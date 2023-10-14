@@ -1,4 +1,4 @@
-import { ErrorModel } from "models/GraphQlModels/ErrorModel.ts";
+import { ErrorModel } from "./ErrorModel.ts";
 
 /**
  * Represents a request response.

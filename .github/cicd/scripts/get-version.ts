@@ -1,4 +1,4 @@
-import { Utils } from "core/Utils.ts";
+import { Utils } from "../../../core/Utils.ts";
 import { VersionPuller } from "../core/VersionPuller.ts";
 
 const versionPuller: VersionPuller = new VersionPuller();

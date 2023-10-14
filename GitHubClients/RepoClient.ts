@@ -1,12 +1,12 @@
-import { decodeBase64, encodeBase64 } from "std/encoding/base64.ts";
-import { GitHubHttpStatusCodes } from "core/Enums.ts";
-import { GitHubClient } from "core/GitHubClient.ts";
-import { Guard } from "core/Guard.ts";
-import { FileContentModel } from "models/FileContentModel.ts";
-import { RepoModel } from "models/RepoModel.ts";
-import { Utils } from "core/Utils.ts";
-import { GitHubVarModel } from "models/GitHubVarModel.ts";
-import { GitHubVariablesModel } from "models/GitHubVariablesModel.ts";
+import { decodeBase64, encodeBase64 } from "../deps.ts";
+import { GitHubHttpStatusCodes } from "../core/Enums.ts";
+import { GitHubClient } from "../core/GitHubClient.ts";
+import { Guard } from "../core/Guard.ts";
+import { FileContentModel } from "../core/Models/FileContentModel.ts";
+import { RepoModel } from "../core/Models/RepoModel.ts";
+import { Utils } from "../core/Utils.ts";
+import { GitHubVarModel } from "../core/Models/GitHubVarModel.ts";
+import { GitHubVariablesModel } from "../core/Models/GitHubVariablesModel.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.

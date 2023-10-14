@@ -1,5 +1,5 @@
-import { Utils } from "core/Utils.ts";
-import { File } from "cicd-core/File.ts";
+import { Utils } from "../../../core/Utils.ts";
+import { File } from "../core/File.ts";
 
 if (Deno.args.length != 2) {
 	let errorMsg = `The required number of arguments is 2 but received ${Deno.args.length}.`;

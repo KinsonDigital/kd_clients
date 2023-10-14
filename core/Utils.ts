@@ -1,7 +1,7 @@
-import { Guard } from "core/Guard.ts";
-import { IssueModel } from "models/IssueModel.ts";
-import { PullRequestModel } from "models/PullRequestModel.ts";
-import { ReleaseType } from "core/Enums.ts";
+import { Guard } from "./Guard.ts";
+import { ReleaseType } from "./Enums.ts";
+import { IssueModel } from "./Models/IssueModel.ts";
+import { PullRequestModel } from "./Models/PullRequestModel.ts";
 
 /**
  * Provides utility functions.
@@ -269,7 +269,7 @@ export class Utils {
 	public static invalidReleaseType(value: string): value is ReleaseType {
 		return value != "preview" && value != "production";
 	}
-	
+
 	/**
 	 * Returns a value indicating whether or not the given {@link value} is a valid preview release type.
 	 * @param value The value to check.
@@ -278,7 +278,7 @@ export class Utils {
 	public static isPreviewRelease(value: string): value is ReleaseType {
 		return value === "preview";
 	}
-	
+
 	/**
 	 * Returns a value indicating whether or not the given {@link value} is a valid production release type.
 	 * @param value The value to check.

@@ -1,4 +1,4 @@
-import { Utils } from "core/Utils.ts";
+import { Utils } from "./Utils.ts";
 
 /**
  * A class that contains functions to check if values are invalid.

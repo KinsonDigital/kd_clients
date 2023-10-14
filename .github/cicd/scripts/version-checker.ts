@@ -1,5 +1,5 @@
-import { RepoClient, TagClient, UsersClient } from "github/mod.ts";
-import { Utils } from "core/Utils.ts";
+import { RepoClient, TagClient, UsersClient } from "../../../GitHubClients/mod.ts";
+import { Utils } from "../../../core/Utils.ts";
 
 if (Deno.args.length !== 5) {
 	let errorMsg = `The required number of arguments is 5 but only ${Deno.args.length}.`;

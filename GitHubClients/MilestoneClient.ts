@@ -1,13 +1,13 @@
-import { Guard } from "core/Guard.ts";
-import { IssueModel } from "core/Models/IssueModel.ts";
-import { MilestoneModel } from "core/Models/MilestoneModel.ts";
-import { PullRequestModel } from "core/Models/PullRequestModel.ts";
-import { Utils } from "core/Utils.ts";
-import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "core/Enums.ts";
-import { GitHubClient } from "core/GitHubClient.ts";
-import { IssueClient } from "github/IssueClient.ts";
-import { PullRequestClient } from "github/PullRequestClient.ts";
-import { IssueOrPR } from "core/Types.ts";
+import { Guard } from "../core/Guard.ts";
+import { IssueModel } from "../core/Models/IssueModel.ts";
+import { MilestoneModel } from "../core/Models/MilestoneModel.ts";
+import { PullRequestModel } from "../core/Models/PullRequestModel.ts";
+import { Utils } from "../core/Utils.ts";
+import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
+import { GitHubClient } from "../core/GitHubClient.ts";
+import { IssueClient } from "./IssueClient.ts";
+import { PullRequestClient } from "./PullRequestClient.ts";
+import { IssueOrPR } from "../core/Types.ts";
 
 /**
  * Provides a client for interacting with milestones.

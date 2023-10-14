@@ -1,8 +1,8 @@
-import { ErrorModel } from "models/GraphQlModels/ErrorModel.ts";
-import { RequestResponseModel } from "models/GraphQlModels/RequestResponseModel.ts";
-import { BadCredentials } from "core/Types.ts";
-import { Utils } from "core/Utils.ts";
-import { Guard } from "core/Guard.ts";
+import { ErrorModel } from "./Models/GraphQlModels/ErrorModel.ts";
+import { RequestResponseModel } from "./Models/GraphQlModels/RequestResponseModel.ts";
+import { BadCredentials } from "./Types.ts";
+import { Utils } from "./Utils.ts";
+import { Guard } from "./Guard.ts";
 
 /**
  * Provides a base class for HTTP clients.
