@@ -5,6 +5,7 @@ import { GitHubVarModel } from "../core/Models/GitHubVarModel.ts";
 import { GitHubVariablesModel } from "../core/Models/GitHubVariablesModel.ts";
 import { UserModel } from "../core/Models/UserModel.ts";
 import { Utils } from "../core/Utils.ts";
+import { OrganizationError } from "./Errors/OrganizationError.ts";
 
 /**
  * Provides a client for interacting with issues.
@@ -56,14 +57,6 @@ export class OrgClient extends GitHubClient {
 
 		const response = await this.requestGET(url);
 
-		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `An error occurred when getting the private members for the organization '${this.ownerName}'.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
-
-			Utils.printError(errorMsg);
-			Deno.exit(1);
-		}
-
 		return [await this.getResponseData<UserModel[]>(response), response];
 	}
 
@@ -89,14 +82,6 @@ export class OrgClient extends GitHubClient {
 
 		const response = await this.requestGET(url);
 
-		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `An error occurred when getting the public members for the organization '${this.ownerName}'.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
-
-			Utils.printError(errorMsg);
-			Deno.exit(1);
-		}
-
 		return [await this.getResponseData<UserModel[]>(response), response];
 	}
 
@@ -105,10 +90,20 @@ export class OrgClient extends GitHubClient {
 	 * that has the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
+	 * @throws {@link Error} if the request fails.
 	 */
 	public async getPrivateAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.admin);
+			const [userModels, response] =  await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.admin);
+
+			if (response.status != GitHubHttpStatusCodes.OK) {
+				let errorMsg = `An error occurred when getting the private admin members for the organization '${this.ownerName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+
+				throw new OrganizationError(errorMsg);
+			}
+
+			return [userModels, response];
 		});
 	}
 
@@ -120,7 +115,16 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getPrivateNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.member);
+			const [users, response] =  await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.member);
+
+			if (response.status != GitHubHttpStatusCodes.OK) {
+				let errorMsg = `An error occurred when getting the private non-admin members for the organization '${this.ownerName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+
+				throw new OrganizationError(errorMsg);
+			}
+
+			return Promise.resolve([users, response]);
 		});
 	}
 
@@ -132,7 +136,16 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getAllPrivateMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.all);
+			const [users, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.all);
+
+			if (response.status != GitHubHttpStatusCodes.OK) {
+				let errorMsg = `An error occurred when getting the private members for the organization '${this.ownerName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+
+				throw new OrganizationError(errorMsg);
+			}
+
+			return Promise.resolve([users, response]);
 		});
 	}
 
@@ -144,7 +157,16 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getPublicAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.admin);
+			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.admin);
+
+			if (response.status != GitHubHttpStatusCodes.OK) {
+				let errorMsg = `An error occurred when getting the public admin members for the organization '${this.ownerName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+
+				throw new OrganizationError(errorMsg);
+			}
+
+			return Promise.resolve([users, response]);
 		});
 	}
 
@@ -156,7 +178,16 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getPublicNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.member);
+			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.member);
+
+			if (response.status != GitHubHttpStatusCodes.OK) {
+				let errorMsg = `An error occurred when getting the public non-admin members for the organization '${this.ownerName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+
+				throw new OrganizationError(errorMsg);
+			}
+
+			return Promise.resolve([users, response]);
 		});
 	}
 
@@ -168,7 +199,16 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getAllPublicMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.all);
+			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.all);
+
+			if (response.status != GitHubHttpStatusCodes.OK) {
+				let errorMsg = `An error occurred when getting the public members for the organization '${this.ownerName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+
+				throw new OrganizationError(errorMsg);
+			}
+
+			return Promise.resolve([users, response]);
 		});
 	}
 
@@ -248,8 +288,7 @@ export class OrgClient extends GitHubClient {
 				let errorMsg = `An error occurred when getting the variables for the organization '${this.ownerName}'.`;
 				errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-				Utils.printError(errorMsg);
-				Deno.exit(1);
+				throw new OrganizationError(errorMsg);
 			}
 
 			const vars = await this.getResponseData<GitHubVariablesModel>(response);
