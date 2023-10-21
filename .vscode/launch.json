@@ -12,6 +12,10 @@
                 "--inspect-wait",
                 "--allow-all",
             ],
+			"args": [
+				"${env:CICD_TOKEN}",
+				"${workspaceFolder}",
+			],
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
 			"outputCapture": "std",

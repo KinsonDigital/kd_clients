@@ -90,7 +90,7 @@ export class OrgClient extends GitHubClient {
 	 * that has the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
-	 * @throws {@link Error} if the request fails.
+	 * @throws The error {@type OrganizationError} if the request to get private admin members fails.
 	 */
 	public async getPrivateAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
@@ -112,6 +112,7 @@ export class OrgClient extends GitHubClient {
 	 * that has the {@link OrgMemberRole.member} role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
+	 * @throws The error {@link OrganizationError} if the request to get private non-admin members fails.
 	 */
 	public async getPrivateNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
@@ -133,6 +134,7 @@ export class OrgClient extends GitHubClient {
 	 * and has any role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
+	 * @throws The error {@link OrganizationError} if the request to get all private members fails.
 	 */
 	public async getAllPrivateMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
@@ -154,6 +156,7 @@ export class OrgClient extends GitHubClient {
 	 * and has the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of public members for an organization.
 	 * @remarks Does not require authentication.
+	 * @throws The error {@link OrganizationError} if the request to get all public admin members fails.
 	 */
 	public async getPublicAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
@@ -175,6 +178,7 @@ export class OrgClient extends GitHubClient {
 	 * that does not have the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of public members for an organization.
 	 * @remarks Does not require authentication.
+	 * @throws The error {@type OrganizationError} if the request to get all public non-admin members fails.
 	 */
 	public async getPublicNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
@@ -196,6 +200,7 @@ export class OrgClient extends GitHubClient {
 	 * given {@link OrgClient}.{@link ownerName} with an {@link OrgMemberRole.admin} role.
 	 * @returns The list of public members for an organization.
 	 * @remarks Does not require authentication.
+	 * @throws The error {@link OrganizationError} if the request to get all public members fails.
 	 */
 	public async getAllPublicMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
