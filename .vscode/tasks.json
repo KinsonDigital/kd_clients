@@ -9,6 +9,7 @@
 				"run",
 				"--allow-read",
 				"--allow-run",
+				"--allow-sys",
 				"${workspaceFolder}/.github/cicd/scripts/deno-check.ts"
 			],
 			"problemMatcher": [
