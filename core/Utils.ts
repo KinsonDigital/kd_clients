@@ -309,7 +309,7 @@ export class Utils {
 			errorMessages.push(error.message);
 		});
 
-		let errorMsg = `The following errors occurred while getting branches for the repository '${this.repoName}':`;
+		let errorMsg = `The following errors occurred:`;
 		errorMsg += `\n${errorMessages.join("\n")}`;
 
 		return errorMsg;
