@@ -3,6 +3,7 @@ import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
 import { Guard } from "../core/Guard.ts";
+import { LabelError } from "./Errors/LabelError.ts";
 
 /**
  * Provides a client for interacting with labels.
@@ -20,7 +21,7 @@ export class LabelClient extends GitHubClient {
 		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 
-		super(token);
+		super(ownerName, repoName, token);
 	}
 
 	/**
@@ -30,6 +31,7 @@ export class LabelClient extends GitHubClient {
 	 * @param qtyPerPage The total to return per {@link page}.
 	 * @returns A list of labels in the repo.
 	 * @remarks Does not require authentication.
+	 * @throws The error {@link LabelError} if the something goes wrong with getting the labels.
 	 */
 	public async getLabels(page: number, qtyPerPage: number): Promise<[LabelModel[], Response]> {
 		page = page < 1 ? 1 : page;
@@ -40,8 +42,7 @@ export class LabelClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printError(`${response.status} - ${response.statusText}`);
-			Deno.exit(1);
+			throw new LabelError(`${response.status} - ${response.statusText}`);
 		}
 
 		return [await this.getResponseData(response), response];
@@ -50,16 +51,23 @@ export class LabelClient extends GitHubClient {
 	/**
 	 * Gets all of the labels for a repository with a name that matches the {@link LabelClient}.{@link repoName}.
 	 * @returns The list of repository labels.
+	 * @throws The error {@link LabelError} if the something goes wrong with getting all of the labels.
 	 */
 	public async getAllLabels(): Promise<LabelModel[]> {
 		const result: LabelModel[] = [];
 
 		await this.getAllData(async (page, qtyPerPage) => {
-			const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
+			try {
+				const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
 
-			result.push(...labels);
+				result.push(...labels);
 
-			return [labels, response];
+				return [labels, response];
+			} catch (error) {
+				let errorMsg = `There was an issue getting all of the labels for the repository '${this.repoName}'.`;
+				errorMsg += `\n${error}`;
+				throw new LabelError(errorMsg);
+			}
 		});
 
 		return result;
@@ -71,6 +79,7 @@ export class LabelClient extends GitHubClient {
 	 * @param label The name of the label to check for.
 	 * @returns True if the label exists, false otherwise.
 	 * @remarks Does not require authentication.
+	 * @throws The error {@link LabelError} when something goes wrong with checking if the label exists.
 	 */
 	public async labelExists(label: string): Promise<boolean> {
 		const funcName = "labelExists";
@@ -84,11 +93,10 @@ export class LabelClient extends GitHubClient {
 		} else if (response.status === GitHubHttpStatusCodes.OK) {
 			return true;
 		} else {
-			let errorMsg = `There was an issue getting the repository label '${label}'.`;
-			errorMsg += `Error: ${response.status} - ${response.statusText}`;
+			let errorMsg = `There was an issue checking if the repository label '${label}' exists.`;
+			errorMsg += `\nError: ${response.status} - ${response.statusText}`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new LabelError(errorMsg);
 		}
 	}
 }
