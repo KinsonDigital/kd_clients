@@ -25,7 +25,7 @@ export abstract class WebApiClient {
 	 * @param url The URL of the request.
 	 * @returns The response from the request.
 	 */
-	protected async requestGET(url: string): Promise<Response> {
+	public async requestGET(url: string): Promise<Response> {
 		Guard.isNothing(url, "fetchGET", "url");
 
 		return await fetch(url, {
@@ -40,7 +40,7 @@ export abstract class WebApiClient {
 	 * @param body The body of the request.
 	 * @returns The response from the request.
 	 */
-	protected async requestPOST(url: string, body: string | object): Promise<Response> {
+	public async requestPOST(url: string, body: string | object): Promise<Response> {
 		const funcName = "fetchPOST";
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
@@ -60,7 +60,7 @@ export abstract class WebApiClient {
 	 * @param body The body of the request.
 	 * @returns The response from the request.
 	 */
-	protected async requestPATCH(url: string, body: string): Promise<Response> {
+	public async requestPATCH(url: string, body: string): Promise<Response> {
 		const funcName = "fetchPATCH";
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
@@ -77,7 +77,7 @@ export abstract class WebApiClient {
 	 * @param url The URL of the request.
 	 * @returns The response from the request.
 	 */
-	protected async requestDELETE(url: string): Promise<Response> {
+	public async requestDELETE(url: string): Promise<Response> {
 		Guard.isNothing(url, "fetchDELETE", "url");
 
 		return await fetch(url, {
@@ -92,7 +92,7 @@ export abstract class WebApiClient {
 	 * @param body The body of the request.
 	 * @returns The response from the request.
 	 */
-	protected async requestPUT(url: string, body: string): Promise<Response> {
+	public async requestPUT(url: string, body: string): Promise<Response> {
 		const funcName = "fetchPUT";
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
