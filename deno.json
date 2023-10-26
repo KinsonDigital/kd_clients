@@ -29,9 +29,5 @@
 		"indentWidth": 4,
 		"semiColons": true,
 		"singleQuote": false
-	},
-	"test": {
-		"exclude": ["*.js"],
-		"include": ["tests/*Tests.ts"]
 	}
 }
