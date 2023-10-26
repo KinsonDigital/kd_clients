@@ -124,8 +124,7 @@ export abstract class GitHubClient extends WebApiClient {
 		} catch (error) {
 			let errorMsg = "There was an issue getting all of the data using pagination.";
 			errorMsg += `\n${error.message}`;
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 
 		return allData;
@@ -209,8 +208,7 @@ export abstract class GitHubClient extends WebApiClient {
 			let errorMsg = "There was an issue getting all of the data using pagination.";
 			errorMsg += `\n${error.message}`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 	}
 
@@ -235,8 +233,7 @@ export abstract class GitHubClient extends WebApiClient {
 		} catch (error) {
 			let errorMsg = "There was an issue getting all of the data using pagination.";
 			errorMsg += `\n${error.message}`;
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 	}
 
