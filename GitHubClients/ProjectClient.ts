@@ -23,7 +23,7 @@ export class ProjectClient extends GraphQlClient {
 		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 
-		super(token);
+		super(ownerName, repoName, token);
 	}
 
 	/**
