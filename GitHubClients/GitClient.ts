@@ -173,7 +173,7 @@ export class GitClient extends GraphQlClient {
 
 		const fromBranch = await this.getBranch(branchFromName);
 
-		const repo = await this.repoClient.getRepoByName();
+		const repo = await this.repoClient.getRepo();
 
 		if (Utils.isNothing(repo.node_id)) {
 			const errorMsg = `The repository '${super.repoName}' did not return a required node ID.`;

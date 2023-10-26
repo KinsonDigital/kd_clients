@@ -7,6 +7,7 @@ import { RepoModel } from "../core/Models/RepoModel.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubVarModel } from "../core/Models/GitHubVarModel.ts";
 import { GitHubVariablesModel } from "../core/Models/GitHubVariablesModel.ts";
+import { RepoError } from "./Errors/RepoError.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.
@@ -23,13 +24,14 @@ export class RepoClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets information about a repository with a name that matches the given {@link RepoClient}/{@link repoName}.
-	 * @returns A repository.
+	 * Gets information about a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
+	 * @returns A repository information.
+	 * @throws The {@link RepoError} if the repository does not exist.
 	 */
-	public async getRepoByName(): Promise<RepoModel> {
+	public async getRepo(): Promise<RepoModel> {
 		const foundRepos = await this.getAllDataUntil<RepoModel>(
 			async (page, qtyPerPage) => {
-				return await this.getUserRepos(page, qtyPerPage ?? 100);
+				return await this.getOwnerRepos(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -41,23 +43,24 @@ export class RepoClient extends GitHubClient {
 		const foundRepo: RepoModel | undefined = foundRepos.find((repo) => repo.name.trim().toLowerCase() === this.repoName);
 
 		if (foundRepo === undefined) {
-			Utils.printError(`The repository '${this.repoName}' was not found.`);
-			Deno.exit(1);
+			throw new RepoError(`The repository '${this.repoName}' was not found.`);
 		}
 
 		return foundRepo;
 	}
 
 	/**
-	 * Gets a {@link page} of repositories with a quantity that matches the given {@link qtyPerPage}.
+	 * Gets a {@link page} of repositories owned by the currently set {@link RepoClient}.{@link ownerName} with a quantity that
+	 * matches the given {@link qtyPerPage}.
 	 * @param page The page number of the results to get.
 	 * @param qtyPerPage The quantity of results to get per page.
 	 * @returns A list of repositories.
 	 * @remarks The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link RepoError} if the repository owner does not exist.
 	 */
-	public async getUserRepos(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
+	public async getOwnerRepos(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
@@ -70,9 +73,7 @@ export class RepoClient extends GitHubClient {
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
 			let errorMsg = `Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
-			Utils.printError(errorMsg);
-
-			Deno.exit(1);
+			throw new RepoError(errorMsg);
 		}
 
 		return [<RepoModel[]> await this.getResponseData(response), response];
@@ -81,6 +82,7 @@ export class RepoClient extends GitHubClient {
 	/**
 	 * Checks if a repository with a name that matches the {@link RepoClient}.{@link repoName} exists.
 	 * @returns True if the repo exists; otherwise, false.
+	 * @throws The {@link RepoError} if there was a problem checking if the repository exists.
 	 */
 	public async exists(): Promise<boolean> {
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}`;
@@ -95,9 +97,9 @@ export class RepoClient extends GitHubClient {
 		switch (response.status) {
 			case GitHubHttpStatusCodes.MovedPermanently:
 			case GitHubHttpStatusCodes.Forbidden: {
-				const errorMsg = `Error: ${response.status} (${response.statusText})`;
-				Utils.printError(errorMsg);
-				Deno.exit(1);
+				let errorMsg = `There was a problem checking if the repository exists.`;
+				errorMsg = `\nError: ${response.status} (${response.statusText})`;
+				throw new RepoError(errorMsg);
 			}
 		}
 
@@ -110,20 +112,13 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns The content of the file.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
+	 * @throws The {@link RepoError} if there was a problem getting the file content.
 	 */
 	public async getFileContent(branchName: string, relativeFilePath: string): Promise<string> {
 		const funcName = "getFileContent";
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
-		relativeFilePath = relativeFilePath.trim();
-		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
-
 		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
-
-		if (fileContentModel === undefined || fileContentModel === null) {
-			Utils.printError("Error: 404(Not Found)");
-			Deno.exit(1);
-		}
 
 		const decodedContent = decodeBase64(fileContentModel.content);
 
@@ -140,6 +135,7 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns True if the file exists; otherwise, false.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
+	 * @throws The {@link RepoError} if there was problem checking if the file exists.
 	 */
 	public async fileExists(branchName: string, relativeFilePath: string): Promise<boolean> {
 		const funcName = "fileExists";
@@ -154,8 +150,15 @@ export class RepoClient extends GitHubClient {
 
 		const response: Response = await this.requestGET(url);
 
-		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			return false;
+		if (response.status != GitHubHttpStatusCodes.OK) {
+			if (response.status === GitHubHttpStatusCodes.NotFound) {
+				return false;
+			} else {
+				let errorMsg = `There was a problem checking if the file '${relativeFilePath}' exists in the`;
+				errorMsg += ` repository '${this.repoName}' in the branch '${branchName}'.`;
+				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				throw new RepoError(errorMsg);
+			}
 		}
 
 		return true;
@@ -164,6 +167,7 @@ export class RepoClient extends GitHubClient {
 	/**
 	 * Gets a list of all the variables for a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @returns A list of all repositories variables.
+	 * @throws The {@link RepoError} if there was a problem getting the variables.
 	 */
 	public async getVariables(): Promise<GitHubVarModel[]> {
 		return await this.getAllData<GitHubVarModel>(async (page: number, qtyPerPage?: number) => {
@@ -173,11 +177,10 @@ export class RepoClient extends GitHubClient {
 			const response = await this.requestGET(url);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the variables for the organization '${this.ownerName}'.`;
+				let errorMsg = `An error occurred when getting the variables for the owner '${this.ownerName}'.`;
 				errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-				Utils.printError(errorMsg);
-				Deno.exit(1);
+				throw new RepoError(errorMsg);
 			}
 
 			const vars = await this.getResponseData<GitHubVariablesModel>(response);
@@ -191,12 +194,12 @@ export class RepoClient extends GitHubClient {
 	 * in a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @param variableName The name of the variable.
 	 * @returns True if the variable exists; otherwise, false.
+	 * @throws The {@link RepoError} if there was a problem checking if the variable exists.
 	 */
 	public async repoVariableExists(variableName: string): Promise<boolean> {
 		Guard.isNothing(variableName, "repoVariableExists", "variableName");
 
 		const variables = await this.getVariables();
-
 		const variable = variables.find((v) => v.name === variableName);
 
 		return variable !== undefined && variable !== null;
@@ -207,6 +210,7 @@ export class RepoClient extends GitHubClient {
 	 * the given {@link variableName} in a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @param variableName The name of the variable.
 	 * @param variableValue The value of the variable.
+	 * @throws The {@link RepoError} if there was a problem updating the variable or if the variable does not exist.
 	 */
 	public async updateVariable(variableName: string, variableValue: string): Promise<void> {
 		const funcName = "updateVariable";
@@ -214,8 +218,7 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(variableValue, funcName, "variableValue");
 
 		if (!(await this.repoVariableExists(variableName))) {
-			Utils.printError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
-			Deno.exit(1);
+			throw new RepoError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
 		}
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/actions/variables/${variableName}`;
@@ -232,8 +235,7 @@ export class RepoClient extends GitHubClient {
 			errorMsg += ` for the repository '${this.repoName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new RepoError(errorMsg);
 		}
 	}
 
@@ -246,6 +248,7 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of where to add the file.
 	 * @param fileContent The content of the file.
 	 * @param commitMessage The commit message.
+	 * @throws The {@link RepoError} if there was a problem creating the file or if the file already exists.
 	 */
 	public async createFile(
 		branchName: string,
@@ -262,6 +265,11 @@ export class RepoClient extends GitHubClient {
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
 
+		if (await this.fileExists(branchName, relativeFilePath)) {
+			const errorMsg = `The file '${relativeFilePath}' already exists in the repository '${this.repoName}'.`;
+			throw new RepoError(errorMsg);
+		}
+
 		const body = {
 			message: commitMessage,
 			content: encodeBase64(fileContent),
@@ -276,8 +284,7 @@ export class RepoClient extends GitHubClient {
 			errorMsg += ` for branch '${branchName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new RepoError(errorMsg);
 		}
 	}
 
@@ -290,6 +297,7 @@ export class RepoClient extends GitHubClient {
 	 * @param fileContent The content of the file.
 	 * @param commitMessage The commit message.
 	 * @remarks If the file does not exist, an error will be thrown.
+	 * @throws The {@link RepoError} if there was a problem updating the file or if the file does not exist.
 	 */
 	public async updateFile(
 		branchName: string,
@@ -306,14 +314,12 @@ export class RepoClient extends GitHubClient {
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
 
-		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
-
-		if (fileContentModel === undefined || fileContentModel === null) {
-			let errorMsg = `The file '${relativeFilePath}' does not exist in the repository`;
-			errorMsg += `\n '${this.repoName}', in branch '${branchName}'.`;
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+		if (await this.fileExists(branchName, relativeFilePath)) {
+			const errorMsg = `The file '${relativeFilePath}' already exists in the repository '${this.repoName}'.`;
+			throw new RepoError(errorMsg);
 		}
+
+		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
 
 		const body = {
 			message: commitMessage,
@@ -330,22 +336,23 @@ export class RepoClient extends GitHubClient {
 			errorMsg += ` for branch '${branchName}'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new RepoError(errorMsg);
 		}
 	}
 
 	/**
 	 * Gets the content of a file in a repository with a name that matches the given {@link RepoClient}.{@link repoName},
-	 * on a branch with a name that matches the given {@link branchName} at the 	 * given {@link relativeFilePath}.
+	 * on a branch with a name that matches the given {@link branchName} at the given {@link relativeFilePath}.
+	 * @param branchName The name of the branch.
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns The content of the file and a boolean flag indicating whether or not the file exists.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
+	 * @throws The {@link RepoError} if there was a problem getting the file content.
 	 */
 	private async getFileContentResult(
 		branchName: string,
 		relativeFilePath: string,
-	): Promise<FileContentModel | null> {
+	): Promise<FileContentModel> {
 		const funcName = "getFileContentWithResult";
 		Guard.isNothing(branchName, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
@@ -360,11 +367,9 @@ export class RepoClient extends GitHubClient {
 
 		switch (response.status) {
 			case GitHubHttpStatusCodes.NotFound:
-				return null;
 			case GitHubHttpStatusCodes.TemporaryRedirect:
 			case GitHubHttpStatusCodes.Forbidden:
-				Utils.printError(`Error: ${response.status} (${response.statusText})`);
-				Deno.exit(1);
+				throw new RepoError(`Error: ${response.status} (${response.statusText})`);
 		}
 
 		const responseData = <FileContentModel> await this.getResponseData(response);
