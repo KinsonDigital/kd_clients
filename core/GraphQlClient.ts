@@ -3,6 +3,7 @@ import { RequestResponseModel } from "./Models/GraphQlModels/RequestResponseMode
 import { BadCredentials } from "./Types.ts";
 import { Utils } from "./Utils.ts";
 import { Guard } from "./Guard.ts";
+import { BadCredentialsError } from "../GitHubClients/Errors/BadCredentials.ts";
 
 /**
  * Provides a base class for HTTP clients.
@@ -15,12 +16,12 @@ export abstract class GraphQlClient {
 
 	/**
 	 * Initializes a new instance of the {@link GraphQlClient} class.
-	 * @param token The GitHub token to use for authentication.
-	 * @param ownerName The name of the owner of the repository to use.
+	 * @param ownerName The name of the repository owner.
 	 * @param repoName The name of a repository.
+	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(token: string, ownerName?: string, repoName?: string) {
+	constructor(ownerName: string, repoName: string, token: string) {
 		this.ownerName = Utils.isNothing(ownerName) ? "" : ownerName.trim();
 		this.repoName = Utils.isNothing(repoName) ? "" : repoName.trim();
 
@@ -76,33 +77,6 @@ export abstract class GraphQlClient {
 		const responseText = await response.text();
 		const responseData = await JSON.parse(responseText);
 
-		if (throwWithErrors === true) {
-			await this.throwIfErrors(responseText);
-		}
-
-		return responseData;
-	}
-
-	/**
-	 * Throws an error and exists the process if the response contains errors.
-	 * @param {response | string} response The response object or response text from a request.
-	 */
-	protected async throwIfErrors(response: Response | string): Promise<void> {
-		const responseText = this.isResponse(response) ? await response.text() : response;
-		const responseData = await JSON.parse(responseText);
-
-		if (this.containsErrors(responseData)) {
-			const errors: ErrorModel[] = this.getErrors(responseData);
-			const errorMessages: string[] = errors.map((e) => e.message);
-			const error = `${errorMessages.join("\n")}`;
-
-			Utils.printError(error);
-			Deno.exit(1);
-		} else if (this.isBadCredentialError(responseData)) {
-			Utils.printError(`There was an issue making your GraphQL request.\nError: ${responseData.message}`);
-			Deno.exit(1);
-		}
-
 		return responseData;
 	}
 
@@ -121,7 +95,13 @@ export abstract class GraphQlClient {
 			headers: this.headers,
 		});
 
-		return await this.getResponseData(response);
+		const result = await this.getResponseData(response);
+
+		if (!Utils.isNothing(result.message) && result.message === "Bad credentials") {
+			throw new BadCredentialsError("The GraphQL query could not be executed because the credentials are invalid.");
+		}
+
+		return result;
 	}
 
 	/**

@@ -11,6 +11,11 @@ export type RequestResponseModel = {
 	data: any;
 
 	/**
+	 * The message returned from the request.
+	 */
+	message?: string;
+
+	/**
 	 * The errors returned from the request.
 	 */
 	errors?: ErrorModel[];
