@@ -3,6 +3,7 @@ import { ReleaseType } from "./Enums.ts";
 import { IssueModel } from "./Models/IssueModel.ts";
 import { PullRequestModel } from "./Models/PullRequestModel.ts";
 import { chalk } from "../deps.ts";
+import { RequestResponseModel } from "./Models/GraphQlModels/RequestResponseModel.ts";
 
 /**
  * Provides utility functions.
@@ -287,5 +288,30 @@ export class Utils {
 	 */
 	public static isProductionRelease(value: string): value is ReleaseType {
 		return value === "production";
+	}
+
+	/**
+	 * Combines the given {@link mainMsg} and {@link requestResponse} error messages into one error message.
+	 * @param mainMsg The main error message.
+	 * @param requestResponse The request response that might contain more error messages.
+	 * @returns The main and response error messages combined.
+	 */
+	public static toErrorMessage(mainMsg: string, requestResponse: RequestResponseModel): string {
+		const errorMessages: string[] = [];
+
+		mainMsg = mainMsg.endsWith(":") ? mainMsg : `${mainMsg}:`;
+
+		if (requestResponse.errors === undefined) {
+			return mainMsg;
+		}
+
+		requestResponse.errors.forEach((error) => {
+			errorMessages.push(error.message);
+		});
+
+		let errorMsg = `The following errors occurred while getting branches for the repository '${this.repoName}':`;
+		errorMsg += `\n${errorMessages.join("\n")}`;
+
+		return errorMsg;
 	}
 }
