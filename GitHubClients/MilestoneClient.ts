@@ -8,6 +8,7 @@ import { GitHubClient } from "../core/GitHubClient.ts";
 import { IssueClient } from "./IssueClient.ts";
 import { PullRequestClient } from "./PullRequestClient.ts";
 import { IssueOrPR } from "../core/Types.ts";
+import { MilestoneError } from "./Errors/MilestoneError.ts";
 
 /**
  * Provides a client for interacting with milestones.
@@ -15,6 +16,7 @@ import { IssueOrPR } from "../core/Types.ts";
 export class MilestoneClient extends GitHubClient {
 	private readonly issueClient: IssueClient;
 	private readonly prClient: PullRequestClient;
+	private readonly isInitialized: boolean = false;
 
 	/**
 	 * Initializes a new instance of the {@link MilestoneClient} class.
@@ -26,12 +28,43 @@ export class MilestoneClient extends GitHubClient {
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "MilestoneClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
-		Guard.isNothing(repoName, funcName, "this.repoName");
+		Guard.isNothing(repoName, funcName, "repoName");
 
-		super(token);
+		super(ownerName, repoName, token);
 
-		this.issueClient = new IssueClient(ownerName, this.repoName, token);
-		this.prClient = new PullRequestClient(ownerName, this.repoName, token);
+		this.issueClient = new IssueClient(ownerName, repoName, token);
+		this.prClient = new PullRequestClient(ownerName, repoName, token);
+		this.isInitialized = true;
+	}
+
+	/**
+	 * Sets the name of the owner of the repository.
+	 */
+	public set ownerName(v: string) {
+		Guard.isNothing("ownerName", v, "v");
+		super.ownerName = v.trim();
+
+		if (!this.isInitialized) {
+			return;
+		}
+	
+		this.issueClient.ownerName = v;
+		this.prClient.ownerName = v;
+	}
+
+	/**
+	 * Sets the name of the repository.
+	 */
+	public set repoName(v: string) {
+		Guard.isNothing("repoName", v, "v");
+		super.repoName = v.trim();
+
+		if (!this.isInitialized) {
+			return;
+		}
+
+		this.issueClient.repoName = v;
+		this.prClient.repoName = v;
 	}
 
 	/**
@@ -147,8 +180,7 @@ export class MilestoneClient extends GitHubClient {
 		if (milestone === undefined) {
 			const errorMsg = `The milestone '${milestoneName}' could not be found.`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new MilestoneError(errorMsg)
 		}
 
 		return milestone;
@@ -166,17 +198,16 @@ export class MilestoneClient extends GitHubClient {
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
 		const queryParams = `?state=all&page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/milestones${queryParams}`;
+		const url = `${this.baseUrl}/repos/${super.ownerName}/${super.repoName}/milestones${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `The milestones for the repository owner '${this.ownerName}'`;
-			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
+			let errorMsg = `The milestones for the repository owner '${super.ownerName}'`;
+			errorMsg += ` and for the repository '${super.repoName}' could not be found.`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new MilestoneError(errorMsg);
 		}
 
 		return [<MilestoneModel[]> await this.getResponseData(response), response];
@@ -220,21 +251,15 @@ export class MilestoneClient extends GitHubClient {
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/milestones/${milestone.number}`;
+		const url = `${this.baseUrl}/repos/${super.ownerName}/${super.repoName}/milestones/${milestone.number}`;
 		const response: Response = await this.requestPATCH(url, JSON.stringify({ state: "closed" }));
 
 		// If there is an error
-		if (response.status === GitHubHttpStatusCodes.OK) {
-			Utils.printAsGitHubNotice(`✅The milestone '${milestoneName}' has been closed.✅`);
-		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printError(`The organization '${this.ownerName}' or repo '${this.repoName}' does not exist.`);
-			Deno.exit(1);
-		} else {
+		if (response.status != GitHubHttpStatusCodes.OK) {
 			let errorMsg = `An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`;
 			errorMsg += `\nError: ${response.status}(${response.statusText})`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new MilestoneError(errorMsg);
 		}
 	}
 }
