@@ -19,7 +19,11 @@ const files: string[] = Directory
 const cli: CLI = new CLI();
 let failed = false;
 
+console.clear();
 console.log(`Checking ${files.length} files . . .`);
+
+let totalPassed = 0;
+let totalFailed = 0;
 
 // Perform a deno check on all of the files
 for await (let file of files) {
@@ -40,13 +44,19 @@ for await (let file of files) {
 		lines.forEach(line => {
 			logEndValue += `   ${line}\n`;
 		});
+
+		totalFailed++;
 	} else {
 		logEndValue = "✅\n";
+		totalPassed++;
 	}
 
 	const logEnd = new TextEncoder().encode(logEndValue);
 	Deno.stdout.writeSync(logEnd);
 };
+
+const resultsMsg = new TextEncoder().encode(`\nTotal Checks Passed✅: ${totalPassed}\nTotal Checks Failed❌: ${totalFailed}\n`);
+Deno.stdout.writeSync(resultsMsg);
 
 if (failed) {
 	Deno.exit(1);
