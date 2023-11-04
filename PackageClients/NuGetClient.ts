@@ -2,6 +2,7 @@ import { WebApiClient } from "../core/WebApiClient.ts";
 import { Guard } from "../core/Guard.ts";
 import { Utils } from "../core/Utils.ts";
 import { NuGetHttpStatusCodes } from "../core/Enums.ts";
+import { NuGetError } from "../GitHubClients/Errors/NuGetError.ts";
 
 /**
  * References:
@@ -27,6 +28,7 @@ export class NuGetClient extends WebApiClient {
 	 * Checks if a package that matches the given {@link packageName} exists in the NuGet registry.
 	 * @param packageName The name of the NuGet package.
 	 * @returns True if the package exists, otherwise false.
+	 * @throws The {@link NuGetError} if there was an issue checking for the package.
 	 */
 	public async packageExists(packageName: string): Promise<boolean> {
 		Guard.isNothing(packageName, "packageExists", "packageName");
@@ -43,8 +45,7 @@ export class NuGetClient extends WebApiClient {
 			let errorMsg = `There was an issue checking for the '${packageName}' NuGet package.`;
 			errorMsg += `\n${this.getErrorMsg(response)}}`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new NuGetError(errorMsg);
 		}
 	}
 
@@ -52,6 +53,7 @@ export class NuGetClient extends WebApiClient {
 	 * Gets all of the versions for a NuGet package that matches the given {@link packageName}.
 	 * @param packageName The name of the NuGet package.
 	 * @returns The versions of the given NuGet package.
+	 * @throws The {@link NuGetError} if there was an issue getting the versions for a package.
 	 */
 	public async getPackageVersions(packageName: string): Promise<string[]> {
 		Guard.isNothing(packageName, "getPackageVersions", "packageName");
@@ -70,8 +72,7 @@ export class NuGetClient extends WebApiClient {
 			let errorMsg = `There was an issue getting the versions for the '${packageName}' NuGet package.`;
 			errorMsg += `\n${this.getErrorMsg(response)}}`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new NuGetError(errorMsg);
 		}
 	}
 
@@ -80,15 +81,18 @@ export class NuGetClient extends WebApiClient {
 	 * @param packageName The name of the NuGet package.
 	 * @param version The version of the NuGet package.
 	 * @returns True if the package exists with the given version, otherwise false.
+	 * @throws The {@link NuGetError} if there was an issue checking for a specific package version.
 	 */
 	public async packageWithVersionExists(packageName: string, version: string): Promise<boolean> {
-		Guard.isNothing(packageName, "getPackageVersions", "packageName");
+		const funcName = "packageWithVersionExists";
+		Guard.isNothing(packageName, funcName, "packageName");
+		Guard.isNothing(packageName, funcName, "version");
 
 		packageName = packageName.trim().toLowerCase();
 		version = version.trim().toLowerCase();
 
 		const url = this.buildUrl(packageName);
-
+		
 		const response: Response = await this.requestGET(url);
 		const statusCode: NuGetHttpStatusCodes = response.status as NuGetHttpStatusCodes;
 
@@ -106,8 +110,7 @@ export class NuGetClient extends WebApiClient {
 			let errorMsg = `There was an issue getting information about the '${packageName}' NuGet package.`;
 			errorMsg += `\n${this.getErrorMsg(response)}}`;
 
-			Utils.printError(errorMsg);
-			Deno.exit(1);
+			throw new NuGetError(errorMsg);
 		}
 	}
 
