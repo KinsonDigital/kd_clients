@@ -1,7 +1,6 @@
 {
     "recommendations": [
 		"denoland.vscode-deno",
-		"humao.rest-client",
 		"github.vscode-github-actions",
 		"redhat.vscode-yaml"
 	]
