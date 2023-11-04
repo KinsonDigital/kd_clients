@@ -46,7 +46,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * Sets the name of the owner of the repository.
 	 */
 	public set ownerName(v: string) {
-		Guard.isNothing("ownerName", v, "v");
+		Guard.isNothing(v, "ownerName", "v");
 		this._ownerName = v.trim();
 	}
 
@@ -61,7 +61,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * Sets the name of the repository.
 	 */
 	public set repoName(v: string) {
-		Guard.isNothing("repoName", v, "v");
+		Guard.isNothing(v, "repoName", "v");
 		this._repoName = v.trim();
 	}
 
