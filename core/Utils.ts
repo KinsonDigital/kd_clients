@@ -134,17 +134,7 @@ export class Utils {
 	}
 
 	/**
-	 * Prints the given {@link message} as a GitHub notice.
-	 * @param message The message to print.
-	 */
-	public static printAsGitHubNotice(message: string): void {
-		Utils.printEmptyLine();
-		console.log(`::notice::${message}`);
-		Utils.printEmptyLine();
-	}
-
-	/**
-	 * Prints the given {@link message} as a GitHub error.
+	 * Prints the given {@link message} as a error.
 	 * @param message The message to print.
 	 */
 	public static printError(message: string): void {
