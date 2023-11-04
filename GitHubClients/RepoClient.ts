@@ -15,12 +15,12 @@ import { RepoError } from "./Errors/RepoError.ts";
 export class RepoClient extends GitHubClient {
 	/**
 	 * Initializes a new instance of the {@link RepoClient} class.
-	 * @param repoOwner The name of the owner of a repository.
+	 * @param ownerName The name of the owner of a repository.
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 */
-	constructor(repoOwner: string, repoName: string, token?: string) {
-		super(repoOwner, repoName, token);
+	constructor(ownerName: string, repoName: string, token?: string) {
+		super(ownerName, repoName, token);
 	}
 
 	/**

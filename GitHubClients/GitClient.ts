@@ -27,7 +27,7 @@ export class GitClient extends GraphQlClient {
 	 */
 	constructor(ownerName: string, repoName: string, token: string) {
 		const funcName = "GitClient.Ctor";
-		Guard.isNothing(ownerName, funcName, "repoOwner");
+		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(ownerName, repoName, token);

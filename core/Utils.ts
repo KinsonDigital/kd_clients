@@ -173,34 +173,34 @@ export class Utils {
 
 	/**
 	 * Builds a URL to a pull request that matches the given {@link prNumber} in a repository with a
-	 * name that matches the given {@link repoName} and is owned by the given {@link repoOwner}.
-	 * @param repoOwner The owner of the repository.
+	 * name that matches the given {@link repoName} and is owned by the given {@link ownerName}.
+	 * @param ownerName The owner of the repository.
 	 * @param repoName The name of the repository.
 	 * @param prNumber The pull request number.
 	 * @returns The URL to the issue.
 	 */
-	public static buildPullRequestUrl(repoOwner: string, repoName: string, prNumber: number): string {
+	public static buildPullRequestUrl(ownerName: string, repoName: string, prNumber: number): string {
 		const funcName = "buildPullRequestUrl";
-		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 		Guard.isLessThanOne(prNumber, funcName, "prNumber");
 
-		return `https://github.com/${repoOwner}/${repoName}/pull/${prNumber}`;
+		return `https://github.com/${ownerName}/${repoName}/pull/${prNumber}`;
 	}
 
 	/**
 	 * Builds a URL to the labels page of a repository with a name that matches the given {@link repoName}
-	 * and is owned by the given {@link repoOwner}.
-	 * @param repoOwner The owner of the repository.
+	 * and is owned by the given {@link ownerName}.
+	 * @param ownerName The owner of the repository.
 	 * @param repoName The name of the repository.
 	 * @returns The URL to the repository labels page.
 	 */
-	public static buildLabelsUrl(repoOwner: string, repoName: string): string {
+	public static buildLabelsUrl(ownerName: string, repoName: string): string {
 		const funcName = "buildLabelsUrl";
-		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 
-		return `https://github.com/${repoOwner}/${repoName}/labels`;
+		return `https://github.com/${ownerName}/${repoName}/labels`;
 	}
 
 	/**

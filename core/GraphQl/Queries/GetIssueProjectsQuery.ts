@@ -1,11 +1,11 @@
 /**
  * Gets the organizational project for an issue.
- * @param repoOwner The owner of the organization.
+ * @param ownerName The owner of the organization.
  * @returns The list of projects.
  */
-export const createGetIssueProjectsQuery = (repoOwner: string, repoName: string, issueNumber: number): string => {
+export const createGetIssueProjectsQuery = (ownerName: string, repoName: string, issueNumber: number): string => {
 	return `{
-		repository(owner: "${repoOwner}", name: "${repoName}") {
+		repository(owner: "${ownerName}", name: "${repoName}") {
 			issue(number: ${issueNumber}) {
 				projectsV2 (first: 100) {
 					nodes {

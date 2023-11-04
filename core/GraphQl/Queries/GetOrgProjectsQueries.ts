@@ -1,11 +1,11 @@
 /**
  * Get a list of the GitHub organization projects.
- * @param repoOwner The owner of the organization.
+ * @param ownerName The owner of the organization.
  * @returns The list of projects.
  */
-export const createOrgProjectsQuery = (repoOwner: string): string => {
+export const createOrgProjectsQuery = (ownerName: string): string => {
 	return `{
-        organization(login: "${repoOwner}") {
+        organization(login: "${ownerName}") {
             projectsV2 (first: 100) {
                 nodes {
                     id
