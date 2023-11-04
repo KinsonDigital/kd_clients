@@ -15,17 +15,17 @@ export class Guard {
 		paramName = "",
 	): void {
 		if (Utils.isNothing(value)) {
-			Utils.printError("The value is null, undefined, or empty.");
+			let errorMsg = "The value is null, undefined, or empty.";
 
 			if (funcName != "") {
-				console.log(`Function Name: ${funcName}`);
+				errorMsg += `\nFunction Name: ${funcName}`;
 			}
 
 			if (paramName != "") {
-				console.log(`Param Name: ${paramName}`);
+				errorMsg += `\nParam Name: ${paramName}`;
 			}
 
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 	}
 
@@ -38,31 +38,31 @@ export class Guard {
 	public static isLessThanOne(value: undefined | null | number, funcName = "", paramName = ""): void {
 		const isNullOrUndefined = value === undefined || value === null;
 		if (isNullOrUndefined || isNaN(value) || !isFinite(value)) {
-			Utils.printError("The value is undefined, null, NaN, Infinite, -Infinity.");
+			let errorMsg = "The value is undefined, null, NaN, Infinite, -Infinity.";
 
 			if (funcName != "") {
-				console.log(`Function Name: ${funcName}`);
+				errorMsg += `\nFunction Name: ${funcName}`;
 			}
 
 			if (paramName != "") {
-				console.log(`Param Name: ${paramName}`);
+				errorMsg += `\nParam Name: ${paramName}`;
 			}
 
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 
 		if (value < 0) {
-			Utils.printError("The value is less than or equal to zero.");
+			let errorMsg = "The value is less than or equal to zero.";
 
 			if (funcName != "") {
-				console.log(`Function Name: ${funcName}`);
+				errorMsg += `\nFunction Name: ${funcName}`;
 			}
 
 			if (paramName != "") {
-				console.log(`Param Name: ${paramName}`);
+				errorMsg += `\nParam Name: ${paramName}`;
 			}
 
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 	}
 }
