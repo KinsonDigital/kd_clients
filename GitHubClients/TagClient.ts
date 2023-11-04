@@ -36,8 +36,6 @@ export class TagClient extends GitHubClient {
 	 * @throws The {@link TagError} if there was an issue getting the tags.
 	 */
 	public async getTags(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
-		Guard.isNothing(this.repoName, "getTags", "repoName");
-
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
@@ -48,7 +46,9 @@ export class TagClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			throw new TagError(`${response.status} - ${response.statusText}`);
+			const errorMsg = this.buildErrorMsg("There was an issue getting the tags.", response);
+
+			throw new TagError(errorMsg);
 		}
 
 		return [<TagModel[]> await this.getResponseData(response), response];
@@ -80,8 +80,7 @@ export class TagClient extends GitHubClient {
 	 * @throws The {@link TagError} if there was an issue getting the tag.
 	 */
 	public async getTagByName(tagName: string): Promise<TagModel> {
-		const funcName = "getTagByName";
-		Guard.isNothing(tagName, funcName, "tagName");
+		Guard.isNothing(tagName, "getTagByName", "tagName");
 
 		tagName = tagName.trim();
 
@@ -112,8 +111,7 @@ export class TagClient extends GitHubClient {
 	 * @throws The {@link TagError} if there was an issue checking if the tag exists.
 	 */
 	public async tagExists(tagName: string): Promise<boolean> {
-		const funcName = "tagExists";
-		Guard.isNothing(tagName, funcName, "tagName");
+		Guard.isNothing(tagName, "tagExists", "tagName");
 
 		tagName = tagName.trim();
 

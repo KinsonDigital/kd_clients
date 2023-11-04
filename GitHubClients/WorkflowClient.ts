@@ -66,8 +66,11 @@ export class WorkflowClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`;
-			errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`,
+				response,
+			);
+
 			throw new WorkflowError(errorMsg);
 		}
 
@@ -362,8 +365,10 @@ export class WorkflowClient extends GitHubClient {
 		switch (response.status) {
 			case GitHubHttpStatusCodes.Forbidden:
 			case GitHubHttpStatusCodes.NotFound: {
-				let errorMsg = `An error occurred trying to delete the workflow run '${workflowRun.name}(${workflowRun.id})'`;
-				errorMsg += `Error: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred trying to delete the workflow run '${workflowRun.name}(${workflowRun.id})'`,
+					response);
+
 				throw new WorkflowError(errorMsg);
 			}
 		}
@@ -424,30 +429,34 @@ export class WorkflowClient extends GitHubClient {
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/actions/workflows/${workflowFileName}/dispatches`;
 
-		const requestResponse: Response = await this.requestPOST(url, body);
+		const response: Response = await this.requestPOST(url, body);
 
-		if (requestResponse.status != GitHubHttpStatusCodes.NoContent) {
+		if (response.status != GitHubHttpStatusCodes.NoContent) {
 			let errorMsg = "";
-			switch (requestResponse.status) {
+			switch (response.status) {
 				case GitHubHttpStatusCodes.NotFound: {
-					errorMsg = `The workflow '${workflowFileName}' could not be found on branch `;
-					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
-					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
+					errorMsg = this.buildErrorMsg(
+						`The workflow '${workflowFileName}' could not be found on ` +
+							`branch '${branchName}' in the repository '${this.repoName}'.'`,
+						response,
+					);
 					break;
 				}
 				case GitHubHttpStatusCodes.UnprocessableContent: {
 					errorMsg = `The workflow '${workflowFileName}' on branch '${branchName}' in the repository `;
 					errorMsg += `'${this.repoName}' was not processable.`;
-					const githubResponse: GithubResponse = JSON.parse(await requestResponse.text());
-
-					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
+					const githubResponse: GithubResponse = JSON.parse(await response.text());
 					errorMsg += `\n${githubResponse.message}\n${githubResponse.documentation_url}`;
+
+					errorMsg = this.buildErrorMsg(errorMsg, response);
+
 					break;
 				}
 				default: {
-					errorMsg = `An error occurred trying to execute the workflow '${workflowFileName}' on branch `;
-					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
-					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
+					errorMsg = this.buildErrorMsg(
+						`An error occurred trying to execute the workflow '${workflowFileName}' on branch ` + 
+							`'${branchName}' in the repository '${this.repoName}'.'`,
+						response);
 					break;
 				}
 			}

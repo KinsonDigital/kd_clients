@@ -110,8 +110,10 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.UnprocessableContent:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred trying to get the pull requests for the repository '${this.repoName}'.`;
-					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred trying to get the pull requests for the repository '${this.repoName}'.`,
+						response);
+
 					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound: {
@@ -237,8 +239,10 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.ServiceUnavailable:
 				case GitHubHttpStatusCodes.Forbidden:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred trying to add the label '${label}' to pull request '${prNumber}'.`;
-					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred trying to add the label '${label}' to pull request '${prNumber}'.`,
+						response);
+
 					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
@@ -269,8 +273,10 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.InternalServerError:
 				case GitHubHttpStatusCodes.ServiceUnavailable:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred checking if pull request '${prNumber}' exists.`;
-					errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred checking if pull request '${prNumber}' exists.`,
+						response);
+
 					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
@@ -328,8 +334,9 @@ export class PullRequestClient extends GitHubClient {
 					case GitHubHttpStatusCodes.ServiceUnavailable:
 					case GitHubHttpStatusCodes.Forbidden:
 					case GitHubHttpStatusCodes.Unauthorized: {
-						let errorMsg = `An error occurred trying to update pull request '${prNumber}'.`;
-						errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
+						const errorMsg = this.buildErrorMsg(
+							`An error occurred trying to update pull request '${prNumber}'.`,
+							response);
 
 						throw new PullRequestError(errorMsg);
 					}
@@ -360,9 +367,10 @@ export class PullRequestClient extends GitHubClient {
 		const response = await this.requestPOST(url, body);
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
-			let errorMsg = `An error occurred trying to request the reviewer '${reviewer}' for pull request '${prNumber}'.`;
-			errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
-			errorMsg += `\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred trying to request the reviewer '${reviewer}' for pull request '${prNumber}'.` +
+				`\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`,
+				response);
 
 			throw new PullRequestError(errorMsg);
 		}
@@ -421,7 +429,9 @@ export class PullRequestClient extends GitHubClient {
 		const response = await this.requestPOST(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
-			const errorMsg = `Error: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg("There was an issue creating the pull request.",
+				response);
+
 			throw new PullRequestError(errorMsg);
 		}
 

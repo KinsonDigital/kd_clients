@@ -38,7 +38,7 @@ export class IssueClient extends GitHubClient {
 		if (!this.isInitialized) {
 			return;
 		}
-		
+
 		this.labelClient.ownerName = v;
 	}
 
@@ -67,8 +67,7 @@ export class IssueClient extends GitHubClient {
 			const [issues, response] = await this.getIssues(page, qtyPerPage);
 
 			if (response.status !== GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred trying to get all of the opened issues.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(`An error occurred trying to get all of the opened issues.`, response);
 				throw new IssueError(errorMsg);
 			}
 
@@ -87,8 +86,7 @@ export class IssueClient extends GitHubClient {
 			const [issues, response] = await this.getIssues(page, qtyPerPage, IssueOrPRState.closed);
 
 			if (response.status !== GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred trying to get all of the closed issues.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg("An error occurred trying to get all of the closed issues.", response);
 				throw new IssueError(errorMsg);
 			}
 
@@ -146,8 +144,8 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.UnprocessableContent:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred trying to get the issues for the repository '${super.repoName}'.`;
-					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
+					const mainMsg = `An error occurred trying to get the issues for the repository '${super.repoName}'.`;
+					const errorMsg = this.buildErrorMsg(mainMsg, response);
 					throw new IssueError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound: {
@@ -184,8 +182,8 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.NotModified:
 				case GitHubHttpStatusCodes.Unauthorized:
 				case GitHubHttpStatusCodes.Gone: {
-					let errorMsg = `An error occurred trying to get issue '${issueNumber}'.`;
-					errorMsg += `\nError: ${response.status}(${response.statusText})`;
+					const errorMsg = this.buildErrorMsg(`An error occurred trying to get issue '${issueNumber}'.`, response);
+
 					throw new IssueError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
@@ -247,8 +245,10 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.ServiceUnavailable:
 				case GitHubHttpStatusCodes.Forbidden:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred trying to add the label '${label}' to issue '${issueNumber}'.`;
-					errorMsg += `\nError: ${response.status}(${response.statusText})`;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred trying to add the label '${label}' to issue '${issueNumber}'.`,
+						response,
+					);
 					throw new IssueError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
@@ -278,8 +278,10 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.Gone:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `There was an issue getting the labels for issue '${issueNumber}'.`;
-					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
+					const errorMsg = this.buildErrorMsg(
+						`There was an issue getting the labels for issue '${issueNumber}'.`,
+						response);
+
 					throw new IssueError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
@@ -382,8 +384,10 @@ export class IssueClient extends GitHubClient {
 					case GitHubHttpStatusCodes.ServiceUnavailable:
 					case GitHubHttpStatusCodes.Unauthorized:
 					case GitHubHttpStatusCodes.Forbidden: {
-						let errorMsg = `An error occurred trying to update issue '${issueNumber}'.`;
-						errorMsg += `\n'Error: ${response.status}(${response.statusText})`;
+						const errorMsg = this.buildErrorMsg(
+							`An error occurred trying to update issue '${issueNumber}'.`,
+							response,
+						);
 
 						throw new IssueError(errorMsg);
 					}

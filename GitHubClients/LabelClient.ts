@@ -42,7 +42,9 @@ export class LabelClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			throw new LabelError(`${response.status} - ${response.statusText}`);
+			const errorMsg = this.buildErrorMsg("There was an issue getting the labels.", response);
+
+			throw new LabelError(errorMsg);
 		}
 
 		return [await this.getResponseData(response), response];
@@ -57,17 +59,11 @@ export class LabelClient extends GitHubClient {
 		const result: LabelModel[] = [];
 
 		await this.getAllData(async (page, qtyPerPage) => {
-			try {
-				const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
+			const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
 
-				result.push(...labels);
+			result.push(...labels);
 
-				return [labels, response];
-			} catch (error) {
-				let errorMsg = `There was an issue getting all of the labels for the repository '${this.repoName}'.`;
-				errorMsg += `\n${error}`;
-				throw new LabelError(errorMsg);
-			}
+			return [labels, response];
 		});
 
 		return result;
@@ -82,8 +78,7 @@ export class LabelClient extends GitHubClient {
 	 * @throws The error {@link LabelError} when something goes wrong with checking if the label exists.
 	 */
 	public async labelExists(label: string): Promise<boolean> {
-		const funcName = "labelExists";
-		Guard.isNothing(label, funcName, "label");
+		Guard.isNothing(label, "labelExists", "label");
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/labels/${label}`;
 		const response: Response = await this.requestGET(url);
@@ -93,8 +88,9 @@ export class LabelClient extends GitHubClient {
 		} else if (response.status === GitHubHttpStatusCodes.OK) {
 			return true;
 		} else {
-			let errorMsg = `There was an issue checking if the repository label '${label}' exists.`;
-			errorMsg += `\nError: ${response.status} - ${response.statusText}`;
+			const errorMsg = this.buildErrorMsg(
+				`There was an issue checking if the repository label '${label}' exists.`,
+				response);
 
 			throw new LabelError(errorMsg);
 		}

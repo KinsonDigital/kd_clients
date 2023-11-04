@@ -256,8 +256,9 @@ export class MilestoneClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`,
+				response);
 
 			throw new MilestoneError(errorMsg);
 		}

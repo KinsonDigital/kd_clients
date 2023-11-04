@@ -1,7 +1,8 @@
 {
     "cSpell.words": [
 		"cicd",
-		"Creds"
+		"Creds",
+		"flatcontainer"
 	],
 	"files.exclude": {
 		"**/.git": true,

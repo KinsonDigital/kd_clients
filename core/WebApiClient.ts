@@ -117,4 +117,14 @@ export abstract class WebApiClient {
 			this.headers.append(name, value);
 		}
 	}
+
+	/**
+	 * Builds an error message from the given error message and response.
+	 * @param errorMsg The error message to use.
+	 * @param response The response to get the data from.
+	 * @returns The error status code and text.
+	 */
+	protected buildErrorMsg(errorMessage: string, response: Response): string {
+		return `${errorMessage}\nError: ${response.status}(${response.statusText})`;
+	}
 }

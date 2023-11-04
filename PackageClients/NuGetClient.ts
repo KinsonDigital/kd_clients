@@ -1,6 +1,5 @@
 import { WebApiClient } from "../core/WebApiClient.ts";
 import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
 import { NuGetHttpStatusCodes } from "../core/Enums.ts";
 import { NuGetError } from "../GitHubClients/Errors/NuGetError.ts";
 
@@ -42,8 +41,9 @@ export class NuGetClient extends WebApiClient {
 		if (this.statusCodeValid(statusCode)) {
 			return statusCode === NuGetHttpStatusCodes.SuccessWithResponseBody;
 		} else {
-			let errorMsg = `There was an issue checking for the '${packageName}' NuGet package.`;
-			errorMsg += `\n${this.getErrorMsg(response)}}`;
+			const errorMsg = this.buildErrorMsg(
+				`There was an issue checking for the '${packageName}' NuGet package.`,
+				response);
 
 			throw new NuGetError(errorMsg);
 		}
@@ -69,8 +69,9 @@ export class NuGetClient extends WebApiClient {
 
 			return data.versions;
 		} else {
-			let errorMsg = `There was an issue getting the versions for the '${packageName}' NuGet package.`;
-			errorMsg += `\n${this.getErrorMsg(response)}}`;
+			const errorMsg = this.buildErrorMsg(
+				`There was an issue getting the versions for the '${packageName}' NuGet package.`,
+				response);
 
 			throw new NuGetError(errorMsg);
 		}
@@ -107,8 +108,9 @@ export class NuGetClient extends WebApiClient {
 				return false;
 			}
 		} else {
-			let errorMsg = `There was an issue getting information about the '${packageName}' NuGet package.`;
-			errorMsg += `\n${this.getErrorMsg(response)}}`;
+			const errorMsg = this.buildErrorMsg(
+				`There was an issue getting information about the '${packageName}' NuGet package.`,
+				response);
 
 			throw new NuGetError(errorMsg);
 		}
@@ -137,15 +139,6 @@ export class NuGetClient extends WebApiClient {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Gets the error message from the given response.
-	 * @param response The response to get the data from.
-	 * @returns The error status code and text.
-	 */
-	private getErrorMsg(response: Response): string {
-		return `Error: ${response.status} - ${response.statusText}`;
 	}
 
 	/**

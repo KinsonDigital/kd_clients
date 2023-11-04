@@ -97,8 +97,9 @@ export class OrgClient extends GitHubClient {
 			const [userModels, response] =  await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.admin);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the private admin members for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the private admin members for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -119,8 +120,9 @@ export class OrgClient extends GitHubClient {
 			const [users, response] =  await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.member);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the private non-admin members for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the private non-admin members for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -141,8 +143,9 @@ export class OrgClient extends GitHubClient {
 			const [users, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.all);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the private members for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the private members for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -163,8 +166,9 @@ export class OrgClient extends GitHubClient {
 			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.admin);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the public admin members for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the public admin members for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -185,8 +189,9 @@ export class OrgClient extends GitHubClient {
 			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.member);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the public non-admin members for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the public non-admin members for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -207,8 +212,9 @@ export class OrgClient extends GitHubClient {
 			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.all);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the public members for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the public members for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -290,8 +296,9 @@ export class OrgClient extends GitHubClient {
 			const response = await this.requestGET(url);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the variables for the organization '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the variables for the organization '${this.ownerName}'.`,
+					response);
 
 				throw new OrganizationError(errorMsg);
 			}

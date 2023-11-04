@@ -71,8 +71,10 @@ export class RepoClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			let errorMsg = `Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg(
+				`Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`,
+				response);
+
 			throw new RepoError(errorMsg);
 		}
 
@@ -97,8 +99,10 @@ export class RepoClient extends GitHubClient {
 		switch (response.status) {
 			case GitHubHttpStatusCodes.MovedPermanently:
 			case GitHubHttpStatusCodes.Forbidden: {
-				let errorMsg = `There was a problem checking if the repository exists.`;
-				errorMsg = `\nError: ${response.status} (${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`There was a problem checking if the repository exists.`,
+					response);
+
 				throw new RepoError(errorMsg);
 			}
 		}
@@ -154,9 +158,11 @@ export class RepoClient extends GitHubClient {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				return false;
 			} else {
-				let errorMsg = `There was a problem checking if the file '${relativeFilePath}' exists in the`;
-				errorMsg += ` repository '${this.repoName}' in the branch '${branchName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`There was a problem checking if the file '${relativeFilePath}' exists in the` +
+					` repository '${this.repoName}' in the branch '${branchName}'.`,
+					response);
+
 				throw new RepoError(errorMsg);
 			}
 		}
@@ -177,8 +183,9 @@ export class RepoClient extends GitHubClient {
 			const response = await this.requestGET(url);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
-				let errorMsg = `An error occurred when getting the variables for the owner '${this.ownerName}'.`;
-				errorMsg += `\nError: ${response.status}(${response.statusText})`;
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred when getting the variables for the owner '${this.ownerName}'.`,
+					response);
 
 				throw new RepoError(errorMsg);
 			}
@@ -231,9 +238,10 @@ export class RepoClient extends GitHubClient {
 		const response = await this.requestPATCH(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.NoContent) {
-			let errorMsg = `An error occurred when updating the variable '${variableName}'`;
-			errorMsg += ` for the repository '${this.repoName}'.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred when updating the variable '${variableName}'` +
+				` for the repository '${this.repoName}'.`,
+				response);
 
 			throw new RepoError(errorMsg);
 		}
@@ -280,9 +288,10 @@ export class RepoClient extends GitHubClient {
 		const response = await this.requestPUT(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
-			let errorMsg = `An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'`;
-			errorMsg += ` for branch '${branchName}'.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
+					` for branch '${branchName}'.`,
+				response);
 
 			throw new RepoError(errorMsg);
 		}
@@ -332,9 +341,10 @@ export class RepoClient extends GitHubClient {
 		const response = await this.requestPUT(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
-			let errorMsg = `An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'`;
-			errorMsg += ` for branch '${branchName}'.`;
-			errorMsg += `\nError: ${response.status}(${response.statusText})`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` + 
+					` for branch '${branchName}'.`,
+					response);
 
 			throw new RepoError(errorMsg);
 		}
@@ -368,8 +378,11 @@ export class RepoClient extends GitHubClient {
 		switch (response.status) {
 			case GitHubHttpStatusCodes.NotFound:
 			case GitHubHttpStatusCodes.TemporaryRedirect:
-			case GitHubHttpStatusCodes.Forbidden:
-				throw new RepoError(`Error: ${response.status} (${response.statusText})`);
+			case GitHubHttpStatusCodes.Forbidden: {
+				const errorMsg = this.buildErrorMsg("There was an issue getting the file content", response);
+				
+				throw new RepoError(errorMsg);
+			}
 		}
 
 		const responseData = <FileContentModel> await this.getResponseData(response);
