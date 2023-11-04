@@ -20,7 +20,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(ownerName?: string, repoName?: string, token?: string) {
+	constructor(ownerName: string, repoName: string, token?: string) {
 		super();
 
 		this.ownerName = Utils.isNothing(ownerName) ? "" : ownerName.trim();

@@ -17,7 +17,7 @@ version = version.startsWith("v") ? version : `v${version}`;
 
 const token = Deno.args[4].trim();
 
-const userCLient: UsersClient = new UsersClient(token);
+const userCLient: UsersClient = new UsersClient(ownerName, repoName, token);
 
 if (!await userCLient.userExists(ownerName)) {
 	const errorMsg = `The user '${ownerName}' does not exist.`;
