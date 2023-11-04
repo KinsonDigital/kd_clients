@@ -1,6 +1,6 @@
-import { LinkHeader } from "core/LinkHeader.ts";
-import { PageInfo } from "core/PageInfo.ts";
-import { Utils } from "core/Utils.ts";
+import { LinkHeader } from "./LinkHeader.ts";
+import { PageInfo } from "./PageInfo.ts";
+import { Utils } from "./Utils.ts";
 
 /**
  * Parses link headers to collect pagination information.
@@ -23,7 +23,7 @@ export class LinkHeaderParser {
 
 		const headerSections: string[] = Utils.splitByComma(linkHeader).map((i) => i.trim());
 		const linkHeaderInfo: LinkHeader = {
-		prevPage: 0,
+			prevPage: 0,
 			nextPage: 0,
 			totalPages: 0,
 			pageData: [],

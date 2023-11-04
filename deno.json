@@ -1,5 +1,5 @@
 {
-	"version": "v1.0.0-preview.2",
+	"version": "v1.0.0-preview.3",
 	"lint": {
 		"include": [
 			"core/",
@@ -29,20 +29,5 @@
 		"indentWidth": 4,
 		"semiColons": true,
 		"singleQuote": false
-	},
-	"test": {
-		"exclude": ["*.js"],
-		"include": ["tests/*Tests.ts"]
-	},
-	"imports": {
-		"core/": "./core/",
-		"cicd-core/": "./.github/cicd/core/",
-		"github/": "./GitHubClients/",
-		"other/": "./OtherClients/",
-		"package/": "./PackageClients/",
-		"models/": "./core/Models/",
-		"twitter": "npm:twitter-api-v2@1.15.0",
-		"assertions/": "https://deno.land/std@0.203.0/assert/",
-		"std/": "https://deno.land/std@0.203.0/"
 	}
 }

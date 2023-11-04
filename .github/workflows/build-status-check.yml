@@ -29,7 +29,4 @@ jobs:
 
     - name: Run Build
       run: |
-        deno run --allow-read --allow-run `
-          --no-remote `
-          --import-map=${{ github.workspace }}/vendor/import_map.json `
-          ./.github/cicd/scripts/deno-check.ts;
+        deno run --allow-read --allow-run "./.github/cicd/scripts/deno-check.ts";

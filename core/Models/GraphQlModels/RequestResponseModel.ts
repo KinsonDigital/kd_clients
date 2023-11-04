@@ -1,4 +1,4 @@
-import { ErrorModel } from "models/GraphQlModels/ErrorModel.ts";
+import { ErrorModel } from "./ErrorModel.ts";
 
 /**
  * Represents a request response.
@@ -9,6 +9,11 @@ export type RequestResponseModel = {
 	 */
 	// deno-lint-ignore no-explicit-any
 	data: any;
+
+	/**
+	 * The message returned from the request.
+	 */
+	message?: string;
 
 	/**
 	 * The errors returned from the request.

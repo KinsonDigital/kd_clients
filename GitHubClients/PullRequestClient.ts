@@ -1,10 +1,11 @@
-import { Guard } from "core/Guard.ts";
-import { LabelClient } from "github/LabelClient.ts";
-import { PullRequestModel } from "models/PullRequestModel.ts";
-import { Utils } from "core/Utils.ts";
-import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "core/Enums.ts";
-import { GitHubClient } from "core/GitHubClient.ts";
-import { IssueOrPRRequestData } from "core/IssueOrPRRequestData.ts";
+import { Guard } from "../core/Guard.ts";
+import { LabelClient } from "./LabelClient.ts";
+import { PullRequestModel } from "../core/Models/PullRequestModel.ts";
+import { Utils } from "../core/Utils.ts";
+import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
+import { GitHubClient } from "../core/GitHubClient.ts";
+import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
+import { PullRequestError } from "./Errors/PullRequestError.ts";
 
 /**
  * Provides a client for interacting with pull requests.
@@ -20,7 +21,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
-		const funcName = "TagClient.ctor";
+		const funcName = "PullRequestClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 
@@ -33,6 +34,7 @@ export class PullRequestClient extends GitHubClient {
 	 * the given{@link PullRequestClient}.{@link repoName}.
 	 * @returns The pull request.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link PullRequestError} when something goes wrong with getting all of the pull requests.
 	 */
 	public async getAllOpenPullRequests(): Promise<PullRequestModel[]> {
 		return await this.getAllData<PullRequestModel>(async (page, qtyPerPage) => {
@@ -45,6 +47,7 @@ export class PullRequestClient extends GitHubClient {
 	 * given {@link PullRequestClient}.{@link repoName}.
 	 * @returns The pull request.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link PullRequestError} when something goes wrong with getting all of the pull requests.
 	 */
 	public async getAllClosedPullRequests(): Promise<PullRequestModel[]> {
 		return await this.getAllData<PullRequestModel>(async (page, qtyPerPage) => {
@@ -69,6 +72,7 @@ export class PullRequestClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value of 100 will be used.
+	 * @thrown The {@link PullRequestError} when something goes wrong with getting the pull requests.
 	 */
 	public async getPullRequests(
 		page = 1,
@@ -106,19 +110,17 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.UnprocessableContent:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred trying to get the pull requests for the repository '${this.repoName}'.`;
-					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
-					break;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred trying to get the pull requests for the repository '${this.repoName}'.`,
+						response);
+
+					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound: {
 					const errorMsg = `The organization '${this.ownerName}' or repository '${this.repoName}' does not exist.`;
-					Utils.printAsGitHubError(errorMsg);
-					break;
+					throw new PullRequestError(errorMsg);
 				}
 			}
-
-			Deno.exit(1);
 		}
 
 		// Get all of the pull requests that are with any merge state
@@ -148,6 +150,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @param prNumber The number of the pull request.
 	 * @returns The labels for the pull request.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link PullRequestError} when something goes wrong with getting the labels.
 	 */
 	public async getLabels(prNumber: number): Promise<string[]> {
 		Guard.isLessThanOne(prNumber, "getLabels", "prNumber");
@@ -161,6 +164,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @param prNumber The number of the pull request.
 	 * @returns The pull request.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link PullRequestError} when something goes wrong with getting a pull request.
 	 */
 	public async getPullRequest(prNumber: number): Promise<PullRequestModel> {
 		Guard.isLessThanOne(prNumber, "getPullRequest", "prNumber");
@@ -179,15 +183,11 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					let errorMsg = `An error occurred trying to get the pull request '${prNumber}'.`;
 					errorMsg += `\n\tError '${response.status}(${response.statusText})'`;
-					Utils.printAsGitHubError(errorMsg);
-					break;
+					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`The pull request number '${prNumber}' does not exist.`);
-					break;
+					throw new PullRequestError(`The pull request number '${prNumber}' does not exist.`);
 			}
-
-			Deno.exit(1);
 		}
 
 		return <PullRequestModel> await this.getResponseData(response);
@@ -199,14 +199,14 @@ export class PullRequestClient extends GitHubClient {
 	 * @param prNumber The number of the pull request.
 	 * @param label The name of the label to add.
 	 * @remarks Requires authentication.
+	 * @throws The {@link PullRequestError} when something goes wrong with adding a label.
 	 */
 	public async addLabel(prNumber: number, label: string): Promise<void> {
 		Guard.isLessThanOne(prNumber, "addLabel", "prNumber");
 		Guard.isNothing(label, "addLabel", "label");
 
 		if (!this.containsToken()) {
-			Utils.printAsGitHubError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
-			Deno.exit(1);
+			throw new PullRequestError(`The request to add label '${label}' is forbidden.  Check the auth token.`);
 		}
 
 		// First check that the label trying to be added exists in the repo
@@ -220,8 +220,7 @@ export class PullRequestClient extends GitHubClient {
 			errorMsg += `\nRepo Labels: ${labelsUrl}`;
 			errorMsg += `\nPull Request: ${prUrl}`;
 
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new PullRequestError(errorMsg);
 		}
 
 		const prLabels: string[] = await this.getLabels(prNumber);
@@ -240,17 +239,15 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.ServiceUnavailable:
 				case GitHubHttpStatusCodes.Forbidden:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred trying to add the label '${label}' to pull request '${prNumber}'.`;
-					errorMsg += `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
-					break;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred trying to add the label '${label}' to pull request '${prNumber}'.`,
+						response);
+
+					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
-					Utils.printAsGitHubError(`The pull request number '${prNumber}' does not exist.`);
-					break;
+					throw new PullRequestError(`The pull request number '${prNumber}' does not exist.`);
 			}
-
-			Deno.exit(1);
 		}
 	}
 
@@ -259,6 +256,7 @@ export class PullRequestClient extends GitHubClient {
 	 * the given {@link PullRequestClient}.{@link repoName}.
 	 * @param prNumber The number of the pull request.
 	 * @returns True if the pull request exists, otherwise false.
+	 * @throws The {@link PullRequestError} when something goes wrong with checking if a pull request exists.
 	 */
 	public async pullRequestExists(prNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(prNumber, "pullRequestExists", "prNumber");
@@ -275,10 +273,11 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.InternalServerError:
 				case GitHubHttpStatusCodes.ServiceUnavailable:
 				case GitHubHttpStatusCodes.Unauthorized: {
-					let errorMsg = `An error occurred checking if pull request '${prNumber}' exists.`;
-					errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
-					break;
+					const errorMsg = this.buildErrorMsg(
+						`An error occurred checking if pull request '${prNumber}' exists.`,
+						response);
+
+					throw new PullRequestError(errorMsg);
 				}
 				case GitHubHttpStatusCodes.NotFound:
 					return false;
@@ -305,6 +304,7 @@ export class PullRequestClient extends GitHubClient {
 	 * in a repository with a name that matches the given {@link PullRequestClient}.{@link repoName}.
 	 * @param prNumber The pull request number.
 	 * @param prRequestData The data to update the pull request with.
+	 * @throws The {@link PullRequestError} when something goes wrong with updating a pull request.
 	 */
 	public async updatePullRequest(prNumber: number, prRequestData: IssueOrPRRequestData): Promise<void> {
 		Guard.isLessThanOne(prNumber, "updatePullRequest", "prNumber");
@@ -312,8 +312,8 @@ export class PullRequestClient extends GitHubClient {
 		const prDoesNotExist = !(await this.pullRequestExists(prNumber));
 
 		if (prDoesNotExist) {
-			Utils.printAsGitHubError(`A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`);
-			Deno.exit(1);
+			const errorMsg = `A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`;
+			throw new PullRequestError(errorMsg);
 		}
 
 		this.repoName = this.repoName.trim();
@@ -325,7 +325,7 @@ export class PullRequestClient extends GitHubClient {
 
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
-				Utils.printAsGitHubError(`An pull request with the number '${prNumber}' does not exist.`);
+				throw new PullRequestError(`An pull request with the number '${prNumber}' does not exist.`);
 			} else {
 				switch (response.status) {
 					case GitHubHttpStatusCodes.MovedPermanently:
@@ -334,16 +334,14 @@ export class PullRequestClient extends GitHubClient {
 					case GitHubHttpStatusCodes.ServiceUnavailable:
 					case GitHubHttpStatusCodes.Forbidden:
 					case GitHubHttpStatusCodes.Unauthorized: {
-						let errorMsg = `An error occurred trying to update pull request '${prNumber}'.`;
-						errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
+						const errorMsg = this.buildErrorMsg(
+							`An error occurred trying to update pull request '${prNumber}'.`,
+							response);
 
-						Utils.printAsGitHubError(errorMsg);
-						break;
+						throw new PullRequestError(errorMsg);
 					}
 				}
 			}
-
-			Deno.exit(1);
 		}
 	}
 
@@ -353,10 +351,12 @@ export class PullRequestClient extends GitHubClient {
 	 * the given {@link PullRequestClient}.{@link repoName}.
 	 * @param prNumber The pull request number.
 	 * @param reviewer The reviewer to request.
+	 * @throws The {@link PullRequestError} when something goes wrong with requesting a pull request reviewer.
 	 */
 	public async requestReviewer(prNumber: number, reviewer: string): Promise<void> {
-		Guard.isLessThanOne(prNumber, "requestReviewer", "prNumber");
-		Guard.isNothing(reviewer, "requestReviewer", "reviewer");
+		const funcName = "requestReviewer";
+		Guard.isLessThanOne(prNumber, funcName, "prNumber");
+		Guard.isNothing(reviewer, funcName, "reviewer");
 
 		this.repoName = this.repoName.trim();
 		reviewer = reviewer.trim();
@@ -367,12 +367,12 @@ export class PullRequestClient extends GitHubClient {
 		const response = await this.requestPOST(url, body);
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
-			let errorMsg = `An error occurred trying to request the reviewer '${reviewer}' for pull request '${prNumber}'.`;
-			errorMsg += `\n\t'Error: ${response.status}(${response.statusText})`;
-			errorMsg += `\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`;
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred trying to request the reviewer '${reviewer}' for pull request '${prNumber}'.` +
+				`\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`,
+				response);
 
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new PullRequestError(errorMsg);
 		}
 	}
 
@@ -381,6 +381,7 @@ export class PullRequestClient extends GitHubClient {
 	 * that matches the given {@link PullRequestClient}.{@link repoName}.
 	 * @param prNumber The pull request number.
 	 * @returns True if the pull request exists and is open, otherwise false.
+	 * @throws The {@link PullRequestError} when something goes wrong with checking if a closed pull request exists.
 	 */
 	public async closedPullRequestExists(prNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(prNumber, "closedPullRequestExists", "issueNumber");
@@ -398,6 +399,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @param maintainerCanModify The value indicating whether or not maintainers can modify the pull request.
 	 * @param isDraft The value indicating whether or not the pull request is a draft pull request.
 	 * @returns The newly created pull request.
+	 * @throws The {@link PullRequestError} when something goes wrong with creating a pull request.
 	 */
 	public async createPullRequest(
 		title: string,
@@ -427,9 +429,10 @@ export class PullRequestClient extends GitHubClient {
 		const response = await this.requestPOST(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
-			const errorMsg = `Error: ${response.status}(${response.statusText})`;
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			const errorMsg = this.buildErrorMsg("There was an issue creating the pull request.",
+				response);
+
+			throw new PullRequestError(errorMsg);
 		}
 
 		const newPullRequest = await response.json() as PullRequestModel;
@@ -442,12 +445,13 @@ export class PullRequestClient extends GitHubClient {
 	 * repository with a name that matches the given {@link PullRequestClient}.{@link repoName}.
 	 * @param prNumber The number of the issue.
 	 * @returns True if the pull request exists, otherwise false.
+	 * @throws The {@link PullRequestError} when something goes wrong with checking if an open or closed pull request exists.
 	 */
 	private async openOrClosedPullRequestExists(
 		prNumber: number,
 		state: IssueOrPRState,
 	): Promise<boolean> {
-		Guard.isLessThanOne(prNumber, "openOrClosedPullRequestExists", "issueNumber");
+		Guard.isLessThanOne(prNumber, "openOrClosedPullRequestExists", "prNumber");
 
 		const issues = await this.getAllDataUntil<PullRequestModel>(
 			async (page: number, qtyPerPage?: number) => {

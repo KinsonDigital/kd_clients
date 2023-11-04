@@ -1,8 +1,9 @@
-import { GitHubHttpStatusCodes } from "core/Enums.ts";
-import { GitHubClient } from "core/GitHubClient.ts";
-import { Guard } from "core/Guard.ts";
-import { ReleaseModel } from "core/Models/ReleaseModel.ts";
-import { Utils } from "core/Utils.ts";
+import { GitHubHttpStatusCodes } from "../core/Enums.ts";
+import { GitHubClient } from "../core/GitHubClient.ts";
+import { Guard } from "../core/Guard.ts";
+import { ReleaseModel } from "../core/Models/ReleaseModel.ts";
+import { Utils } from "../core/Utils.ts";
+import { ReleaseError } from "./Errors/ReleaseError.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.
@@ -35,6 +36,7 @@ export class ReleaseClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link ReleaseError} if there was an issue getting the releases.
 	 */
 	public async getReleases(page: number, qtyPerPage: number): Promise<[ReleaseModel[], Response]> {
 		page = page < 1 ? 1 : page;
@@ -50,9 +52,7 @@ export class ReleaseClient extends GitHubClient {
 			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
 			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
 
-			Utils.printAsGitHubError(errorMsg);
-
-			Deno.exit(1);
+			throw new ReleaseError(errorMsg);
 		}
 
 		return [<ReleaseModel[]> await this.getResponseData(response), response];
@@ -63,6 +63,7 @@ export class ReleaseClient extends GitHubClient {
 	 * where the tag name matches the given {@link tagName}.
 	 * @param tagName The tag of the release to get.
 	 * @returns The release for the given repository and tag.
+	 * @throws The {@link ReleaseError} if there was an issue getting the release.
 	 */
 	public async getReleaseByTag(tagName: string): Promise<ReleaseModel> {
 		const funcName = "getReleaseByTag";
@@ -86,8 +87,7 @@ export class ReleaseClient extends GitHubClient {
 
 		if (foundRelease === undefined) {
 			const errorMsg = `A release with the tag '${tagName}' for the repository '${this.repoName}' could not be found.`;
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new ReleaseError(errorMsg);
 		}
 
 		return foundRelease;
@@ -98,6 +98,7 @@ export class ReleaseClient extends GitHubClient {
 	 * where the name that the name of the release matches the given {@link releaseName}.
 	 * @param releaseName The name of the release to get.
 	 * @returns The release for the given repository and name.
+	 * @throws The {@link ReleaseError} if there was an issue getting the release.
 	 */
 	public async getReleaseByName(releaseName: string): Promise<ReleaseModel> {
 		const funcName = "getReleaseByName";
@@ -121,8 +122,7 @@ export class ReleaseClient extends GitHubClient {
 
 		if (foundRelease === undefined) {
 			const errorMsg = `A release with the name '${releaseName}' for the repository '${this.repoName}' could not be found.`;
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new ReleaseError(errorMsg);
 		}
 
 		return foundRelease;
@@ -133,6 +133,7 @@ export class ReleaseClient extends GitHubClient {
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
 	 * @returns The release for the given repository and name.
+	 * @throws The {@link ReleaseError} if there was an issue checking if the release exists.
 	 */
 	public async releaseExists(tagName: string): Promise<boolean> {
 		const funcName = "releaseExists";

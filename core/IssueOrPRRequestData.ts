@@ -1,4 +1,4 @@
-import { IssueState, StateReason } from "core/Enums.ts";
+import { IssueState, StateReason } from "./Enums.ts";
 
 /**
  * Represents the body of an HTTP GitHub API issue request.

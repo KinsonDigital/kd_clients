@@ -1,4 +1,4 @@
-import { PageInfo } from "core/PageInfo.ts";
+import { PageInfo } from "./PageInfo.ts";
 
 /**
  * Represents a response link header from a GitHub API response

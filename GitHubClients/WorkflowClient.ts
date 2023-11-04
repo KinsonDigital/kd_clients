@@ -1,11 +1,12 @@
-import { Guard } from "core/Guard.ts";
-import { Utils } from "core/Utils.ts";
-import { GitHubHttpStatusCodes, WorkflowEvent, WorkflowRunStatus } from "core/Enums.ts";
-import { GitHubClient } from "core/GitHubClient.ts";
-import { WorkflowRunModel } from "core/Models/WorkflowRunModel.ts";
-import { WorkflowRunsModel } from "core/Models/WorkflowRunsModel.ts";
-import { AnyBranch } from "core/Types.ts";
-import { GithubResponse } from "github/GithubResponse.ts";
+import { Guard } from "../core/Guard.ts";
+import { Utils } from "../core/Utils.ts";
+import { GitHubHttpStatusCodes, WorkflowEvent, WorkflowRunStatus } from "../core/Enums.ts";
+import { GitHubClient } from "../core/GitHubClient.ts";
+import { WorkflowRunModel } from "../core/Models/WorkflowRunModel.ts";
+import { WorkflowRunsModel } from "../core/Models/WorkflowRunsModel.ts";
+import { AnyBranch } from "../core/Types.ts";
+import { GithubResponse } from "../GitHubClients/GithubResponse.ts";
+import { WorkflowError } from "./Errors/WorkflowError.ts";
 
 /**
  * Provides a client for interacting with workflow runs.
@@ -21,10 +22,10 @@ export class WorkflowClient extends GitHubClient {
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
-		const funcName = "ProjectClient.ctor";
+		const funcName = "WorkflowClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
-		
+
 		super(ownerName, repoName, token);
 	}
 
@@ -41,6 +42,7 @@ export class WorkflowClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link WorkflowError} if there was an issue getting the workflow runs.
 	 */
 	public async getWorkflowRuns(
 		branch: string | null | AnyBranch,
@@ -64,10 +66,12 @@ export class WorkflowClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
-			let errorMsg = `An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`;
-			errorMsg = `\n\tError: ${response.status}(${response.statusText})`;
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`,
+				response,
+			);
+
+			throw new WorkflowError(errorMsg);
 		}
 
 		const workflowRuns: WorkflowRunsModel = await this.getResponseData(response);
@@ -78,6 +82,7 @@ export class WorkflowClient extends GitHubClient {
 	/**
 	 * Gets a list of all the workflow runs for a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @returns The list of workflow runs.
+	 * @throws The {@link WorkflowError} if there was an issue getting all of the workflow runs.
 	 */
 	public async getAllWorkflowRuns(): Promise<WorkflowRunModel[]> {
 		Guard.isNothing(this.repoName, "getAllWorkflowRuns", "repoName");
@@ -100,13 +105,13 @@ export class WorkflowClient extends GitHubClient {
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link WorkflowError} if there was an issue getting the completed workflow runs.
 	 */
 	public async getCompletedWorkflowRunsByBranch(
 		branch: string,
 		event: WorkflowEvent,
 	): Promise<WorkflowRunModel[]> {
-		const funcName = "getCompletedWorkflowRunsByBranch";
-		Guard.isNothing(branch, funcName, "branch");
+		Guard.isNothing(branch, "getCompletedWorkflowRunsByBranch", "branch");
 
 		branch = branch.trim();
 
@@ -123,6 +128,7 @@ export class WorkflowClient extends GitHubClient {
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link WorkflowError} if there was an issue getting the completed workflow runs.
 	 */
 	public async getCompletedWorkflowRuns(event: WorkflowEvent): Promise<WorkflowRunModel[]> {
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
@@ -140,13 +146,13 @@ export class WorkflowClient extends GitHubClient {
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link WorkflowError} if there was an issue getting the failed workflow runs.
 	 */
 	public async getFailedWorkflowRunsByBranch(
 		branch: string,
 		event: WorkflowEvent,
 	): Promise<WorkflowRunModel[]> {
-		const funcName = "getFailedWorkflowRunsByBranch";
-		Guard.isNothing(branch, funcName, "branch");
+		Guard.isNothing(branch, "getFailedWorkflowRunsByBranch", "branch");
 
 		branch = branch.trim();
 
@@ -163,6 +169,7 @@ export class WorkflowClient extends GitHubClient {
 	 * @param event The event that triggered the workflow runs.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link WorkflowError} if there was an issue getting the failed workflow runs.
 	 */
 	public async getFailedWorkflowRuns(event: WorkflowEvent): Promise<WorkflowRunModel[]> {
 		Guard.isNothing("getFailedWorkflowRuns", "repoName");
@@ -182,6 +189,7 @@ export class WorkflowClient extends GitHubClient {
 	 * @param endDate The end date of when the workflow run was created.
 	 * @returns The workflow runs.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link WorkflowError} if there was an issue getting the workflow runs.
 	 */
 	public async getWorkflowRunsBetweenDates(startDate: Date, endDate: Date): Promise<WorkflowRunModel[]> {
 		const result = await this.getAllFilteredData<WorkflowRunModel>(
@@ -215,6 +223,7 @@ export class WorkflowClient extends GitHubClient {
 	 * the {@link WorkflowClient}.{@link repoName}.
 	 * @param title The title of the workflow runs.
 	 * @returns The workflow runs.
+	 * @throws The {@link WorkflowError} if there was an issue getting the workflow runs.
 	 */
 	public async getAllWorkflowRunsByTitle(title: string): Promise<WorkflowRunModel[]> {
 		const funcName = "getAllWorkflowRunsByTitle";
@@ -245,10 +254,10 @@ export class WorkflowClient extends GitHubClient {
 	 * the {@link WorkflowClient}.{@link repoName}.
 	 * @param title The title of the workflow run.
 	 * @returns The workflow run.
+	 * @throws The {@link WorkflowError} if there was an issue getting the workflow run.
 	 */
 	public async getWorkflowRunByTitle(title: string): Promise<WorkflowRunModel> {
-		const funcName = "getWorkflowRunByTitle";
-		Guard.isNothing(title, funcName, "title");
+		Guard.isNothing(title, "getWorkflowRunByTitle", "title");
 
 		title = title.trim();
 
@@ -272,8 +281,7 @@ export class WorkflowClient extends GitHubClient {
 		const workflowRun = workflowRuns.find((run) => run.display_title.trim() === title);
 
 		if (workflowRun === undefined) {
-			Utils.printAsGitHubError(`A workflow run with the title '${title}' was not found.`);
-			Deno.exit(1);
+			throw new WorkflowError(`A workflow run with the title '${title}' was not found.`);
 		}
 
 		return workflowRun;
@@ -285,10 +293,10 @@ export class WorkflowClient extends GitHubClient {
 	 * @param prNumber The number of the pull request.
 	 * @returns The workflow runs for a pull request number that matches the given {@link prNumber}.
 	 * @remarks Does not require authentication.
+	 * @throws The {@link WorkflowError} if there was an issue getting the workflow runs.
 	 */
 	public async getWorkflowRunsForPR(prNumber: number): Promise<WorkflowRunModel[]> {
-		const funcName = "getWorkflowRunsForPR";
-		Guard.isLessThanOne(prNumber, funcName, "prNumber");
+		Guard.isLessThanOne(prNumber, "getWorkflowRunsForPR", "prNumber");
 
 		const result = await this.getAllDataUntil<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
@@ -320,9 +328,9 @@ export class WorkflowClient extends GitHubClient {
 	 * Gets all of the workflow runs for pull requests for a repository with a name that matches the
 	 * {@link WorkflowClient}.{@link repoName}.
 	 * @returns All of the workflow runs that are for a pull request.
+	 * @throws The {@link WorkflowError} if there was an issue getting the workflow runs.
 	 */
 	public async getPullRequestWorkflowRuns(): Promise<WorkflowRunModel[]> {
-
 		return await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
 				return await this.getWorkflowRuns(
@@ -345,6 +353,7 @@ export class WorkflowClient extends GitHubClient {
 
 	/**
 	 * Deletes the given {@link workflowRun} in a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
+	 * @throws The {@link WorkflowError} if there was an issue deleting the workflow run.
 	 * @remarks Requires authentication.
 	 */
 	public async deleteWorkflow(workflowRun: WorkflowRunModel): Promise<void> {
@@ -356,9 +365,11 @@ export class WorkflowClient extends GitHubClient {
 		switch (response.status) {
 			case GitHubHttpStatusCodes.Forbidden:
 			case GitHubHttpStatusCodes.NotFound: {
-				let errorMsg = `An error occurred trying to delete the workflow run '${workflowRun.name}(${workflowRun.id})'`;
-				errorMsg += `Error: ${response.status}(${response.statusText})`, Utils.printAsGitHubError(errorMsg);
-				Deno.exit(1);
+				const errorMsg = this.buildErrorMsg(
+					`An error occurred trying to delete the workflow run '${workflowRun.name}(${workflowRun.id})'`,
+					response);
+
+				throw new WorkflowError(errorMsg);
 			}
 		}
 	}
@@ -368,6 +379,7 @@ export class WorkflowClient extends GitHubClient {
 	 * given {@link branchName} for a repository that matches the {@link WorkflowClient}.{@link repoName}.
 	 * @param branchName The name of the branch.
 	 * @param workflowFileName The file name of the workflow.
+	 * @throws The {@link WorkflowError} if there was an issue executing the workflow.
 	 */
 	public async executeWorkflow(
 		branchName: string,
@@ -385,7 +397,7 @@ export class WorkflowClient extends GitHubClient {
 		if (!workflowFileName.endsWith(".yml") && !workflowFileName.endsWith(".yaml")) {
 			let errorMsg = `The workflow file name '${workflowFileName}' does not contain the correct extension.`;
 			errorMsg += `\nThe workflow file name must end with '.yml' or '.yaml'.`;
-			Deno.exit(1);
+			throw new WorkflowError(errorMsg);
 		}
 
 		let body = {};
@@ -405,8 +417,7 @@ export class WorkflowClient extends GitHubClient {
 					errorMsg += `\n\tWorkflow: ${workflowFileName}`;
 					errorMsg += `\n\tBranch: ${branchName}`;
 					errorMsg += `\n\tRepository: ${this.repoName}`;
-					Utils.printAsGitHubError(errorMsg);
-					Deno.exit(1);
+					throw new WorkflowError(errorMsg);
 				}
 			});
 
@@ -418,37 +429,39 @@ export class WorkflowClient extends GitHubClient {
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/actions/workflows/${workflowFileName}/dispatches`;
 
-		const requestResponse: Response = await this.requestPOST(url, body);
+		const response: Response = await this.requestPOST(url, body);
 
-		if (requestResponse.status != GitHubHttpStatusCodes.NoContent) {
+		if (response.status != GitHubHttpStatusCodes.NoContent) {
 			let errorMsg = "";
-			switch (requestResponse.status) {
+			switch (response.status) {
 				case GitHubHttpStatusCodes.NotFound: {
-					errorMsg = `The workflow '${workflowFileName}' could not be found on branch `;
-					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
-					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
+					errorMsg = this.buildErrorMsg(
+						`The workflow '${workflowFileName}' could not be found on ` +
+							`branch '${branchName}' in the repository '${this.repoName}'.'`,
+						response,
+					);
 					break;
 				}
 				case GitHubHttpStatusCodes.UnprocessableContent: {
 					errorMsg = `The workflow '${workflowFileName}' on branch '${branchName}' in the repository `;
 					errorMsg += `'${this.repoName}' was not processable.`;
-					const githubResponse: GithubResponse = JSON.parse(await requestResponse.text());
-
-					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
+					const githubResponse: GithubResponse = JSON.parse(await response.text());
 					errorMsg += `\n${githubResponse.message}\n${githubResponse.documentation_url}`;
+
+					errorMsg = this.buildErrorMsg(errorMsg, response);
+
 					break;
 				}
 				default: {
-					errorMsg = `An error occurred trying to execute the workflow '${workflowFileName}' on branch `;
-					errorMsg += `'${branchName}' in the repository '${this.repoName}'.'`;
-					errorMsg += `\n\tError: ${requestResponse.status}(${requestResponse.statusText})`;
-					Utils.printAsGitHubError(errorMsg);
+					errorMsg = this.buildErrorMsg(
+						`An error occurred trying to execute the workflow '${workflowFileName}' on branch ` + 
+							`'${branchName}' in the repository '${this.repoName}'.'`,
+						response);
 					break;
 				}
 			}
 
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new WorkflowError(errorMsg);
 		}
 	}
 }

@@ -12,6 +12,10 @@
                 "--inspect-wait",
                 "--allow-all",
             ],
+			"args": [
+				"${env:CICD_TOKEN}",
+				"${workspaceFolder}",
+			],
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
 			"outputCapture": "std",
@@ -120,6 +124,31 @@
 				"preview",
 				"v1.0.0-preview.1"
 			],
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+		},
+		{
+            "name": "Deno Check",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/deno-check.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+				"--allow-read",
+				"--allow-run",
+            ],
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
 			"outputCapture": "std",

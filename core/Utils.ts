@@ -1,7 +1,9 @@
-import { Guard } from "core/Guard.ts";
-import { IssueModel } from "models/IssueModel.ts";
-import { PullRequestModel } from "models/PullRequestModel.ts";
-import { ReleaseType } from "core/Enums.ts";
+import { Guard } from "./Guard.ts";
+import { ReleaseType } from "./Enums.ts";
+import { IssueModel } from "./Models/IssueModel.ts";
+import { PullRequestModel } from "./Models/PullRequestModel.ts";
+import { chalk } from "../deps.ts";
+import { RequestResponseModel } from "./Models/GraphQlModels/RequestResponseModel.ts";
 
 /**
  * Provides utility functions.
@@ -132,22 +134,12 @@ export class Utils {
 	}
 
 	/**
-	 * Prints the given {@link message} as a GitHub notice.
+	 * Prints the given {@link message} as a error.
 	 * @param message The message to print.
 	 */
-	public static printAsGitHubNotice(message: string): void {
+	public static printError(message: string): void {
 		Utils.printEmptyLine();
-		console.log(`::notice::${message}`);
-		Utils.printEmptyLine();
-	}
-
-	/**
-	 * Prints the given {@link message} as a GitHub error.
-	 * @param message The message to print.
-	 */
-	public static printAsGitHubError(message: string): void {
-		Utils.printEmptyLine();
-		console.log(`::error::${message}`);
+		console.log(chalk.red(message));
 		Utils.printEmptyLine();
 	}
 
@@ -171,34 +163,34 @@ export class Utils {
 
 	/**
 	 * Builds a URL to a pull request that matches the given {@link prNumber} in a repository with a
-	 * name that matches the given {@link repoName} and is owned by the given {@link repoOwner}.
-	 * @param repoOwner The owner of the repository.
+	 * name that matches the given {@link repoName} and is owned by the given {@link ownerName}.
+	 * @param ownerName The owner of the repository.
 	 * @param repoName The name of the repository.
 	 * @param prNumber The pull request number.
 	 * @returns The URL to the issue.
 	 */
-	public static buildPullRequestUrl(repoOwner: string, repoName: string, prNumber: number): string {
+	public static buildPullRequestUrl(ownerName: string, repoName: string, prNumber: number): string {
 		const funcName = "buildPullRequestUrl";
-		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 		Guard.isLessThanOne(prNumber, funcName, "prNumber");
 
-		return `https://github.com/${repoOwner}/${repoName}/pull/${prNumber}`;
+		return `https://github.com/${ownerName}/${repoName}/pull/${prNumber}`;
 	}
 
 	/**
 	 * Builds a URL to the labels page of a repository with a name that matches the given {@link repoName}
-	 * and is owned by the given {@link repoOwner}.
-	 * @param repoOwner The owner of the repository.
+	 * and is owned by the given {@link ownerName}.
+	 * @param ownerName The owner of the repository.
 	 * @param repoName The name of the repository.
 	 * @returns The URL to the repository labels page.
 	 */
-	public static buildLabelsUrl(repoOwner: string, repoName: string): string {
+	public static buildLabelsUrl(ownerName: string, repoName: string): string {
 		const funcName = "buildLabelsUrl";
-		Guard.isNothing(repoOwner, funcName, "repoOwner");
+		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
 
-		return `https://github.com/${repoOwner}/${repoName}/labels`;
+		return `https://github.com/${ownerName}/${repoName}/labels`;
 	}
 
 	/**
@@ -269,7 +261,7 @@ export class Utils {
 	public static invalidReleaseType(value: string): value is ReleaseType {
 		return value != "preview" && value != "production";
 	}
-	
+
 	/**
 	 * Returns a value indicating whether or not the given {@link value} is a valid preview release type.
 	 * @param value The value to check.
@@ -278,7 +270,7 @@ export class Utils {
 	public static isPreviewRelease(value: string): value is ReleaseType {
 		return value === "preview";
 	}
-	
+
 	/**
 	 * Returns a value indicating whether or not the given {@link value} is a valid production release type.
 	 * @param value The value to check.
@@ -286,5 +278,30 @@ export class Utils {
 	 */
 	public static isProductionRelease(value: string): value is ReleaseType {
 		return value === "production";
+	}
+
+	/**
+	 * Combines the given {@link mainMsg} and {@link requestResponse} error messages into one error message.
+	 * @param mainMsg The main error message.
+	 * @param requestResponse The request response that might contain more error messages.
+	 * @returns The main and response error messages combined.
+	 */
+	public static toErrorMessage(mainMsg: string, requestResponse: RequestResponseModel): string {
+		const errorMessages: string[] = [];
+
+		mainMsg = mainMsg.endsWith(":") ? mainMsg : `${mainMsg}:`;
+
+		if (requestResponse.errors === undefined) {
+			return mainMsg;
+		}
+
+		requestResponse.errors.forEach((error) => {
+			errorMessages.push(error.message);
+		});
+
+		let errorMsg = `The following errors occurred:`;
+		errorMsg += `\n${errorMessages.join("\n")}`;
+
+		return errorMsg;
 	}
 }

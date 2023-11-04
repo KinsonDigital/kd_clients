@@ -21,6 +21,7 @@ on:
         default: false
         type: boolean
 
+
 jobs:
   get_version:
     name: Get Version
@@ -39,10 +40,8 @@ jobs:
         id: get_version
         run: |
           $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/get-version.ts";
-          deno run --allow-read --allow-write --allow-env `
-            --no-remote `
-            --import-map=${{ github.workspace }}/vendor/import_map.json `
-            "$scriptPath";
+
+          deno run --allow-read --allow-write --allow-env "$scriptPath";
 
 
   validate_release:
@@ -73,8 +72,7 @@ jobs:
 
           deno run `
             --allow-net `
-            --no-remote `
-            --import-map=${{ github.workspace }}/vendor/import_map.json `
+            --allow-read `
             "$scriptPath" `
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
@@ -88,11 +86,10 @@ jobs:
 
           deno run `
             --allow-read `
-            --no-remote `
-            --import-map=${{ github.workspace }}/vendor/import_map.json `
             "$scriptPath" `
             "${{ inputs.release-type }}" `
             "${{ needs.get_version.outputs.version }}";
+
 
   release:
     name: Run ${{ inputs.release-type }} Release
@@ -113,7 +110,7 @@ jobs:
         run: deno lint
 
       - name: Run Tests
-        run: deno test
+        run: deno test --allow-read ./tests/*Tests.ts;
 
       - name: Creating ${{ inputs.release-type }} GitHub Release
         if: ${{ inputs.dry-run == false }}
@@ -126,7 +123,7 @@ jobs:
           prerelease: ${{ inputs.release-type == 'Preview' }}
           draft: false
 
-      - name: Close Milestone
+      - name: Close Milestone ${{ needs.get_version.outputs.version }}
         if: ${{ inputs.dry-run == false }}
         run: |
           $scriptUrl = "${{ vars.SCRIPT_BASE_URL }}/${{ vars.CICD_SCRIPTS_VERSION }}/${{ vars.SCRIPT_RELATIVE_DIR_PATH }}";

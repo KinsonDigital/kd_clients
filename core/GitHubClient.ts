@@ -1,8 +1,8 @@
-import { Utils } from "core/Utils.ts";
-import { LinkHeaderParser } from "core/LinkHeaderParser.ts";
-import { WebApiClient } from "core/WebApiClient.ts";
-import { GetDataFunc } from "core/Types.ts";
-import { Guard } from "core/Guard.ts";
+import { Utils } from "./Utils.ts";
+import { LinkHeaderParser } from "./LinkHeaderParser.ts";
+import { WebApiClient } from "./WebApiClient.ts";
+import { GetDataFunc } from "./Types.ts";
+import { Guard } from "./Guard.ts";
 
 /**
  * Provides a base class for HTTP clients.
@@ -20,7 +20,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(ownerName?: string, repoName?: string, token?: string) {
+	constructor(ownerName: string, repoName: string, token?: string) {
 		super();
 
 		this.ownerName = Utils.isNothing(ownerName) ? "" : ownerName.trim();
@@ -33,7 +33,7 @@ export abstract class GitHubClient extends WebApiClient {
 		if (!Utils.isNothing(token)) {
 			this.headers.append("Authorization", `Bearer ${token}`);
 		}
-	}	
+	}
 
 	/**
 	 * Gets the name of the owner of the repository.
@@ -46,22 +46,22 @@ export abstract class GitHubClient extends WebApiClient {
 	 * Sets the name of the owner of the repository.
 	 */
 	public set ownerName(v: string) {
-		Guard.isNothing("ownerName", v, "v");
+		Guard.isNothing(v, "ownerName", "v");
 		this._ownerName = v.trim();
 	}
-	
+
 	/**
 	 * Gets the name of the repository.
-	*/
-	public get repoName() : string {
+	 */
+	public get repoName(): string {
 		return this._repoName;
 	}
-	
+
 	/**
 	 * Sets the name of the repository.
-	*/
-	public set repoName(v : string) {
-		Guard.isNothing("repoName", v, "v");
+	 */
+	public set repoName(v: string) {
+		Guard.isNothing(v, "repoName", "v");
 		this._repoName = v.trim();
 	}
 
@@ -124,8 +124,7 @@ export abstract class GitHubClient extends WebApiClient {
 		} catch (error) {
 			let errorMsg = "There was an issue getting all of the data using pagination.";
 			errorMsg += `\n${error.message}`;
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 
 		return allData;
@@ -209,8 +208,7 @@ export abstract class GitHubClient extends WebApiClient {
 			let errorMsg = "There was an issue getting all of the data using pagination.";
 			errorMsg += `\n${error.message}`;
 
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 	}
 
@@ -235,8 +233,7 @@ export abstract class GitHubClient extends WebApiClient {
 		} catch (error) {
 			let errorMsg = "There was an issue getting all of the data using pagination.";
 			errorMsg += `\n${error.message}`;
-			Utils.printAsGitHubError(errorMsg);
-			Deno.exit(1);
+			throw new Error(errorMsg);
 		}
 	}
 
