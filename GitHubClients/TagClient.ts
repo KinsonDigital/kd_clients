@@ -3,6 +3,7 @@ import { TagModel } from "../core/Models/TagModel.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
+import { TagError } from "./Errors/TagError.ts";
 
 /**
  * Provides a client for interacting with GitHub GIT tags.
@@ -32,6 +33,7 @@ export class TagClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link TagError} if there was an issue getting the tags.
 	 */
 	public async getTags(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
 		Guard.isNothing(this.repoName, "getTags", "repoName");
@@ -46,8 +48,7 @@ export class TagClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
-			Utils.printError(`${response.status} - ${response.statusText}`);
-			Deno.exit(1);
+			throw new TagError(`${response.status} - ${response.statusText}`);
 		}
 
 		return [<TagModel[]> await this.getResponseData(response), response];
@@ -56,6 +57,7 @@ export class TagClient extends GitHubClient {
 	/**
 	 * Gets all of the tags in a repository with a name that matches the {@link TagClient}.{@link repoName}.
 	 * @returns All of the tags.
+	 * @throws The {@link TagError} if there was an issue getting all of the tags.
 	 */
 	public async getAllTags(): Promise<TagModel[]> {
 		const result: TagModel[] = [];
@@ -75,6 +77,7 @@ export class TagClient extends GitHubClient {
 	 * Gets a tag with the given {@link tagName} in a repository with a name that matches the {@link TagClient}.{@link repoName}.
 	 * @param tagName The name of the tag.
 	 * @returns Returns the tag with the given name.
+	 * @throws The {@link TagError} if there was an issue getting the tag.
 	 */
 	public async getTagByName(tagName: string): Promise<TagModel> {
 		const funcName = "getTagByName";
@@ -96,8 +99,7 @@ export class TagClient extends GitHubClient {
 		const foundTag = foundTags.find((tag: TagModel) => tag.name.trim() === tagName);
 
 		if (foundTag === undefined) {
-			Utils.printError(`The tag '${tagName}' could not be found.`);
-			Deno.exit(1);
+			throw new TagError(`The tag '${tagName}' could not be found.`);
 		}
 
 		return foundTag;
@@ -107,6 +109,7 @@ export class TagClient extends GitHubClient {
 	 * Searches for a tag with the given {@link tagName} in a repository that matches the {@link TagClient}.{@link repoName}.
 	 * @param tagName The name of the tag.
 	 * @returns True if the tag exists, false otherwise.
+	 * @throws The {@link TagError} if there was an issue checking if the tag exists.
 	 */
 	public async tagExists(tagName: string): Promise<boolean> {
 		const funcName = "tagExists";
