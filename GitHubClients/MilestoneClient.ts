@@ -89,8 +89,7 @@ export class MilestoneClient extends GitHubClient {
 		await Promise.all([issuesPromise, pullRequestsPromise]).then((values) => {
 			issuesAndPullRequests.push(...values[0], ...values[1]);
 		}).catch((error) => {
-			Utils.printError(`The request to get issues returned error '${error}'`);
-			Deno.exit(1);
+			throw new MilestoneError(`The request to get issues returned error '${error}'`);
 		});
 
 		return issuesAndPullRequests;
