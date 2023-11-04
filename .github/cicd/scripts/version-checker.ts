@@ -1,7 +1,7 @@
 import { RepoClient, TagClient, UsersClient } from "../../../GitHubClients/mod.ts";
 import { Utils } from "../../../core/Utils.ts";
 
-if (Deno.args.length !== 5) {
+if (Deno.args.length != 5) {
 	let errorMsg = `The required number of arguments is 5 but only ${Deno.args.length}.`;
 	errorMsg += `\nPlease provide the following arguments: version, owner name, repo name, and token.`;
 	Utils.printError(errorMsg);

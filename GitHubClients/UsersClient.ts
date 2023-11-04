@@ -33,7 +33,7 @@ export class UsersClient extends GitHubClient {
 
 		const response: Response = await this.requestGET(url);
 
-		if (response.status !== GitHubHttpStatusCodes.OK) {
+		if (response.status != GitHubHttpStatusCodes.OK) {
 			// If there is an error
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				throw new UsersError(`The user '${userName}' does not exist.`, response.status);
@@ -59,7 +59,7 @@ export class UsersClient extends GitHubClient {
 
 		const response: Response = await this.requestGET(url);
 
-		if (response.status !== GitHubHttpStatusCodes.OK) {
+		if (response.status != GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				return false;
 			} else {

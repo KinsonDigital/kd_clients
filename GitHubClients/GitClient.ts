@@ -217,7 +217,7 @@ export class GitClient extends GraphQlClient {
 
 		const response = await this.executeQuery(mutation);
 
-		if (response.errors !== undefined) {
+		if (response.errors != undefined) {
 			const mainMsg = `The following errors occurred while adding a commit to the branch '${branchName}'`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, response);
 

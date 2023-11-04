@@ -209,7 +209,7 @@ export class RepoClient extends GitHubClient {
 		const variables = await this.getVariables();
 		const variable = variables.find((v) => v.name === variableName);
 
-		return variable !== undefined && variable !== null;
+		return variable != undefined && variable != null;
 	}
 
 	/**

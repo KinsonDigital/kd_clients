@@ -66,7 +66,7 @@ export class IssueClient extends GitHubClient {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
 			const [issues, response] = await this.getIssues(page, qtyPerPage);
 
-			if (response.status !== GitHubHttpStatusCodes.OK) {
+			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(`An error occurred trying to get all of the opened issues.`, response);
 				throw new IssueError(errorMsg);
 			}
@@ -85,7 +85,7 @@ export class IssueClient extends GitHubClient {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
 			const [issues, response] = await this.getIssues(page, qtyPerPage, IssueOrPRState.closed);
 
-			if (response.status !== GitHubHttpStatusCodes.OK) {
+			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg("An error occurred trying to get all of the closed issues.", response);
 				throw new IssueError(errorMsg);
 			}
