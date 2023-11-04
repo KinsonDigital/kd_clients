@@ -1,7 +1,7 @@
 import { XAuthValues } from "./XAuthValue.ts";
 import { TweetV2PostTweetResult, TwitterApi } from "../deps.ts";
-import { Utils } from "../core/Utils.ts";
 import { WebApiClient } from "../core/WebApiClient.ts";
+import { XError } from "../GitHubClients/Errors/XError.ts";
 
 /**
  * Provides twitter functionality.
@@ -36,10 +36,8 @@ export class XClient extends WebApiClient {
 				let errorMsg = `Error Title: ${error.title}`;
 				errorMsg += `\nError Detail: ${error.detail}`;
 
-				Utils.printError(errorMsg);
+				throw new XError(errorMsg);
 			});
-		} else {
-			Utils.printAsGitHubNotice(`${tweetResult.data.id}\n${tweetResult.data.text}`);
 		}
 	}
 }
