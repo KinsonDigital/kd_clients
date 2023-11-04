@@ -1,5 +1,5 @@
 {
-	"version": "v1.0.0-preview.2",
+	"version": "v1.0.0-preview.3",
 	"lint": {
 		"include": [
 			"core/",
