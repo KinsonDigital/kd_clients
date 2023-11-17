@@ -1,9 +1,9 @@
 import { ErrorModel } from "./ErrorModel.ts";
 
 /**
- * Represents a request response.
+ * Represents a request response from a GraphQL request.
  */
-export type RequestResponseModel = {
+export type GraphQlRequestResponseModel = {
 	/**
 	 * The data returned from the request.
 	 */

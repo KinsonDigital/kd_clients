@@ -1,7 +1,7 @@
 import { assertEquals } from "../deps.ts";
 import { Utils } from "../core/Utils.ts";
 
-Deno.test("clamp |> when_num_is_larger_than_max |> returns_max_value", () => {
+Deno.test("clamp |> when-num-is-larger-than-max |> returns-max-value", () => {
 	// Arrange
 	const expected = 5;
 	const testNumber = 10;
@@ -13,7 +13,7 @@ Deno.test("clamp |> when_num_is_larger_than_max |> returns_max_value", () => {
 	assertEquals(actual, expected);
 });
 
-Deno.test("clamp |> when_num_is_smaller_than_max |> returns_min_value", () => {
+Deno.test("clamp |> when-num-is-smaller-than-max |> returns-min-value", () => {
 	// Arrange
 	const expected = 100;
 	const testNumber = 90;
@@ -25,7 +25,7 @@ Deno.test("clamp |> when_num_is_smaller_than_max |> returns_min_value", () => {
 	assertEquals(actual, expected);
 });
 
-Deno.test("invalidReleaseType |> with_invalid_type |> returns_true", () => {
+Deno.test("invalidReleaseType |> with-invalid-type |> returns-true", () => {
 	// Arrange
 	const invalidValue = "is_invalid";
 
@@ -36,7 +36,7 @@ Deno.test("invalidReleaseType |> with_invalid_type |> returns_true", () => {
 	assertEquals(actual, true);
 });
 
-Deno.test("invalidReleaseType |> with_valid_preview_type |> returns_false", () => {
+Deno.test("invalidReleaseType |> with-valid-preview-type |> returns-false", () => {
 	// Arrange
 	const validValue = "preview";
 
@@ -47,7 +47,7 @@ Deno.test("invalidReleaseType |> with_valid_preview_type |> returns_false", () =
 	assertEquals(actual, false);
 });
 
-Deno.test("invalidReleaseType |> with_valid_prod_type |> returns_false", () => {
+Deno.test("invalidReleaseType |> with-valid-prod-type |> returns-false", () => {
 	// Arrange
 	const validValue = "production";
 
@@ -58,7 +58,7 @@ Deno.test("invalidReleaseType |> with_valid_prod_type |> returns_false", () => {
 	assertEquals(actual, false);
 });
 
-Deno.test("isPreviewRelease  |> > with_valid_type  |> > returns_true", () => {
+Deno.test("isPreviewRelease  |> > with-valid-type  |> > returns-true", () => {
 	// Arrange
 	const invalidValue = "preview";
 
@@ -69,7 +69,7 @@ Deno.test("isPreviewRelease  |> > with_valid_type  |> > returns_true", () => {
 	assertEquals(actual, true);
 });
 
-Deno.test("isPreviewRelease  |> with_invalid_type  |> returns_false", () => {
+Deno.test("isPreviewRelease  |> with-invalid-type  |> returns-false", () => {
 	// Arrange
 	const invalidValue = "invalid";
 
@@ -80,7 +80,7 @@ Deno.test("isPreviewRelease  |> with_invalid_type  |> returns_false", () => {
 	assertEquals(actual, false);
 });
 
-Deno.test("isProductionRelease  |> > with_valid_type |> returns_true", () => {
+Deno.test("isProductionRelease  |> > with-valid-type |> returns-true", () => {
 	// Arrange
 	const validValue = "production";
 
@@ -91,7 +91,7 @@ Deno.test("isProductionRelease  |> > with_valid_type |> returns_true", () => {
 	assertEquals(actual, true);
 });
 
-Deno.test("isProductionRelease |> with_invalid_type |> returns_false", () => {
+Deno.test("isProductionRelease |> with-invalid-type |> returns-false", () => {
 	// Arrange
 	const invalidValue = "invalid";
 

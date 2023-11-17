@@ -16,8 +16,8 @@
 	// 	"description": "Log output to console"
 	// }
 
-	"Workflow Job": {
-		"prefix": "test",
+	"Synchronous Deno Test": {
+		"prefix": "test-sync",
 		"body": [
             "Deno.test(\"${1:MEMBER_UNDER_TEST} |> ${2:SCENARIO_UNDER_TEST} |> ${3:EXPECTED_RESULT}\", () => {",
                 "\t// Arrange",
@@ -27,6 +27,19 @@
                 "\t// Assert",
             "});"
 		],
-		"description": "Workflow Job"
+		"description": "Deno synchronous test"
+	},
+    "Aynchronous Deno Test": {
+		"prefix": "test-async",
+		"body": [
+            "Deno.test(\"${1:MEMBER_UNDER_TEST} |> ${2:SCENARIO_UNDER_TEST} |> ${3:EXPECTED_RESULT}\", async () => {",
+                "\t// Arrange",
+                "\t$0",
+                "\t// Act",
+                "",
+                "\t// Assert",
+            "});"
+		],
+		"description": "Deno asynchronous test"
 	}
 }
