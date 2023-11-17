@@ -82,10 +82,8 @@ export class PullRequestClient extends GitHubClient {
 		labels?: string[] | null,
 		milestoneNumber?: number,
 	): Promise<[PullRequestModel[], Response]> {
-		const functionName = "getPullRequests";
-		Guard.isLessThanOne(page, functionName, "page");
+		Guard.isLessThanOne(page, "getPullRequests", "page");
 
-		this.repoName = this.repoName.trim();
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
@@ -315,8 +313,6 @@ export class PullRequestClient extends GitHubClient {
 			const errorMsg = `A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`;
 			throw new PullRequestError(errorMsg);
 		}
-
-		this.repoName = this.repoName.trim();
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/issues/${prNumber}`;
 
