@@ -3,7 +3,7 @@ import { RepoModel } from "../core/Models/RepoModel.ts";
 import { assertEquals, assertRejects, assertSpyCalls, stub } from "../deps.ts";
 import { RepoClient } from "../mod.ts";
 
-Deno.test("getRepo |> when_invoked |> gets_repository", async () => {
+Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	// Arrange
 	const client = new RepoClient("test-owner", "test-repo", "test-token");
 	const data: RepoModel[] = [{
@@ -27,7 +27,7 @@ Deno.test("getRepo |> when_invoked |> gets_repository", async () => {
 	assertSpyCalls(myStub, 1);
 });
 
-Deno.test("getRepo |> when_repo_does_not_exist |> throws_error", async () => {
+Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
 	// Arrange
 	const client = new RepoClient("test-owner", "test-repo", "test-token");
 	const data: RepoModel[] = [{
