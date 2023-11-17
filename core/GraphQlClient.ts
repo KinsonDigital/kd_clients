@@ -1,4 +1,4 @@
-import { RequestResponseModel } from "./Models/GraphQlModels/RequestResponseModel.ts";
+import { GraphQlRequestResponseModel } from "./Models/GraphQlModels/GraphQlRequestResponseModel.ts";
 import { Utils } from "./Utils.ts";
 import { Guard } from "./Guard.ts";
 import { BadCredentialsError } from "../GitHubClients/Errors/BadCredentials.ts";
@@ -70,7 +70,7 @@ export abstract class GraphQlClient {
 	 * @returns The response data.
 	 * @remarks This method will throw an error if the response contains errors.
 	 */
-	protected async getResponseData(response: Response): Promise<RequestResponseModel> {
+	protected async getResponseData(response: Response): Promise<GraphQlRequestResponseModel> {
 		const responseText = await response.text();
 		const responseData = await JSON.parse(responseText);
 
@@ -83,7 +83,7 @@ export abstract class GraphQlClient {
 	 * @param query The GraphQL query to use for the request.
 	 * @returns The response from the request.
 	 */
-	protected async executeQuery(query: string): Promise<RequestResponseModel> {
+	protected async executeQuery(query: string): Promise<GraphQlRequestResponseModel> {
 		const body: string = JSON.stringify({ query });
 
 		const response = await fetch(this.baseUrl, {
