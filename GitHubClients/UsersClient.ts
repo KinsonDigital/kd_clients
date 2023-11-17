@@ -1,7 +1,7 @@
 import { Guard } from "../core/Guard.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
-import { UserModel } from "../core/Models/UserModel.ts";
+import { UserModel } from "../core/Models/mod.ts";
 import { UsersError } from "./Errors/UsersError.ts";
 
 /**

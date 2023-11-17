@@ -1,5 +1,5 @@
 import { RepoError } from "../GitHubClients/Errors/RepoError.ts";
-import { RepoModel } from "../core/Models/RepoModel.ts";
+import { RepoModel } from "../core/Models/mod.ts";
 import { assertEquals, assertRejects, assertSpyCalls, stub } from "../deps.ts";
 import { RepoClient } from "../mod.ts";
 
