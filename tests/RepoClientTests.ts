@@ -13,7 +13,7 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	}];
 	const response: Response = new Response(null, { status: 200 });
 
-	const myStub = stub(
+	const spy_getOwnerRepos = stub(
 		sut,
 		"getOwnerRepos",
 		(_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
@@ -24,7 +24,7 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 
 	// Assert
 	assertEquals(actual, data[0]);
-	assertSpyCalls(myStub, 1);
+	assertSpyCalls(spy_getOwnerRepos, 1);
 });
 
 Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
