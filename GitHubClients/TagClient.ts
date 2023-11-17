@@ -1,5 +1,5 @@
 import { Guard } from "../core/Guard.ts";
-import { TagModel } from "../core/Models/TagModel.ts";
+import { TagModel } from "../core/Models/mod.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";

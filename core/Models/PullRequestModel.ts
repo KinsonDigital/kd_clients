@@ -1,7 +1,7 @@
 import { LabelModel } from "./LabelModel.ts";
 import { MilestoneModel } from "./MilestoneModel.ts";
 import { PullRequestHeadOrBaseModel } from "./PullRequestHeadOrBaseModel.ts";
-import { PullRequestInfoModel } from "./PullRequestInfo.ts";
+import { PullRequestInfoModel } from "./PullRequestInfoModel.ts";
 import { UserModel } from "./UserModel.ts";
 
 /**
