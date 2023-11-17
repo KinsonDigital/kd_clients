@@ -51,7 +51,7 @@ export class Guard {
 			throw new Error(errorMsg);
 		}
 
-		if (value < 0) {
+		if (value < 1) {
 			let errorMsg = "The value is less than or equal to zero.";
 
 			if (funcName != "") {
