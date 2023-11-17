@@ -1,9 +1,10 @@
 import { Guard } from "./Guard.ts";
 import { ReleaseType } from "./Enums.ts";
-import { IssueModel } from "./Models/IssueModel.ts";
-import { PullRequestModel } from "./Models/PullRequestModel.ts";
 import { chalk } from "../deps.ts";
-import { RequestResponseModel } from "./Models/GraphQlModels/RequestResponseModel.ts";
+import { IssueModel } from "./Models/mod.ts";
+import { PullRequestModel } from "./Models/mod.ts";
+import { GraphQlRequestResponseModel } from "./Models/mod.ts";
+import { ErrorModel } from "./Models/mod.ts";
 
 /**
  * Provides utility functions.
@@ -286,7 +287,7 @@ export class Utils {
 	 * @param requestResponse The request response that might contain more error messages.
 	 * @returns The main and response error messages combined.
 	 */
-	public static toErrorMessage(mainMsg: string, requestResponse: RequestResponseModel): string {
+	public static toErrorMessage(mainMsg: string, requestResponse: GraphQlRequestResponseModel): string {
 		const errorMessages: string[] = [];
 
 		mainMsg = mainMsg.endsWith(":") ? mainMsg : `${mainMsg}:`;
@@ -295,7 +296,7 @@ export class Utils {
 			return mainMsg;
 		}
 
-		requestResponse.errors.forEach((error) => {
+		requestResponse.errors.forEach((error: ErrorModel) => {
 			errorMessages.push(error.message);
 		});
 

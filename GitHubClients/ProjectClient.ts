@@ -1,5 +1,4 @@
 import { createOrgProjectsQuery } from "../core/GraphQl/Queries/GetOrgProjectsQueries.ts";
-import { ProjectModel } from "../core/Models/ProjectModel.ts";
 import { GraphQlClient } from "../core/GraphQlClient.ts";
 import { Guard } from "../core/Guard.ts";
 import { Utils } from "../core/Utils.ts";
@@ -8,8 +7,9 @@ import { createGetIssueProjectsQuery } from "../core/GraphQl/Queries/GetIssuePro
 import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
 import { ProjectError } from "./Errors/ProjectError.ts";
 import { IssueClient, PullRequestClient } from "./mod.ts";
-import { IssueModel } from "../core/Models/IssueModel.ts";
-import { PullRequestModel } from "../core/Models/PullRequestModel.ts";
+import { ProjectModel } from "../core/Models/mod.ts";
+import { IssueModel } from "../core/Models/mod.ts";
+import { PullRequestModel } from "../core/Models/mod.ts";
 
 /**
  * Gets or saves data related to GitHub organization V2 projects.

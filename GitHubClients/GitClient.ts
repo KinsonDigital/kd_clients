@@ -1,13 +1,13 @@
 import { GraphQlClient } from "../core/GraphQlClient.ts";
 import { createGetBranchesQuery } from "../core/GraphQl/Queries/GetBranchesQuery.ts";
 import { Guard } from "../core/Guard.ts";
-import { PageInfoModel } from "../core/Models/GraphQlModels/PageInfoModel.ts";
-import { GitBranchModel } from "../core/Models/GraphQlModels/GitBranchModel.ts";
+import { PageInfoModel } from "../core/Models/mod.ts";
+import { GitBranchModel } from "../core/Models/mod.ts";
+import { RawRefsGetBranchModel } from "../core/Models/mod.ts";
+import { RawGitBranchModel } from "../core/Models/mod.ts";
 import { Utils } from "../core/Utils.ts";
 import { RepoClient } from "./RepoClient.ts";
 import { getCreateBranchMutation } from "../core/GraphQl/Mutations/CreateBranchMutation.ts";
-import { RawRefsGetBranchModel } from "../core/Models/GraphQlModels/RawModels/RawRefsGetBranchModel.ts";
-import { RawGitBranchModel } from "../core/Models/GraphQlModels/RawModels/RawGitBranchModel.ts";
 import { addCommitMutation } from "../core/GraphQl/Mutations/AddCommitMutation.ts";
 import { OrganizationError } from "./Errors/OrganizationError.ts";
 import { GitError } from "./Errors/GitError.ts";

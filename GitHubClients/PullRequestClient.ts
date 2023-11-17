@@ -1,6 +1,6 @@
 import { Guard } from "../core/Guard.ts";
 import { LabelClient } from "./LabelClient.ts";
-import { PullRequestModel } from "../core/Models/PullRequestModel.ts";
+import { PullRequestModel } from "../core/Models/mod.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
@@ -82,10 +82,8 @@ export class PullRequestClient extends GitHubClient {
 		labels?: string[] | null,
 		milestoneNumber?: number,
 	): Promise<[PullRequestModel[], Response]> {
-		const functionName = "getPullRequests";
-		Guard.isLessThanOne(page, functionName, "page");
+		Guard.isLessThanOne(page, "getPullRequests", "page");
 
-		this.repoName = this.repoName.trim();
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
@@ -316,8 +314,6 @@ export class PullRequestClient extends GitHubClient {
 			throw new PullRequestError(errorMsg);
 		}
 
-		this.repoName = this.repoName.trim();
-
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/issues/${prNumber}`;
 
 		const prBody: string = JSON.stringify(prRequestData);
@@ -346,31 +342,39 @@ export class PullRequestClient extends GitHubClient {
 	}
 
 	/**
-	 * Requests a review from a reviewer with a GitHub login name that matches the given {@link reviewer},
+	 * Requests a review from a reviewer with a GitHub login name that matches the given {@link reviewers},
 	 * for a pull request that matches the given {@link prNumber} in a repository where the name matches
 	 * the given {@link PullRequestClient}.{@link repoName}.
 	 * @param prNumber The pull request number.
-	 * @param reviewer The reviewer to request.
+	 * @param reviewers The reviewer to request.
 	 * @throws The {@link PullRequestError} when something goes wrong with requesting a pull request reviewer.
 	 */
-	public async requestReviewer(prNumber: number, reviewer: string): Promise<void> {
-		const funcName = "requestReviewer";
+	public async requestReviewers(prNumber: number, reviewers: string | string[]): Promise<void> {
+		const funcName = "requestReviewers";
 		Guard.isLessThanOne(prNumber, funcName, "prNumber");
-		Guard.isNothing(reviewer, funcName, "reviewer");
-
-		this.repoName = this.repoName.trim();
-		reviewer = reviewer.trim();
+		Guard.isNothing(reviewers, funcName, "reviewers");
+		
+		const reviewersToAdd: string[] = [];
+		
+		if (typeof reviewers === "string") {
+			reviewersToAdd.push(reviewers.trim());
+		} else if (Array.isArray(reviewers)) {
+			// Trim all of the items
+			for (let i = 0; i < reviewers.length; i++) {
+				const reviewer = reviewers[i];
+				reviewersToAdd.push(reviewer.trim());
+			}
+		}
 
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/pulls/${prNumber}/requested_reviewers`;
-		const body = JSON.stringify({ reviewers: [reviewer] });
+		const body = JSON.stringify({ reviewers: reviewersToAdd });
 
 		const response = await this.requestPOST(url, body);
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
-				`An error occurred trying to request the reviewer '${reviewer}' for pull request '${prNumber}'.` +
-				`\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`,
-				response);
+				`An error occurred trying to request the reviewer '${reviewers}' for pull request '${prNumber}'.` +
+				`\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`, response);
 
 			throw new PullRequestError(errorMsg);
 		}

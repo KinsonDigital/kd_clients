@@ -1,7 +1,7 @@
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
 import { Guard } from "../core/Guard.ts";
-import { ReleaseModel } from "../core/Models/ReleaseModel.ts";
+import { ReleaseModel } from "../core/Models/mod.ts";
 import { Utils } from "../core/Utils.ts";
 import { ReleaseError } from "./Errors/ReleaseError.ts";
 
