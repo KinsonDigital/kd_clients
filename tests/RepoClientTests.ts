@@ -5,7 +5,7 @@ import { RepoClient } from "../mod.ts";
 
 Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	// Arrange
-	const client = new RepoClient("test-owner", "test-repo", "test-token");
+	const sut = new RepoClient("test-owner", "test-repo", "test-token");
 	const data: RepoModel[] = [{
 		id: 1,
 		name: "test-repo",
@@ -14,13 +14,13 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	const response: Response = new Response(null, { status: 200 });
 
 	const myStub = stub(
-		client,
+		sut,
 		"getOwnerRepos",
 		(_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
 
 
 	// Act
-	const actual = await client.getRepo();
+	const actual = await sut.getRepo();
 
 	// Assert
 	assertEquals(actual, data[0]);
@@ -29,7 +29,7 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 
 Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
 	// Arrange
-	const client = new RepoClient("test-owner", "test-repo", "test-token");
+	const sut = new RepoClient("test-owner", "test-repo", "test-token");
 	const data: RepoModel[] = [{
 		id: 1,
 		name: "other-repo",
@@ -37,8 +37,8 @@ Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
 	}];
 	const response: Response = new Response(null, { status: 200 });
 
-	stub(client, "getOwnerRepos", (_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
+	stub(sut, "getOwnerRepos", (_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
 
 	// Act & Assert
-	await assertRejects(async () => await client.getRepo(), RepoError, "The repository 'test-repo' was not found.");
+	await assertRejects(async () => await sut.getRepo(), RepoError, "The repository 'test-repo' was not found.");
 });
