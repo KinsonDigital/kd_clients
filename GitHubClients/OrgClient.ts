@@ -20,7 +20,7 @@ export class OrgClient extends GitHubClient {
 		const funcName = "OrgClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
 
-		super(ownerName, "", token);
+		super(ownerName, "na", token);
 	}
 
 	/**

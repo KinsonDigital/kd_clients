@@ -53,10 +53,21 @@ jobs:
       - name: Validate Workflow Inputs
         run: |
           $branch = "${{ github.ref }}".TrimStart('refs/heads/');
-          $expectedBranch = "${{ vars.PROD_RELEASE_BRANCH }}".Trim();
+          $expectedPrevBranch = "${{ vars.PREV_RELEASE_BRANCH }}".Trim();
+          $expectedProdBranch = "${{ vars.PROD_RELEASE_BRANCH }}".Trim();
 
-          if ($branch -ne $expectedBranch) {
-            Write-Host "::error::Releases are only allowed to be run on the '$expectedBranch' branch.";
+          if ($expectedPrevBranch -eq "") {
+            Write-Host "::error::The PREV_RELEASE_BRANCH variable is not set.";
+            exit 1;
+          }
+
+          if ($expectedProdBranch -eq "") {
+            Write-Host "::error::The PROD_RELEASE_BRANCH variable is not set.";
+            exit 1;
+          }
+
+          if ($branch -ne $expectedPrevBranch -and $branch -ne $expectedProdBranch) {
+            Write-Host "::error::Releases are only allowed to be run on '$expectedPrevBranch' or '$expectedProdBranch' branches.";
             exit 1;
           }
 
