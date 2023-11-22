@@ -32,7 +32,7 @@ export class ProjectClient extends GraphQlClient {
 		Guard.isNothing(repoName, funcName, "repoName");
 
 		super(ownerName, repoName, token);
-		
+
 		this.issueClient = new IssueClient(ownerName, repoName, token);
 		this.prClient = new PullRequestClient(ownerName, repoName, token);
 
@@ -114,7 +114,7 @@ export class ProjectClient extends GraphQlClient {
 		let issue: IssueModel;
 
 		try {
-			issue = await this.issueClient.getIssue(issueNumber)
+			issue = await this.issueClient.getIssue(issueNumber);
 		} catch (error) {
 			throw new ProjectError(error.message);
 		}
@@ -138,7 +138,8 @@ export class ProjectClient extends GraphQlClient {
 		const response = await this.executeQuery(query);
 
 		if (response.errors != undefined) {
-			const mainMsg = `The following errors occurred while adding the issue '${issueNumber}' to the project '${projectName}'.`;
+			const mainMsg =
+				`The following errors occurred while adding the issue '${issueNumber}' to the project '${projectName}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, response);
 
 			throw new ProjectError(errorMsg);
@@ -157,11 +158,11 @@ export class ProjectClient extends GraphQlClient {
 		let pr: PullRequestModel;
 
 		try {
-			pr = await this.prClient.getPullRequest(prNumber)
+			pr = await this.prClient.getPullRequest(prNumber);
 		} catch (error) {
 			throw new ProjectError(error.message);
 		}
-		
+
 		projectName = projectName.trim();
 
 		const projects = await this.getOrgProjects();
@@ -181,13 +182,14 @@ export class ProjectClient extends GraphQlClient {
 		const response = await this.executeQuery(query);
 
 		if (response.errors != undefined) {
-			const mainMsg = `The following errors occurred while adding the pull request '${prNumber}' to the project '${projectName}'.`;
+			const mainMsg =
+				`The following errors occurred while adding the pull request '${prNumber}' to the project '${projectName}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, response);
 
 			throw new ProjectError(errorMsg);
 		}
 	}
-	
+
 	/**
 	 * Gets a list of the organizational projects for an issue that has the given {@link issueNumber},
 	 * in a repository with a name that matches the {@link ProjectClient}.{@link repoName}.
@@ -202,7 +204,8 @@ export class ProjectClient extends GraphQlClient {
 		const responseData = await this.executeQuery(query);
 
 		if (responseData.errors != undefined) {
-			const mainMsg = `The following errors occurred while getting the organizational projects for the issue '${issueNumber}'.`;
+			const mainMsg =
+				`The following errors occurred while getting the organizational projects for the issue '${issueNumber}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
 
 			throw new ProjectError(errorMsg);
@@ -225,7 +228,8 @@ export class ProjectClient extends GraphQlClient {
 		const responseData = await this.executeQuery(query);
 
 		if (responseData.errors != undefined) {
-			const mainMsg = `The following errors occurred while getting the organizational projects for the pull request '${prNumber}'.`;
+			const mainMsg =
+				`The following errors occurred while getting the organizational projects for the pull request '${prNumber}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
 
 			throw new ProjectError(errorMsg);

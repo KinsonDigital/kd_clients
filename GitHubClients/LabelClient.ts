@@ -90,7 +90,8 @@ export class LabelClient extends GitHubClient {
 		} else {
 			const errorMsg = this.buildErrorMsg(
 				`There was an issue checking if the repository label '${label}' exists.`,
-				response);
+				response,
+			);
 
 			throw new LabelError(errorMsg);
 		}

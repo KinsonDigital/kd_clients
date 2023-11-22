@@ -11,7 +11,7 @@ export class VersionPuller {
 	 */
 	public getVersion(fileName: string): string {
 		const denoJsonFilePath = Directory
-			.getFiles(".", true)
+			.getFiles(".", "*", true)
 			.find(f => f.endsWith(fileName));
 
 		if (denoJsonFilePath === undefined) {

@@ -47,7 +47,7 @@ export class MilestoneClient extends GitHubClient {
 		if (!this.isInitialized) {
 			return;
 		}
-	
+
 		this.issueClient.ownerName = v;
 		this.prClient.ownerName = v;
 	}
@@ -179,7 +179,7 @@ export class MilestoneClient extends GitHubClient {
 		if (milestone === undefined) {
 			const errorMsg = `The milestone '${milestoneName}' could not be found.`;
 
-			throw new MilestoneError(errorMsg)
+			throw new MilestoneError(errorMsg);
 		}
 
 		return milestone;
@@ -257,7 +257,8 @@ export class MilestoneClient extends GitHubClient {
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`,
-				response);
+				response,
+			);
 
 			throw new MilestoneError(errorMsg);
 		}
