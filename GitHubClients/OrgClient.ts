@@ -13,10 +13,11 @@ import { OrganizationError } from "./Errors/OrganizationError.ts";
 export class OrgClient extends GitHubClient {
 	/**
 	 * Initializes a new instance of the {@link OrgClient} class.
+	 * @param ownerName The name of the organization.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
-	constructor(ownerName: string, token?: string) {
+	constructor(ownerName: string, token: string) {
 		const funcName = "OrgClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
 
