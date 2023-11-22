@@ -95,12 +95,13 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getPrivateAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [userModels, response] =  await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.admin);
+			const [userModels, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.admin);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the private admin members for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -118,12 +119,13 @@ export class OrgClient extends GitHubClient {
 	 */
 	public async getPrivateNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [users, response] =  await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.member);
+			const [users, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.member);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the private non-admin members for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -146,7 +148,8 @@ export class OrgClient extends GitHubClient {
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the private members for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -169,7 +172,8 @@ export class OrgClient extends GitHubClient {
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the public admin members for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -192,7 +196,8 @@ export class OrgClient extends GitHubClient {
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the public non-admin members for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -215,7 +220,8 @@ export class OrgClient extends GitHubClient {
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the public members for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}
@@ -299,7 +305,8 @@ export class OrgClient extends GitHubClient {
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the variables for the organization '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new OrganizationError(errorMsg);
 			}

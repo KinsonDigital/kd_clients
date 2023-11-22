@@ -280,7 +280,8 @@ export class IssueClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					const errorMsg = this.buildErrorMsg(
 						`There was an issue getting the labels for issue '${issueNumber}'.`,
-						response);
+						response,
+					);
 
 					throw new IssueError(errorMsg);
 				}

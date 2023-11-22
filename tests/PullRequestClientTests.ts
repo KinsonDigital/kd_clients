@@ -31,7 +31,8 @@ Deno.test("requestReviewers |> when-using-single-reviewer-name |> adds-reviewer-
 			assertEquals(_body, '{"reviewers":["test-reviewer"]}');
 
 			return Promise.resolve(new Response(null, { status: 201 }));
-		});
+		},
+	);
 
 	// Act
 	await sut.requestReviewers(123, "test-reviewer");
@@ -52,7 +53,8 @@ Deno.test("requestReviewers |> when-using-multiple-reviewer-names |> adds-all-re
 			assertEquals(_body, '{"reviewers":["test-reviewer-1","test-reviewer-2"]}');
 
 			return Promise.resolve(new Response(null, { status: 201 }));
-		});
+		},
+	);
 
 	const reviewers: string[] = ["test-reviewer-1", "test-reviewer-2"];
 

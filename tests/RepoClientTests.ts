@@ -16,8 +16,8 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	const spy_getOwnerRepos = stub(
 		sut,
 		"getOwnerRepos",
-		(_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
-
+		(_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]),
+	);
 
 	// Act
 	const actual = await sut.getRepo();

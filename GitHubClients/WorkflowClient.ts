@@ -367,7 +367,8 @@ export class WorkflowClient extends GitHubClient {
 			case GitHubHttpStatusCodes.NotFound: {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred trying to delete the workflow run '${workflowRun.name}(${workflowRun.id})'`,
-					response);
+					response,
+				);
 
 				throw new WorkflowError(errorMsg);
 			}
@@ -454,9 +455,10 @@ export class WorkflowClient extends GitHubClient {
 				}
 				default: {
 					errorMsg = this.buildErrorMsg(
-						`An error occurred trying to execute the workflow '${workflowFileName}' on branch ` + 
+						`An error occurred trying to execute the workflow '${workflowFileName}' on branch ` +
 							`'${branchName}' in the repository '${this.repoName}'.'`,
-						response);
+						response,
+					);
 					break;
 				}
 			}

@@ -47,7 +47,7 @@ const checkFile = async (file: string): Promise<CheckResult> => {
 	{
 		checkResult.hasPassed = false;
 		commandResult = "❌\n";
-		
+
 		const lines = result.message.split("\n");
 
 		// Prefix each command output line with 3 spaces
@@ -57,7 +57,7 @@ const checkFile = async (file: string): Promise<CheckResult> => {
 	} else {
 		commandResult = "✅\n";
 	}
-	
+
 	checkResult.result += commandResult;
 
 	Deno.stdout.writeSync(new TextEncoder().encode(checkResult.result));

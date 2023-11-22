@@ -110,7 +110,8 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					const errorMsg = this.buildErrorMsg(
 						`An error occurred trying to get the pull requests for the repository '${this.repoName}'.`,
-						response);
+						response,
+					);
 
 					throw new PullRequestError(errorMsg);
 				}
@@ -239,7 +240,8 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					const errorMsg = this.buildErrorMsg(
 						`An error occurred trying to add the label '${label}' to pull request '${prNumber}'.`,
-						response);
+						response,
+					);
 
 					throw new PullRequestError(errorMsg);
 				}
@@ -273,7 +275,8 @@ export class PullRequestClient extends GitHubClient {
 				case GitHubHttpStatusCodes.Unauthorized: {
 					const errorMsg = this.buildErrorMsg(
 						`An error occurred checking if pull request '${prNumber}' exists.`,
-						response);
+						response,
+					);
 
 					throw new PullRequestError(errorMsg);
 				}
@@ -332,7 +335,8 @@ export class PullRequestClient extends GitHubClient {
 					case GitHubHttpStatusCodes.Unauthorized: {
 						const errorMsg = this.buildErrorMsg(
 							`An error occurred trying to update pull request '${prNumber}'.`,
-							response);
+							response,
+						);
 
 						throw new PullRequestError(errorMsg);
 					}
@@ -353,9 +357,9 @@ export class PullRequestClient extends GitHubClient {
 		const funcName = "requestReviewers";
 		Guard.isLessThanOne(prNumber, funcName, "prNumber");
 		Guard.isNothing(reviewers, funcName, "reviewers");
-		
+
 		const reviewersToAdd: string[] = [];
-		
+
 		if (typeof reviewers === "string") {
 			reviewersToAdd.push(reviewers.trim());
 		} else if (Array.isArray(reviewers)) {
@@ -374,7 +378,9 @@ export class PullRequestClient extends GitHubClient {
 		if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred trying to request the reviewer '${reviewers}' for pull request '${prNumber}'.` +
-				`\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`, response);
+					`\n\t'PR: ${Utils.buildPullRequestUrl(this.ownerName, this.repoName, prNumber)}'`,
+				response,
+			);
 
 			throw new PullRequestError(errorMsg);
 		}
@@ -433,8 +439,7 @@ export class PullRequestClient extends GitHubClient {
 		const response = await this.requestPOST(url, JSON.stringify(body));
 
 		if (response.status != GitHubHttpStatusCodes.Created) {
-			const errorMsg = this.buildErrorMsg("There was an issue creating the pull request.",
-				response);
+			const errorMsg = this.buildErrorMsg("There was an issue creating the pull request.", response);
 
 			throw new PullRequestError(errorMsg);
 		}
