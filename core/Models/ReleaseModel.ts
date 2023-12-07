@@ -8,6 +8,11 @@ export type ReleaseModel = {
 	name: string;
 
 	/**
+	 * Gets or sets the release ID.
+	 */
+	id: number;
+
+	/**
 	 * Gets or sets the release tag name.
 	 */
 	tag_name: string;
