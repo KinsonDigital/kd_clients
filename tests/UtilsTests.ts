@@ -115,13 +115,13 @@ Deno.test("isFilePath |> when-invoked |> returns-correct-result", () => {
 	for (const [args, expected] of testData) {
 		// Arrange
 		const [path] = args;
-		
+
 		// Act
 		const actual = Utils.isFilePath(path);
-		
+
 		// Assert
 		assertEquals(actual, expected);
-	};
+	}
 });
 
 Deno.test("isNotFilePath |> when-invoked |> returns-correct-result", () => {
@@ -136,30 +136,30 @@ Deno.test("isNotFilePath |> when-invoked |> returns-correct-result", () => {
 	for (const [args, expected] of testData) {
 		// Arrange
 		const [path] = args;
-		
+
 		// Act
 		const actual = Utils.isNotFilePath(path);
-		
+
 		// Assert
 		assertEquals(actual, expected);
-	};
+	}
 });
 
 Deno.test("isDirPath |> when-invoked |> returns-correct-result", () => {
 	// Test Data Args
-	const testData:TestDataArgs<[string], boolean>[] = [
+	const testData: TestDataArgs<[string], boolean>[] = [
 		[["C:/dirA/dirB/fileA.txt"], false],
 		[["C:/dirA/dirB"], true],
 		[["C:/dirA/dirB/"], true],
 	];
 
-	for (const [ args, expected ] of testData) {
+	for (const [args, expected] of testData) {
 		// Arrange
 		const [path] = args;
-		
+
 		// Act
 		const actual = Utils.isDirPath(path);
-		
+
 		// Assert
 		assertEquals(actual, expected);
 	}
@@ -167,19 +167,19 @@ Deno.test("isDirPath |> when-invoked |> returns-correct-result", () => {
 
 Deno.test("isNotDirPath |> when-invoked |> returns-correct-result", () => {
 	// Test Data Args
-	const testData:TestDataArgs<[string], boolean>[] = [
+	const testData: TestDataArgs<[string], boolean>[] = [
 		[["C:/dirA/dirB/fileA.txt"], true],
 		[["C:/dirA/dirB"], false],
 		[["C:/dirA/dirB/"], false],
 	];
 
-	for (const [ args, expected ] of testData) {
+	for (const [args, expected] of testData) {
 		// Arrange
 		const [path] = args;
-		
+
 		// Act
 		const actual = Utils.isNotDirPath(path);
-		
+
 		// Assert
 		assertEquals(actual, expected);
 	}

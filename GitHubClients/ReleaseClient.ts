@@ -73,9 +73,7 @@ export class ReleaseClient extends GitHubClient {
 		getByValue = getByValue.trim();
 
 		const filterPredicate: (item: ReleaseModel) => boolean = (item: ReleaseModel) => {
-			return options?.getByTitle === true
-				? item.name === getByValue
-				: item.tag_name === getByValue;
+			return options?.getByTitle === true ? item.name === getByValue : item.tag_name === getByValue;
 		};
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
@@ -137,7 +135,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
 	 */
-	public async uploadAssets(toReleaseBy: string, filePaths: string | string[], options?:ReleaseOptions): Promise<void> {
+	public async uploadAssets(toReleaseBy: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
 		const funcName = "uploadAsset";
 		Guard.isNothing(toReleaseBy, funcName, "toReleaseBy");
 		Guard.isNothing(toReleaseBy, funcName, "filePath");
@@ -208,22 +206,24 @@ export class ReleaseClient extends GitHubClient {
 		tagOrTitle: string,
 		filePath: string,
 		releaseId: number,
-		getByTitle:boolean): Promise<void | ReleaseError> {
+		getByTitle: boolean,
+	): Promise<void | ReleaseError> {
 		const file = Deno.readFileSync(filePath);
 		const fileName = basename(filePath);
-		
+
 		this.baseUrl = "https://uploads.github.com";
 		const queryParams = `?name=${fileName}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}/assets${queryParams}`;
-		
+
 		this.headers.append("Content-Type", "application/octet-stream");
 		this.headers.append("Content-Length", file.byteLength.toString());
-		
+
 		const response = await this.requestPOST(url, file);
-		
+
 		if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorSection = getByTitle === true ? "title" : "tag";
-			const errorMsg = `The asset '${fileName}' could not be uploaded to the release with the ${errorSection} '${tagOrTitle}'.`;
+			const errorMsg =
+				`The asset '${fileName}' could not be uploaded to the release with the ${errorSection} '${tagOrTitle}'.`;
 			throw new ReleaseError(errorMsg);
 		}
 	}
