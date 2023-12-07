@@ -11,3 +11,4 @@ export { RepoClient } from "./RepoClient.ts";
 export { TagClient } from "./TagClient.ts";
 export { UsersClient } from "./UsersClient.ts";
 export { WorkflowClient } from "./WorkflowClient.ts";
+export type { ReleaseOptions } from "./ReleaseOptions.ts";
