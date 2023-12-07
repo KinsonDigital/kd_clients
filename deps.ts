@@ -1,7 +1,7 @@
 // ----IMPORTS----
 
 // Official Deno Modules
-import { existsSync } from "https://deno.land/std@0.203.0/fs/exists.ts";
+import { exists, existsSync } from "https://deno.land/std@0.203.0/fs/exists.ts";
 import { extname, basename } from "https://deno.land/std@0.203.0/path/mod.ts";
 import { decodeBase64, encodeBase64 } from "https://deno.land/std@0.203.0/encoding/base64.ts";
 import { assert, assertEquals, assertThrows, assertRejects, equal } from "https://deno.land/std@0.204.0/assert/mod.ts";
@@ -14,7 +14,7 @@ import { TwitterApi, TweetV2PostTweetResult } from "npm:twitter-api-v2@1.15.0";
 // ----EXPORTS----
 
 // Official Deno Modules
-export { existsSync };
+export { exists, existsSync };
 export { extname, basename };
 export { decodeBase64, encodeBase64 };
 export { assert, assertEquals, assertThrows, assertRejects, equal };
