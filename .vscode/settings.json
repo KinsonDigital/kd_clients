@@ -3,8 +3,10 @@
 		"Atxt",
 		"cicd",
 		"Creds",
+		"deno",
 		"flatcontainer",
-		"Kinson"
+		"Kinson",
+		"tasklist"
 	],
 	"files.exclude": {
 		"**/.git": true,
