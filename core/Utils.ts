@@ -1,6 +1,6 @@
 import { Guard } from "./Guard.ts";
 import { ReleaseType } from "./Enums.ts";
-import { chalk } from "../deps.ts";
+import { basename, chalk, extname } from "../deps.ts";
 import { IssueModel } from "./Models/mod.ts";
 import { PullRequestModel } from "./Models/mod.ts";
 import { GraphQlRequestResponseModel } from "./Models/mod.ts";
@@ -304,5 +304,48 @@ export class Utils {
 		errorMsg += `\n${errorMessages.join("\n")}`;
 
 		return errorMsg;
+	}
+
+	/**
+	 * Returns a value indicating whether or not the given {@link value} is a file path.
+	 * @param path The path to check.
+	 * @returns True if the path is a file path, otherwise false.
+	 */
+	public static isFilePath(path: string): boolean {
+		const notNothing = !this.isNothing(path);
+		const extension = extname(path);
+		const hasExtension = extension.length > 0 && extension.startsWith(".");
+
+		return notNothing && hasExtension;
+	}
+
+	/**
+	 * Returns a value indicating whether or not the given {@link value} is not a file path.
+	 * @param path The path to check.
+	 * @returns True if the path is not a file path, otherwise false.
+	 */
+	public static isNotFilePath(path: string): boolean {
+		return !this.isFilePath(path);
+	}
+
+	/**
+	 * Returns a value indicating whether or not the given {@link path} is a directory path.
+	 * @param path The path to check.
+	 * @returns True if the path is a directory path, otherwise false.
+	 */
+	public static isDirPath(path: string): boolean {
+		const doesNotHaveExtension = !this.isFilePath(path);
+		const endsWithDir = !this.isNothing(basename(path));
+
+		return doesNotHaveExtension && endsWithDir;
+	}
+
+	/**
+	 * Returns a value indicating whether or not the given {@link path} is not a directory path.
+	 * @param path The path to check.
+	 * @returns True if the path is not a directory path, otherwise false.
+	 */
+	public static isNotDirPath(path: string): boolean {
+		return !this.isDirPath(path);
 	}
 }

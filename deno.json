@@ -1,7 +1,11 @@
 {
 	"version": "v1.0.0-preview.5",
     "tasks": {
-        "build": "deno run -A ./.github/cicd/scripts/deno-check.ts"
+        "clear": "deno run -A ./.github/deno-tasks/clear-screen.ts",
+        "build": "deno task clear && deno run -A ./.github/cicd/scripts/deno-check.ts",
+        "test": "deno task clear && deno test -A ./tests/*Tests.ts",
+        "lint": "deno task clear && deno lint",
+        "format": "deno task clear && deno fmt"
     },
 	"lint": {
 		"include": [

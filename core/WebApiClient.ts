@@ -40,12 +40,18 @@ export abstract class WebApiClient {
 	 * @param body The body of the request.
 	 * @returns The response from the request.
 	 */
-	public async requestPOST(url: string, body: string | object): Promise<Response> {
+	public async requestPOST(url: string, body: string | object | Uint8Array): Promise<Response> {
 		const funcName = "fetchPOST";
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
 
-		const requestBody = typeof body === "string" ? body : JSON.stringify(body);
+		let requestBody: string | Uint8Array;
+
+		if (body instanceof Uint8Array) {
+			requestBody = body;
+		} else {
+			requestBody = typeof body === "string" ? body : JSON.stringify(body);
+		}
 
 		return await fetch(url, {
 			method: "POST",
