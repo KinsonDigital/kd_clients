@@ -329,8 +329,8 @@ export class RepoClient extends GitHubClient {
 		relativeFilePath = Utils.normalizePath(relativeFilePath);
 		Utils.trimAllStartingValue("/", relativeFilePath);
 
-		if (await this.fileExists(branchName, relativeFilePath)) {
-			const errorMsg = `The file '${relativeFilePath}' already exists in the repository '${this.repoName}'.`;
+		if (!await this.fileExists(branchName, relativeFilePath)) {
+			const errorMsg = `The file '${relativeFilePath}' does not exist in the repository '${this.repoName}'.`;
 			throw new RepoError(errorMsg);
 		}
 
