@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64 } from "../deps.ts";
+import { decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../core/GitHubClient.ts";
 import { Guard } from "../core/Guard.ts";
@@ -149,7 +149,16 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
-		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
+
+		if (isAbsolute(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid relative file path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (Utils.isNotFilePath(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid directory path.`;
+			throw new RepoError(errorMsg);
+		}
 
 		const queryParams = `?ref=${branchName}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents${relativeFilePath}${queryParams}`;
@@ -326,11 +335,20 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(fileContent, funcName, "fileContent");
 		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
-		relativeFilePath = Utils.normalizePath(relativeFilePath);
-		Utils.trimAllStartingValue("/", relativeFilePath);
+		relativeFilePath = relativeFilePath.trim();
 
-		if (await this.fileExists(branchName, relativeFilePath)) {
-			const errorMsg = `The file '${relativeFilePath}' already exists in the repository '${this.repoName}'.`;
+		if (isAbsolute(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid relative file path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (Utils.isNotFilePath(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid directory path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (!await this.fileExists(branchName, relativeFilePath)) {
+			const errorMsg = `The file '${relativeFilePath}' does not exist in the repository '${this.repoName}'.`;
 			throw new RepoError(errorMsg);
 		}
 
@@ -370,15 +388,24 @@ export class RepoClient extends GitHubClient {
 		branchName: string,
 		relativeFilePath: string,
 	): Promise<FileContentModel> {
-		const funcName = "getFileContentWithResult";
+		const funcName = "getFileContentResult";
 		Guard.isNothing(branchName, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
-		relativeFilePath = relativeFilePath.trim();
-		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
+		if (isAbsolute(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid relative file path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (Utils.isNotFilePath(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid directory path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		relativeFilePath = relativeFilePath.startsWith("./") ? relativeFilePath.substring(2) : relativeFilePath;
 
 		const queryParams = `?ref=${branchName}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents${relativeFilePath}${queryParams}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
 
