@@ -36,14 +36,16 @@ export class RepoClient extends GitHubClient {
 			1, // Start page
 			100, // Qty per page
 			(pageOfData: RepoModel[]) => {
-				return pageOfData.some((repo) => repo.name.trim().toLowerCase() === this.repoName);
+				return pageOfData.some((repo) => repo.name.trim() === this.repoName.trim());
 			},
 		);
 
-		const foundRepo: RepoModel | undefined = foundRepos.find((repo) => repo.name.trim().toLowerCase() === this.repoName);
+		const foundRepo: RepoModel | undefined = foundRepos.find((repo) => repo.name.trim() === this.repoName.trim());
 
 		if (foundRepo === undefined) {
-			throw new RepoError(`The repository '${this.repoName}' was not found.`);
+			const errorMsg = `The repository '${this.repoName}' was not found.` +
+				'\nThe repository name is case sensitive.  Make sure to check the name and try again.';
+			throw new RepoError(errorMsg);
 		}
 
 		return foundRepo;
