@@ -2,13 +2,14 @@
 
 ```[tasklist]
 ### Complete the following items to perform a release.
-- [ ] All of the issues in the assigned milestone are closed and all issue tasks are complete.
+- [ ] All of the issues in the assigned milestone are closed.
+- [ ] All issue tasks are checked/marked as complete.
 - [ ] The `🚀Production Release` label has been added to this issue.
 - [ ] This issue is assigned to a project.
 - [ ] This issue is assigned to a milestone.
 - [ ] All of the unit tests have been executed locally and have passed. _(Check out the appropriate branch before running tests)_.
 - [ ] The version has been updated. _(All changes made directly on a 'prod-release' branch)_.
-- [ ] The release notes have been created and added. _(All changes made directly on a 'prod-release' branch)_.
+- [ ] The release notes have been created. _(All changes made directly on a 'prod-release' branch)_.
 - [ ] All manual QA Testing completed. _(if applicable)_
 - [ ] The pull request has been approved and merged into the _**main**_ branch before performing the release. _(Releases are performed on the main branch)_.
 - [ ] The production release has been completed. _(The release is performed by running the `🚀Release` workflow)_.
