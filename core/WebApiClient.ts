@@ -18,10 +18,10 @@ export abstract class WebApiClient {
 		const acceptHeaderValue = this.getHeader("Accept") ?? "";
 
 		return acceptHeaderValue.length > 0 &&
-			acceptHeaderValue?.startsWith("application/vnd") &&
-			acceptHeaderValue.includes("json")
-				? await JSON.parse(responseText)
-				: responseText;
+				acceptHeaderValue?.startsWith("application/vnd") &&
+				acceptHeaderValue.includes("json")
+			? await JSON.parse(responseText)
+			: responseText;
 	}
 
 	/**
