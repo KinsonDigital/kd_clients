@@ -67,9 +67,7 @@ Deno.test("fileExists |> when-path-is-not-relative-path |> throws-error", async 
 	const sut = new RepoClient("test-owner", "test-repo", "test-token");
 
 	// Act & Assert
-	await assertRejects(async () => await sut.fileExists("test-branch", "/dirA/dirB"),
-		RepoError,
-		expectedErrorMsg);
+	await assertRejects(async () => await sut.fileExists("test-branch", "/dirA/dirB"), RepoError, expectedErrorMsg);
 });
 
 Deno.test("fileExists |> when-path-param-is-not-valid-file-path |> throws-error", async () => {
@@ -78,9 +76,7 @@ Deno.test("fileExists |> when-path-param-is-not-valid-file-path |> throws-error"
 	const sut = new RepoClient("test-owner", "test-repo", "test-token");
 
 	// Act & Assert
-	await assertRejects(async () => await sut.fileExists("test-branch", "./dirA/dirB"),
-		RepoError,
-		expectedErrorMsg);
+	await assertRejects(async () => await sut.fileExists("test-branch", "./dirA/dirB"), RepoError, expectedErrorMsg);
 });
 
 Deno.test("fileExists |> when-other-http-error-occurs |> throws-error", async () => {
@@ -92,9 +88,7 @@ Deno.test("fileExists |> when-other-http-error-occurs |> throws-error", async ()
 	stub(sut, "requestGET", (_url) => Promise.resolve(new Response(null, { status: 403 })));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.fileExists("test-branch", "./dirA/test-file.txt"),
-		RepoError,
-		expectedErrorMsg);
+	await assertRejects(async () => await sut.fileExists("test-branch", "./dirA/test-file.txt"), RepoError, expectedErrorMsg);
 });
 
 Deno.test("fileExists |> when-file-does-not-exist |> returns-false", async () => {
@@ -116,13 +110,17 @@ Deno.test("updateFile |> when-branch-name-param-is-nothing |> throws-error", asy
 	stub(sut, "fileExists", (_branchName, _relativeFilePath) => Promise.resolve(true));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-			"",
-			"./dirA/test-file.txt",
-			"test-content",
-			"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"",
+				"./dirA/test-file.txt",
+				"test-content",
+				"test-commit",
+			),
 		Error,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> when-path-param-is-nothing |> throws-error", async () => {
@@ -132,13 +130,17 @@ Deno.test("updateFile |> when-path-param-is-nothing |> throws-error", async () =
 	stub(sut, "fileExists", (_branchName, _relativeFilePath) => Promise.resolve(true));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-			"test-branch",
-			"",
-			"test-content",
-			"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				"",
+				"test-content",
+				"test-commit",
+			),
 		Error,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> when-file-content-param-is-nothing |> throws-error", async () => {
@@ -148,13 +150,17 @@ Deno.test("updateFile |> when-file-content-param-is-nothing |> throws-error", as
 	stub(sut, "fileExists", (_branchName, _relativeFilePath) => Promise.resolve(true));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-			"test-branch",
-			"./dirA/test-file.txt",
-			"",
-			"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				"./dirA/test-file.txt",
+				"",
+				"test-commit",
+			),
 		Error,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> when-commit-msg-param-is-nothing |> throws-error", async () => {
@@ -164,13 +170,17 @@ Deno.test("updateFile |> when-commit-msg-param-is-nothing |> throws-error", asyn
 	stub(sut, "fileExists", (_branchName, _relativeFilePath) => Promise.resolve(true));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-			"test-branch",
-			"./dirA/test-file.txt",
-			"test-content",
-			""),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				"./dirA/test-file.txt",
+				"test-content",
+				"",
+			),
 		Error,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> when-path-is-not-relative-path |> throws-error", async () => {
@@ -179,13 +189,17 @@ Deno.test("updateFile |> when-path-is-not-relative-path |> throws-error", async 
 	const sut = new RepoClient("test-owner", "test-repo", "test-token");
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-		"test-branch",
-		"/dirA/dirB",
-		"test-content",
-		"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				"/dirA/dirB",
+				"test-content",
+				"test-commit",
+			),
 		RepoError,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> when-path-param-is-not-valid-file-path |> throws-error", async () => {
@@ -194,13 +208,17 @@ Deno.test("updateFile |> when-path-param-is-not-valid-file-path |> throws-error"
 	const sut = new RepoClient("test-owner", "test-repo", "test-token");
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-		"test-branch",
-		"./dirA/dirB",
-		"test-content",
-		"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				"./dirA/dirB",
+				"test-content",
+				"test-commit",
+			),
 		RepoError,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> when-file-does-not-exist |> throws-error", async () => {
@@ -211,21 +229,26 @@ Deno.test("updateFile |> when-file-does-not-exist |> throws-error", async () => 
 	stub(sut, "fileExists", (_branchName, _relativeFilePath) => Promise.resolve(false));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-			"test-branch",
-			"./dirA/test-file.txt",
-			"test-content",
-			"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				"./dirA/test-file.txt",
+				"test-content",
+				"test-commit",
+			),
 		RepoError,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });
 
 Deno.test("updateFile |> with-non-200-http-status-code |> throws-error", async () => {
 	// Arrange
 	const relativeFilePath = "./dirA/test-file.txt";
-	const expectedErrorMsg = `An error occurred when creating the file '${relativeFilePath}' in the repository 'test-repo' for branch 'test-branch'.`;
+	const expectedErrorMsg =
+		`An error occurred when creating the file '${relativeFilePath}' in the repository 'test-repo' for branch 'test-branch'.`;
 	const sut = new RepoClient("test-owner", "test-repo", "test-token");
-	
+
 	const fileContent: FileContentModel = {
 		name: "test-name",
 		path: "test-path",
@@ -242,11 +265,15 @@ Deno.test("updateFile |> with-non-200-http-status-code |> throws-error", async (
 	stub(sut, "fileExists", (_branchName, _relativeFilePath) => Promise.resolve(true));
 
 	// Act & Assert
-	await assertRejects(async () => await sut.updateFile(
-		"test-branch",
-		relativeFilePath,
-		"test-content",
-		"test-commit"),
+	await assertRejects(
+		async () =>
+			await sut.updateFile(
+				"test-branch",
+				relativeFilePath,
+				"test-content",
+				"test-commit",
+			),
 		RepoError,
-		expectedErrorMsg);
+		expectedErrorMsg,
+	);
 });

@@ -44,7 +44,7 @@ export class RepoClient extends GitHubClient {
 
 		if (foundRepo === undefined) {
 			const errorMsg = `The repository '${this.repoName}' was not found.` +
-				'\nThe repository name is case sensitive.  Make sure to check the name and try again.';
+				"\nThe repository name is case sensitive.  Make sure to check the name and try again.";
 			throw new RepoError(errorMsg);
 		}
 

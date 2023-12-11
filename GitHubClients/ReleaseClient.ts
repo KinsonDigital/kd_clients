@@ -92,7 +92,8 @@ export class ReleaseClient extends GitHubClient {
 
 		if (foundRelease === undefined) {
 			const tagOrTitle = options?.getByTitle === true ? "title" : "tag";
-			const errorMsg = `A release with the ${tagOrTitle} '${getByValue}' for the repository '${this.repoName}' could not be found.`;
+			const errorMsg =
+				`A release with the ${tagOrTitle} '${getByValue}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
