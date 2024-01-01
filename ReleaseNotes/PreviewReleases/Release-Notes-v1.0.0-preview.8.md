@@ -11,14 +11,13 @@ As with all software, there is always a chance for issues and bugs, especially f
 
 <h2 align="center" style="font-weight: bold;">Bug Fixes 🐛</h2>
 
-1. [#35](https://github.com/KinsonDigital/kd_clients/issues/35) -  Fix NuGet client issue
+1. [#35](https://github.com/KinsonDigital/kd_clients/issues/35) - Fixed an issue with the `NuGetClient` class where the `getPackageVersions` and `packageWithVersionExists` functions were not working correctly.
 
 <h2 align="center" style="font-weight: bold;">Dependency Updates 📦</h2>
 
-1. [#34](https://github.com/KinsonDigital/kd_clients/pull/34) - chore(deps): update kinsondigital/infrastructure action to v13.6.0
-2. [#25](https://github.com/KinsonDigital/kd_clients/pull/25) - chore(deps): update kinsondigital/infrastructure action to v13.5.0
+1. [#34](https://github.com/KinsonDigital/kd_clients/pull/34) - Updated _**kinsondigital/infrastructure**_ action to _**v13.6.0**_
 
 <h2 align="center" style="font-weight: bold;">Other 🪧</h2>
 
-1. [#21](https://github.com/KinsonDigital/kd_clients/issues/21) - 📋Improve the CLI and Directory types
-2. [#14](https://github.com/KinsonDigital/kd_clients/issues/14) - Create prepare release workflow
+1. [#21](https://github.com/KinsonDigital/kd_clients/issues/21) - Improved the `CLI` and `Directory` types.
+2. [#14](https://github.com/KinsonDigital/kd_clients/issues/14) - Created a prepare release workflow.
