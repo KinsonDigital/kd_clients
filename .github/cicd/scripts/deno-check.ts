@@ -7,7 +7,7 @@ const ignoreDirectories = [
 ];
 
 const files: string[] = Directory
-	.getFiles("/", ".ts", true)
+	.getFiles("./", ".ts", true)
 	.filter(f => ignoreDirectories.every(ignoreDir => !f.startsWith(ignoreDir)));
 
 const cli: CLI = new CLI();

@@ -10,18 +10,18 @@ export class CLI {
 	public async runAsync(command: string): Promise<string | Error> {
 		if (command === undefined || command === null || command === "") {
 			const errorMsg = "The command parameter cannot be null or empty.";
+			console.log(errorMsg);
 			Deno.exit(1);
 		}
 
-		if (!command.includes(" ")) {
-			const errorMsg = "The command parameter must include a space.";
-			Deno.exit(1);
-		}
+		command = command.includes("'")
+			? command.replace(/'/g, '"')
+			: command;
 
-		const sections: string[] = command.split(" ");
+		const sections: string[] = command.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) ?? [];
 
-		const app = sections[0];
-		const args = sections.slice(1);
+		const app = sections[0] === "deno" ? Deno.execPath() : sections[0];
+		const args = sections.slice(1).map(arg => arg.replace(/"/g, ''));
 
 		const cmd = new Deno.Command(app, { args: args });
 
