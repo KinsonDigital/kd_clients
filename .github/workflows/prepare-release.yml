@@ -64,7 +64,7 @@ jobs:
           if (($releaseVersion -match $versionRegex)) {
             Write-Host "::notice::The 'release-version' workflow input is valid.";
           } else {
-            $versionSyntax = $releaseType == "production" ? "v#.#.#" : "v#.#.#-preview.#";
+            $versionSyntax = $releaseType -eq "production" ? "v#.#.#" : "v#.#.#-preview.#";
             Write-Host "::error::The 'release-version' workflow input is not valid.  Expected format: '$versionSyntax";
             exit 1;
           }
@@ -73,7 +73,7 @@ jobs:
   prepare_release:
     name: Prepare ${{ inputs.release-type }} Release Of ${{ vars.PROJECT_NAME }}
     needs: print_validate_workflow
-    uses: KinsonDigital/Infrastructure/.github/workflows/prepare-release.yml@v13.5.0
+    uses: KinsonDigital/Infrastructure/.github/workflows/prepare-release.yml@v13.6.0
     with:
       project-name: "${{ vars.PROJECT_NAME }}"
       release-type: "${{ inputs.release-type }}"
