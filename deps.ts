@@ -9,7 +9,6 @@ import { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg } fro
 
 // NPM Modules
 import chalk from "npm:chalk@4.1.1";
-import { TwitterApi, TweetV2PostTweetResult } from "npm:twitter-api-v2@1.15.0";
 
 // ----EXPORTS----
 
@@ -22,5 +21,3 @@ export { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg }
 
 // NPM Modules
 export { chalk };
-export { TwitterApi };
-export type { TweetV2PostTweetResult };
