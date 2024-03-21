@@ -155,6 +155,7 @@ jobs:
           deno run `
             --allow-read --allow-net `
             "$scriptUrl" `
+            "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
             "${{ needs.get_version.outputs.version }}" `
             "${{ secrets.CICD_TOKEN }}";
