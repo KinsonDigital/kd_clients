@@ -8,9 +8,6 @@ import { assert, assertEquals, assertThrows, assertRejects, equal } from "https:
 import { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg } from "https://deno.land/std@0.204.0/testing/mock.ts";
 import { oauth1a } from "jsr:@nexterias/twitter-api-fetch@3.0.1";
 
-// NPM Modules
-import chalk from "npm:chalk@4.1.1";
-
 // Local Core Types
 import { GitHubClient } from "./core/GitHubClient.ts";
 import { GraphQlClient } from "./core/GraphQlClient.ts";
@@ -37,9 +34,6 @@ export { decodeBase64, encodeBase64 };
 export { assert, assertEquals, assertThrows, assertRejects, equal };
 export { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg }
 export { oauth1a };
-
-// NPM Modules
-export { chalk };
 
 // Local Core Types
 export { GitHubClient, GraphQlClient };
