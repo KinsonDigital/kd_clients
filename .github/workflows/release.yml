@@ -163,9 +163,10 @@ jobs:
       - name: Send X Announcement
         run: |
           # Construct the URL to the organizations CICD scripts
-          $scriptUrl = "${{ vars.SCRIPT_BASE_URL }}/${{ vars.CICD_SCRIPTS_VERSION }}/${{ vars.SCRIPT_RELATIVE_DIR_PATH }}";
-          $scriptUrl = $scriptUrl.Replace("\", "/").Replace("//", "/");
-          $scriptUrl = $scriptUrl.EndsWith("/") ? $scriptUrl.Substring(0, $scriptUrl.Length - 1) : $url;
+          $scriptBaseUrl = "${{ vars.SCRIPT_BASE_URL }}/${{ vars.CICD_SCRIPTS_VERSION }}/${{ vars.SCRIPT_RELATIVE_DIR_PATH }}";
+          $scriptBaseUrl = $scriptBaseUrl.Replace("\", "/").Replace("//", "/");
+          $scriptBaseUrl = $scriptBaseUrl.EndsWith("/") ? $scriptBaseUrl.Substring(0, $scriptBaseUrl.Length - 1) : $url;
+          $scriptUrl = "$scriptUrl/send-release-tweet.ts";
 
           <# Deno Args:
             1. Repo owner
