@@ -1,8 +1,8 @@
-import { LabelModel } from "./LabelModel.ts";
-import { MilestoneModel } from "./MilestoneModel.ts";
-import { PullRequestHeadOrBaseModel } from "./PullRequestHeadOrBaseModel.ts";
-import { PullRequestInfoModel } from "./PullRequestInfoModel.ts";
-import { UserModel } from "./UserModel.ts";
+import { LabelModel } from "./mod.ts";
+import { MilestoneModel } from "./mod.ts";
+import { PullRequestHeadOrBaseModel } from "./mod.ts";
+import { PullRequestInfoModel } from "./mod.ts";
+import { UserModel } from "./mod.ts";
 
 /**
  * Represents a GitHub pull request.

@@ -10,6 +10,23 @@ import { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg } fro
 // NPM Modules
 import chalk from "npm:chalk@4.1.1";
 
+// Local Core Types
+import { GitHubClient } from "./core/GitHubClient.ts";
+import { GraphQlClient } from "./core/GraphQlClient.ts";
+
+// Local Core Models
+import {
+	CommitModel, FileContentModel, GitHubVariablesModel, GitHubVarModel, IssueModel, LabelModel, MilestoneModel,
+	ProjectModel, PullRequestHeadOrBaseModel, PullRequestInfoModel, PullRequestModel, ReleaseModel, RepoModel,
+	TagModel, UserModel, WorkflowRunModel, WorkflowRunsModel
+} from "./core/Models/mod.ts"
+
+// Local GraphQL Models
+import { 
+	ErrorModel, GitBranchModel,	GraphQlRequestResponseModel, PageInfoModel,
+	LocationModel,RawGetBranchTargetModel, RawGitBranchModel, RawRefsGetBranchModel
+} from "./core/Models/GraphQlModels/mod.ts";
+
 // ----EXPORTS----
 
 // Official Deno Modules
@@ -21,3 +38,19 @@ export { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg }
 
 // NPM Modules
 export { chalk };
+
+// Local Core Types
+export { GitHubClient, GraphQlClient };
+
+// Local Core Models
+export type {
+	CommitModel, FileContentModel, GitHubVariablesModel, GitHubVarModel, IssueModel, LabelModel, MilestoneModel,
+	ProjectModel, PullRequestHeadOrBaseModel, PullRequestInfoModel, PullRequestModel, ReleaseModel, RepoModel,
+	TagModel, UserModel, WorkflowRunModel, WorkflowRunsModel
+};
+
+// Local GraphQL Models
+export type { 
+	ErrorModel, GitBranchModel,	GraphQlRequestResponseModel, PageInfoModel,
+	LocationModel,RawGetBranchTargetModel, RawGitBranchModel, RawRefsGetBranchModel
+}

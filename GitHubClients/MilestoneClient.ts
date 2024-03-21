@@ -1,10 +1,10 @@
 import { Guard } from "../core/Guard.ts";
-import { IssueModel } from "../core/Models/mod.ts";
-import { MilestoneModel } from "../core/Models/mod.ts";
-import { PullRequestModel } from "../core/Models/mod.ts";
+import { IssueModel } from "../deps.ts";
+import { MilestoneModel } from "../deps.ts";
+import { PullRequestModel } from "../deps.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
+import { GitHubClient } from "../deps.ts";
 import { IssueClient } from "./IssueClient.ts";
 import { PullRequestClient } from "./PullRequestClient.ts";
 import { IssueOrPR } from "../core/Types.ts";
