@@ -11,10 +11,12 @@ As with all software, there is always a chance for issues and bugs, especially f
 
 <h2 align="center" style="font-weight: bold;">Dependency Updates 📦</h2>
 
-1. [#44](https://github.com/KinsonDigital/kd_clients/pull/44) - chore(deps): update softprops/action-gh-release action to v2
-2. [#41](https://github.com/KinsonDigital/kd_clients/pull/41) - chore(deps): update kinsondigital/infrastructure action to v13.6.3
+1. [#44](https://github.com/KinsonDigital/kd_clients/pull/44) - Updated _**softprops/action-gh-release**_ action to _**v2.0.0**_
+2. [#41](https://github.com/KinsonDigital/kd_clients/pull/41) - Updated _**kinsondigital/infrastructure**_ action to _**v13.6.3**_
 
 <h2 align="center" style="font-weight: bold;">Other 🪧</h2>
 
-1. [#46](https://github.com/KinsonDigital/kd_clients/issues/46) - Replace chalk npm package
-2. [#45](https://github.com/KinsonDigital/kd_clients/issues/45) - Replace twitter npm package
+1. [#46](https://github.com/KinsonDigital/kd_clients/issues/46) - Replaced _**chalk**_ internal npm package
+   - This has been done to remove any dependencies on npm to make it easier to use and vendor.
+2. [#45](https://github.com/KinsonDigital/kd_clients/issues/45) - Replaced _**twitter**_ internal npm package
+   - This has been done to remove any dependencies on npm to make it easier to use and vendor.
