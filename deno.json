@@ -5,7 +5,8 @@
         "build": "deno task clear && deno run -A ./.github/cicd/scripts/deno-check.ts",
         "test": "deno task clear && deno test -A ./tests/*Tests.ts",
         "lint": "deno task clear && deno lint",
-        "format": "deno task clear && deno fmt"
+        "format": "deno task clear && deno fmt",
+        "reload-cache": "powershell cls && deno cache --reload --lock=deno.lock --lock-write \"./deps.ts\""
     },
 	"lint": {
 		"include": [
