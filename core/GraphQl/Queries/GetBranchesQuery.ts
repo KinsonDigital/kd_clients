@@ -1,4 +1,4 @@
-import { Utils } from "../../Utils.ts";
+import { Utils } from "../../../deps.ts";
 
 /**
  * Get a list of branches for a GitHub repository.

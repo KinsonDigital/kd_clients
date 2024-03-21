@@ -1,11 +1,11 @@
 import { GitHubHttpStatusCodes, OrgMemberRole } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
+import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
-import { GitHubVarModel } from "../core/Models/mod.ts";
-import { GitHubVariablesModel } from "../core/Models/mod.ts";
-import { UserModel } from "../core/Models/mod.ts";
-import { Utils } from "../core/Utils.ts";
-import { OrganizationError } from "./Errors/OrganizationError.ts";
+import { GitHubVarModel } from "../deps.ts";
+import { GitHubVariablesModel } from "../deps.ts";
+import { UserModel } from "../deps.ts";
+import { Utils } from "../deps.ts";
+import { OrganizationError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with issues.

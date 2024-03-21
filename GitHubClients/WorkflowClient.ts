@@ -1,12 +1,12 @@
 import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
+import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, WorkflowEvent, WorkflowRunStatus } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
-import { WorkflowRunModel } from "../core/Models/mod.ts";
-import { WorkflowRunsModel } from "../core/Models/mod.ts";
+import { GitHubClient } from "../deps.ts";
+import { WorkflowRunModel } from "../deps.ts";
+import { WorkflowRunsModel } from "../deps.ts";
 import { AnyBranch } from "../core/Types.ts";
 import { GithubResponse } from "../GitHubClients/GithubResponse.ts";
-import { WorkflowError } from "./Errors/WorkflowError.ts";
+import { WorkflowError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with workflow runs.

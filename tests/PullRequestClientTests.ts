@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects, assertSpyCalls, stub } from "../deps.ts";
-import { PullRequestClient } from "../mod.ts";
+import { PullRequestClient } from "../GitHubClients/mod.ts";
 
 Deno.test("requestReviewers |> with-pr-number-less-than-one |> throws-error", async () => {
 	// Arrange

@@ -1,6 +1,6 @@
-import { LabelModel } from "./LabelModel.ts";
-import { MilestoneModel } from "./MilestoneModel.ts";
-import { UserModel } from "./UserModel.ts";
+import { LabelModel } from "./mod.ts";
+import { MilestoneModel } from "./mod.ts";
+import { UserModel } from "./mod.ts";
 
 /**
  * Represents a GitHub issue.
