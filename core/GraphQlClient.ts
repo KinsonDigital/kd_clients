@@ -1,7 +1,7 @@
 import { GraphQlRequestResponseModel } from "./Models/GraphQlModels/mod.ts";
-import { Utils } from "./Utils.ts";
+import { Utils } from "../deps.ts";
 import { Guard } from "./Guard.ts";
-import { BadCredentialsError } from "../GitHubClients/Errors/BadCredentials.ts";
+import { BadCredentialsError } from "../GitHubClients/Errors/BadCredentialsError.ts";
 
 /**
  * Provides a base class for HTTP clients.

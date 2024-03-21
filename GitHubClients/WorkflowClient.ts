@@ -1,5 +1,5 @@
 import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
+import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, WorkflowEvent, WorkflowRunStatus } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { WorkflowRunModel } from "../deps.ts";

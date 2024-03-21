@@ -1,7 +1,7 @@
 import { Guard } from "../core/Guard.ts";
 import { LabelClient } from "./LabelClient.ts";
 import { PullRequestModel } from "../deps.ts";
-import { Utils } from "../core/Utils.ts";
+import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";

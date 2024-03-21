@@ -25,6 +25,9 @@ import {
 	LocationModel,RawGetBranchTargetModel, RawGitBranchModel, RawRefsGetBranchModel
 } from "./core/Models/GraphQlModels/mod.ts";
 
+// Local
+import { Utils } from "./core/Utils.ts";
+
 // ----EXPORTS----
 
 // Official Deno Modules
@@ -50,3 +53,6 @@ export type {
 	ErrorModel, GitBranchModel,	GraphQlRequestResponseModel, PageInfoModel,
 	LocationModel,RawGetBranchTargetModel, RawGitBranchModel, RawRefsGetBranchModel
 }
+
+// Local
+export { Utils };

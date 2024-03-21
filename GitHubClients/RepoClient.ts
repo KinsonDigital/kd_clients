@@ -2,7 +2,7 @@ import { decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
+import { Utils } from "../deps.ts";
 import { FileContentModel } from "../deps.ts";
 import { RepoModel } from "../deps.ts";
 import { GitHubVarModel } from "../deps.ts";
