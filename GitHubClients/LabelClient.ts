@@ -3,7 +3,7 @@ import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
-import { LabelError } from "./Errors/LabelError.ts";
+import { LabelError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with labels.

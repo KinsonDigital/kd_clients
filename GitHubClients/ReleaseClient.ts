@@ -4,7 +4,7 @@ import { Guard } from "../core/Guard.ts";
 import { ReleaseModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { basename, existsSync } from "../deps.ts";
-import { ReleaseError } from "./Errors/ReleaseError.ts";
+import { ReleaseError } from "../deps.ts";
 import { ReleaseOptions } from "./ReleaseOptions.ts";
 
 /**

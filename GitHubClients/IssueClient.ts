@@ -6,7 +6,7 @@ import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
-import { IssueError } from "./Errors/IssueError.ts";
+import { IssueError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with issues.

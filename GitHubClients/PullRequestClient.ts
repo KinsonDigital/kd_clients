@@ -5,7 +5,7 @@ import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
-import { PullRequestError } from "./Errors/PullRequestError.ts";
+import { PullRequestError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with pull requests.

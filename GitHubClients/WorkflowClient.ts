@@ -6,7 +6,7 @@ import { WorkflowRunModel } from "../deps.ts";
 import { WorkflowRunsModel } from "../deps.ts";
 import { AnyBranch } from "../core/Types.ts";
 import { GithubResponse } from "../GitHubClients/GithubResponse.ts";
-import { WorkflowError } from "./Errors/WorkflowError.ts";
+import { WorkflowError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with workflow runs.

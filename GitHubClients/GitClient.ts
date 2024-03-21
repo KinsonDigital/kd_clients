@@ -9,8 +9,8 @@ import { Utils } from "../deps.ts";
 import { RepoClient } from "./RepoClient.ts";
 import { getCreateBranchMutation } from "../core/GraphQl/Mutations/CreateBranchMutation.ts";
 import { addCommitMutation } from "../core/GraphQl/Mutations/AddCommitMutation.ts";
-import { OrganizationError } from "./Errors/OrganizationError.ts";
-import { GitError } from "./Errors/GitError.ts";
+import { OrganizationError } from "../deps.ts";
+import { GitError } from "../deps.ts";
 
 /**
  * Provides a client for to perform git operations for a GitHub repository.

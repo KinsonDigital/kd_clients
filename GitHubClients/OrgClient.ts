@@ -5,7 +5,7 @@ import { GitHubVarModel } from "../deps.ts";
 import { GitHubVariablesModel } from "../deps.ts";
 import { UserModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
-import { OrganizationError } from "./Errors/OrganizationError.ts";
+import { OrganizationError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with issues.

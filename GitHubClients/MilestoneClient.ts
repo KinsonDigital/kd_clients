@@ -8,7 +8,7 @@ import { GitHubClient } from "../deps.ts";
 import { IssueClient } from "./IssueClient.ts";
 import { PullRequestClient } from "./PullRequestClient.ts";
 import { IssueOrPR } from "../core/Types.ts";
-import { MilestoneError } from "./Errors/MilestoneError.ts";
+import { MilestoneError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with milestones.

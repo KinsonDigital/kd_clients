@@ -7,7 +7,7 @@ import { FileContentModel } from "../deps.ts";
 import { RepoModel } from "../deps.ts";
 import { GitHubVarModel } from "../deps.ts";
 import { GitHubVariablesModel } from "../deps.ts";
-import { RepoError } from "./Errors/RepoError.ts";
+import { RepoError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.
