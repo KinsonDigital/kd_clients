@@ -2,8 +2,21 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "jsr:@nexterias/twitter-api-fetch": "jsr:@nexterias/twitter-api-fetch@3.0.1",
+      "jsr:@std/encoding@^0.219.1": "jsr:@std/encoding@0.219.1",
       "npm:chalk@4.1.1": "npm:chalk@4.1.1",
       "npm:twitter-api-v2@1.15.0": "npm:twitter-api-v2@1.15.0"
+    },
+    "jsr": {
+      "@nexterias/twitter-api-fetch@3.0.1": {
+        "integrity": "9fb5a6770ce659b46df02c3b93ed4ab13ce7b3dd9a84232e0bc921fe7bdd1dad",
+        "dependencies": [
+          "jsr:@std/encoding@^0.219.1"
+        ]
+      },
+      "@std/encoding@0.219.1": {
+        "integrity": "77b30e481a596cfb2a8f2f38c3165e6035a4f76a7259bf89b6a622ceaf57d575"
+      }
     },
     "npm": {
       "ansi-styles@4.3.0": {
