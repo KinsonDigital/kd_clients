@@ -1,11 +1,11 @@
 import { createOrgProjectsQuery } from "../core/GraphQl/Queries/GetOrgProjectsQueries.ts";
 import { GraphQlClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
+import { Utils } from "../deps.ts";
 import { createLinkItemToProjectMutation } from "../core/GraphQl/Mutations/AddToProjectMutation.ts";
 import { createGetIssueProjectsQuery } from "../core/GraphQl/Queries/GetIssueProjectsQuery.ts";
 import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
-import { ProjectError } from "./Errors/ProjectError.ts";
+import { ProjectError } from "../deps.ts";
 import { IssueClient, PullRequestClient } from "./mod.ts";
 import { ProjectModel } from "../deps.ts";
 import { IssueModel } from "../deps.ts";

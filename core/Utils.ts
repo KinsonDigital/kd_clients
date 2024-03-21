@@ -1,6 +1,6 @@
 import { Guard } from "./Guard.ts";
 import { ReleaseType } from "./Enums.ts";
-import { basename, chalk, extname } from "../deps.ts";
+import { basename, extname } from "../deps.ts";
 import { IssueModel } from "../deps.ts";
 import { PullRequestModel } from "../deps.ts";
 import { GraphQlRequestResponseModel } from "../deps.ts";
@@ -140,7 +140,7 @@ export class Utils {
 	 */
 	public static printError(message: string): void {
 		Utils.printEmptyLine();
-		console.log(chalk.red(message));
+		console.log(message);
 		Utils.printEmptyLine();
 	}
 

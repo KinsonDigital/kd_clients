@@ -4,8 +4,8 @@ import { Guard } from "../core/Guard.ts";
 import { GitHubVarModel } from "../deps.ts";
 import { GitHubVariablesModel } from "../deps.ts";
 import { UserModel } from "../deps.ts";
-import { Utils } from "../core/Utils.ts";
-import { OrganizationError } from "./Errors/OrganizationError.ts";
+import { Utils } from "../deps.ts";
+import { OrganizationError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with issues.
