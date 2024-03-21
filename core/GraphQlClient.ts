@@ -1,4 +1,4 @@
-import { GraphQlRequestResponseModel } from "./Models/mod.ts";
+import { GraphQlRequestResponseModel } from "./Models/GraphQlModels/mod.ts";
 import { Utils } from "./Utils.ts";
 import { Guard } from "./Guard.ts";
 import { BadCredentialsError } from "../GitHubClients/Errors/BadCredentials.ts";

@@ -1,12 +1,12 @@
 import { decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
+import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
 import { Utils } from "../core/Utils.ts";
-import { FileContentModel } from "../core/Models/mod.ts";
-import { RepoModel } from "../core/Models/mod.ts";
-import { GitHubVarModel } from "../core/Models/mod.ts";
-import { GitHubVariablesModel } from "../core/Models/mod.ts";
+import { FileContentModel } from "../deps.ts";
+import { RepoModel } from "../deps.ts";
+import { GitHubVarModel } from "../deps.ts";
+import { GitHubVariablesModel } from "../deps.ts";
 import { RepoError } from "./Errors/RepoError.ts";
 
 /**

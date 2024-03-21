@@ -1,7 +1,7 @@
-import { LabelModel } from "../core/Models/LabelModel.ts";
+import { LabelModel } from "../deps.ts";
 import { Utils } from "../core/Utils.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
+import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
 import { LabelError } from "./Errors/LabelError.ts";
 

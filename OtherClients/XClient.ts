@@ -1,5 +1,6 @@
-import { XAuthValues } from "./XAuthValue.ts";
-import { TweetV2PostTweetResult, TwitterApi } from "../deps.ts";
+import { Guard } from "../core/Guard.ts";
+import { XAuthValues } from "./XAuthValues.ts";
+import { oauth1a } from "../deps.ts";
 import { WebApiClient } from "../core/WebApiClient.ts";
 import { XError } from "../GitHubClients/Errors/XError.ts";
 
@@ -7,21 +8,16 @@ import { XError } from "../GitHubClients/Errors/XError.ts";
  * Provides twitter functionality.
  */
 export class XClient extends WebApiClient {
-	private readonly xClientBase: TwitterApi;
+	private readonly authValues: XAuthValues;
 
 	/**
 	 * Creates a new instance of the {@link XClient} class.
 	 * @param secrets The X secrets and tokens.
 	 */
 	constructor(authValues: XAuthValues) {
+		Guard.isNothing(authValues, "ctor", "authValues");
 		super();
-
-		this.xClientBase = new TwitterApi({
-			appKey: authValues.consumer_api_key,
-			appSecret: authValues.consumer_api_secret,
-			accessToken: authValues.access_token_key,
-			accessSecret: authValues.access_token_secret,
-		});
+		this.authValues = authValues;
 	}
 
 	/**
@@ -29,15 +25,25 @@ export class XClient extends WebApiClient {
 	 * @description Manage setting up and tweeting the given status
 	 */
 	public async tweet(message: string): Promise<void> {
-		const tweetResult: TweetV2PostTweetResult = await this.xClientBase.v2.tweet(message);
+		const fetcher = await oauth1a({
+			consumerKey: this.authValues.consumer_api_key,
+			secretConsumerKey: this.authValues.consumer_api_secret,
+			accessToken: this.authValues.access_token_key,
+			secretAccessToken: this.authValues.access_token_secret,
+		});
 
-		if (tweetResult.errors) {
-			tweetResult.errors.forEach((error) => {
-				let errorMsg = `Error Title: ${error.title}`;
-				errorMsg += `\nError Detail: ${error.detail}`;
+		const response = await fetcher("/2/tweets", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				text: message,
+			}),
+		});
 
-				throw new XError(errorMsg);
-			});
+		if (response.status != 200 && response.status != 201) {
+			throw new XError(`Failed to send tweet.\n${response.status} - ${response.statusText}`);
 		}
 	}
 }
