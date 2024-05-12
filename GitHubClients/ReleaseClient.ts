@@ -6,6 +6,7 @@ import { Utils } from "../deps.ts";
 import { basename, existsSync } from "../deps.ts";
 import { ReleaseError } from "../deps.ts";
 import { ReleaseOptions } from "./ReleaseOptions.ts";
+import { AuthError } from "./Errors/AuthError.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.
@@ -122,7 +123,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
 	 */
-	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void | ReleaseError> {
+	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void | AuthError | ReleaseError> {
 		const funcName = "uploadAsset";
 		Guard.isNothing(tagOrTitle, funcName, "toReleaseBy");
 		Guard.isNothing(tagOrTitle, funcName, "filePath");
@@ -191,7 +192,7 @@ export class ReleaseClient extends GitHubClient {
 	private async uploadFile(
 		filePath: string,
 		releaseId: number,
-		getByTitle: boolean,
+	): Promise<void | AuthError | ReleaseError> {
 		const file = Deno.readFileSync(filePath);
 		const fileName = basename(filePath);
 
@@ -204,8 +205,9 @@ export class ReleaseClient extends GitHubClient {
 
 		const response = await this.requestPOST(url, file);
 
-		if (response.status != GitHubHttpStatusCodes.Created) {
-			const errorSection = getByTitle === true ? "title" : "tag";
+		if (response.status === GitHubHttpStatusCodes.Forbidden) {
+			throw new AuthError();
+		} else if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorMsg =
 				`The asset '${fileName}' could not be uploaded to the release with the release id '${releaseId}'.`;
 			throw new ReleaseError(errorMsg);
