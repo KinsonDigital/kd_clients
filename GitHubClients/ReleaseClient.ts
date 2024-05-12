@@ -159,7 +159,7 @@ export class ReleaseClient extends GitHubClient {
 
 		// Gather all of the work to be done
 		for (const filePath of filesToUpload) {
-			uploadWork.push(this.uploadFile(toReleaseBy, filePath, release.id, options?.getByTitle === true));
+			uploadWork.push(this.uploadFile(filePath, release.id));
 		}
 
 		// Wait for completion of all the uploads
@@ -182,7 +182,6 @@ export class ReleaseClient extends GitHubClient {
 
 	/**
 	 * Uploads a file using the given {@link filePath} to a release that matches the given {@link releaseId}.
-	 * @param tagOrTitle The tag or title of the release to upload the file to.
 	 * @param filePath The path of the file to upload.
 	 * @param releaseId The id of the release to upload the file to.
 	 * @param options Various options to use when uploading the file.
@@ -190,11 +189,9 @@ export class ReleaseClient extends GitHubClient {
 	 * @returns An asynchronous promise of the operation.
 	 */
 	private async uploadFile(
-		tagOrTitle: string,
 		filePath: string,
 		releaseId: number,
 		getByTitle: boolean,
-	): Promise<void | ReleaseError> {
 		const file = Deno.readFileSync(filePath);
 		const fileName = basename(filePath);
 
@@ -210,7 +207,7 @@ export class ReleaseClient extends GitHubClient {
 		if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorSection = getByTitle === true ? "title" : "tag";
 			const errorMsg =
-				`The asset '${fileName}' could not be uploaded to the release with the ${errorSection} '${tagOrTitle}'.`;
+				`The asset '${fileName}' could not be uploaded to the release with the release id '${releaseId}'.`;
 			throw new ReleaseError(errorMsg);
 		}
 	}
