@@ -115,22 +115,22 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Uploads one or more assets to a release that matches a tag or title by the given {@link toReleaseBy}.
-	 * @param toReleaseBy The tag or title of the release to upload the asset to.
+	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tagOrTitle}.
+	 * @param tagOrTitle The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
 	 * @param options Various options to use when uploading the asset.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
 	 */
-	public async uploadAssets(toReleaseBy: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
+	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void | ReleaseError> {
 		const funcName = "uploadAsset";
-		Guard.isNothing(toReleaseBy, funcName, "toReleaseBy");
-		Guard.isNothing(toReleaseBy, funcName, "filePath");
+		Guard.isNothing(tagOrTitle, funcName, "toReleaseBy");
+		Guard.isNothing(tagOrTitle, funcName, "filePath");
 
-		toReleaseBy = toReleaseBy.trim();
+		tagOrTitle = tagOrTitle.trim();
 
-		if (!(await this.releaseExists(toReleaseBy))) {
-			const errorMsg = `A release with the tag '${toReleaseBy}' for the repository '${this.repoName}' could not be found.`;
+		if (!(await this.releaseExists(tagOrTitle))) {
+			const errorMsg = `A release with the tag '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
@@ -152,7 +152,7 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		const release = await this.getRelease(toReleaseBy, options);
+		const release = await this.getRelease(tagOrTitle, options);
 
 		// All of the upload work
 		const uploadWork: Promise<void | ReleaseError>[] = [];
