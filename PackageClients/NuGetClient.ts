@@ -21,6 +21,7 @@ export class NuGetClient extends WebApiClient {
 	constructor() {
 		super();
 		this.baseUrl = "https://api.nuget.org";
+		this.updateOrAdd("Accept", "json");
 	}
 
 	/**
@@ -43,7 +44,8 @@ export class NuGetClient extends WebApiClient {
 		} else {
 			const errorMsg = this.buildErrorMsg(
 				`There was an issue checking for the '${packageName}' NuGet package.`,
-				response);
+				response,
+			);
 
 			throw new NuGetError(errorMsg);
 		}
@@ -71,7 +73,8 @@ export class NuGetClient extends WebApiClient {
 		} else {
 			const errorMsg = this.buildErrorMsg(
 				`There was an issue getting the versions for the '${packageName}' NuGet package.`,
-				response);
+				response,
+			);
 
 			throw new NuGetError(errorMsg);
 		}
@@ -93,7 +96,7 @@ export class NuGetClient extends WebApiClient {
 		version = version.trim().toLowerCase();
 
 		const url = this.buildUrl(packageName);
-		
+
 		const response: Response = await this.requestGET(url);
 		const statusCode: NuGetHttpStatusCodes = response.status as NuGetHttpStatusCodes;
 
@@ -110,7 +113,8 @@ export class NuGetClient extends WebApiClient {
 		} else {
 			const errorMsg = this.buildErrorMsg(
 				`There was an issue getting information about the '${packageName}' NuGet package.`,
-				response);
+				response,
+			);
 
 			throw new NuGetError(errorMsg);
 		}

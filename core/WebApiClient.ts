@@ -4,7 +4,7 @@ import { Guard } from "./Guard.ts";
  * Provides a base class for HTTP clients.
  */
 export abstract class WebApiClient {
-	protected readonly headers: Headers = new Headers();
+	private readonly headers: Headers = new Headers();
 	protected baseUrl = "";
 
 	/**
@@ -15,9 +15,9 @@ export abstract class WebApiClient {
 	protected async getResponseData<T>(response: Response): Promise<T> {
 		const responseText: string = await response.text();
 
-		return this.headers.has("Accept") && this.headers.get("Accept") === "application/vnd.github.v3.raw"
-			? responseText
-			: await JSON.parse(responseText);
+		const acceptHeaderValue = this.getHeader("Accept") ?? "";
+
+		return acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json") ? await JSON.parse(responseText) : responseText;
 	}
 
 	/**
@@ -40,12 +40,18 @@ export abstract class WebApiClient {
 	 * @param body The body of the request.
 	 * @returns The response from the request.
 	 */
-	public async requestPOST(url: string, body: string | object): Promise<Response> {
+	public async requestPOST(url: string, body: string | object | Uint8Array): Promise<Response> {
 		const funcName = "fetchPOST";
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
 
-		const requestBody = typeof body === "string" ? body : JSON.stringify(body);
+		let requestBody: string | Uint8Array;
+
+		if (body instanceof Uint8Array) {
+			requestBody = body;
+		} else {
+			requestBody = typeof body === "string" ? body : JSON.stringify(body);
+		}
 
 		return await fetch(url, {
 			method: "POST",
@@ -105,17 +111,43 @@ export abstract class WebApiClient {
 	}
 
 	/**
-	 * Sets an HTTP header with a name that matches the given {@link name}
-	 * to the given {@link value}.
+	 * Gets the value of an HTTP header with a name that matches the given {@link name}.
+	 * @param name The name of the header to get.
+	 * @returns The value of the header.
+	 */
+	public getHeader(name: string): string | null {
+		return this.headers.get(name);
+	}
+
+	/**
+	 * Updates or adds an HTTP header with the given {@link name} and {@link value}.
 	 * @param name The name of the header to set.
 	 * @param value The value of the header to set.
 	 */
-	protected setHeader(name: string, value: string): void {
+	public updateOrAdd(name: string, value: string): void {
 		if (this.headers.has(name)) {
 			this.headers.set(name, value);
 		} else {
 			this.headers.append(name, value);
 		}
+	}
+
+	/**
+	 * Clears all of the HTTP headers.
+	 */
+	public clearHeaders(): void {
+		for (const headerName of this.headers.keys()) {
+			this.headers.delete(headerName);
+		}
+	}
+
+	/**
+	 * Returns a value indicating whether or not an HTTP header with the given {@link name} exists.
+	 * @param name The name of the header to check.
+	 * @returns True if the header exists, otherwise false.
+	 */
+	public containsHeader(name: string): boolean {
+		return this.headers.has(name);
 	}
 
 	/**

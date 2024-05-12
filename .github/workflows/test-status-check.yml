@@ -9,7 +9,7 @@ defaults:
 
 on:
   pull_request_target:
-    branches: main
+    branches: [main, preview]
 
 
 jobs:
@@ -20,8 +20,8 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.ref }}
-        repository: ${{ github.repository }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Setup Deno
       uses: denoland/setup-deno@v1

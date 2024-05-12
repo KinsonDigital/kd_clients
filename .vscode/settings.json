@@ -1,8 +1,13 @@
 {
     "cSpell.words": [
+		"Atxt",
 		"cicd",
 		"Creds",
-		"flatcontainer"
+		"deno",
+		"flatcontainer",
+		"Kinson",
+		"nexterias",
+		"tasklist"
 	],
 	"files.exclude": {
 		"**/.git": true,

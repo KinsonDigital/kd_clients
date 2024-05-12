@@ -1,3 +1,4 @@
+import { Utils } from "../../../core/Utils.ts";
 import { existsSync } from "../../../deps.ts";
 
 /**
@@ -26,25 +27,50 @@ export class Directory {
 	 * Gets a list of files in the given {@link dirPath}.  This will search recursively
 	 * if {@link recursive} is true.
 	 * @param dirPath The path of the directory start searching.
+	 * @param extension The file extension to search for.
 	 * @param recursive True to search recursively, otherwise false.
+	 * @returns {string[]} A list of files in the given {@link dirPath}.
 	 */
-	public static getFiles(dirPath: string, recursive = false): string[] {
+	public static getFiles(dirPath: string, extension:string, recursive = false): string[] {
 		let files: string[] = [];
+
+		extension = extension.trim();
+		extension = Utils.isNothing(extension) ? "*.*" : extension;
+
+		if (extension != "*.*") {
+			extension = extension.startsWith("*.") ? extension.substring(1) : extension;
+
+			if (!extension.startsWith(".") || extension.length === 1) {
+				const errorMsg = `The extension '${extension}' is not supported.\n` +
+									`Must be a value of '*.*' or '*.<extension>'.`;
+				console.log(errorMsg);
+				throw new Error(errorMsg);
+			}
+		}
 
 		if (dirPath === undefined || dirPath === null || dirPath === "") {
 			const errorMsg = "The dirPath parameter cannot be null or empty.";
+			console.log(errorMsg);
 			Deno.exit(1);
 		}
 
-		dirPath = dirPath === "." || dirPath === "/" ? "." : dirPath;
+		dirPath = dirPath === "." || dirPath === "./" ? Deno.cwd() : dirPath;
 
 		for (const dirEntry of Deno.readDirSync(dirPath)) {
-			const entry = dirPath + "/" + dirEntry.name;
+			const entry = dirPath == "/"
+				? dirPath + dirEntry.name
+				: dirPath + "/" + dirEntry.name;
 
 			if (recursive && dirEntry.isDirectory) {
-				files = [...files, ...(Directory.getFiles(entry, recursive))];
+				files = [...files, ...(Directory.getFiles(entry, extension, recursive))];
 			} else if (dirEntry.isFile) {
-				files.push(entry);
+				if (extension === "*.*") {
+					files.push(entry);
+				} else {
+					if (entry.endsWith(extension)) {
+						files.push(entry);
+					}
+				}
 			}
 		}
 

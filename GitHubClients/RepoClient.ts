@@ -1,13 +1,13 @@
-import { decodeBase64, encodeBase64 } from "../deps.ts";
+import { decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
+import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
-import { Utils } from "../core/Utils.ts";
-import { FileContentModel } from "../core/Models/mod.ts";
-import { RepoModel } from "../core/Models/mod.ts";
-import { GitHubVarModel } from "../core/Models/mod.ts";
-import { GitHubVariablesModel } from "../core/Models/mod.ts";
-import { RepoError } from "./Errors/RepoError.ts";
+import { Utils } from "../deps.ts";
+import { FileContentModel } from "../deps.ts";
+import { RepoModel } from "../deps.ts";
+import { GitHubVarModel } from "../deps.ts";
+import { GitHubVariablesModel } from "../deps.ts";
+import { RepoError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.
@@ -36,14 +36,16 @@ export class RepoClient extends GitHubClient {
 			1, // Start page
 			100, // Qty per page
 			(pageOfData: RepoModel[]) => {
-				return pageOfData.some((repo) => repo.name.trim().toLowerCase() === this.repoName);
+				return pageOfData.some((repo) => repo.name.trim() === this.repoName.trim());
 			},
 		);
 
-		const foundRepo: RepoModel | undefined = foundRepos.find((repo) => repo.name.trim().toLowerCase() === this.repoName);
+		const foundRepo: RepoModel | undefined = foundRepos.find((repo) => repo.name.trim() === this.repoName.trim());
 
 		if (foundRepo === undefined) {
-			throw new RepoError(`The repository '${this.repoName}' was not found.`);
+			const errorMsg = `The repository '${this.repoName}' was not found.` +
+				"\nThe repository name is case sensitive.  Make sure to check the name and try again.";
+			throw new RepoError(errorMsg);
 		}
 
 		return foundRepo;
@@ -73,7 +75,8 @@ export class RepoClient extends GitHubClient {
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
 			const errorMsg = this.buildErrorMsg(
 				`Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`,
-				response);
+				response,
+			);
 
 			throw new RepoError(errorMsg);
 		}
@@ -101,7 +104,8 @@ export class RepoClient extends GitHubClient {
 			case GitHubHttpStatusCodes.Forbidden: {
 				const errorMsg = this.buildErrorMsg(
 					`There was a problem checking if the repository exists.`,
-					response);
+					response,
+				);
 
 				throw new RepoError(errorMsg);
 			}
@@ -147,7 +151,16 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
-		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
+
+		if (isAbsolute(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid relative file path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (Utils.isNotFilePath(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid directory path.`;
+			throw new RepoError(errorMsg);
+		}
 
 		const queryParams = `?ref=${branchName}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents${relativeFilePath}${queryParams}`;
@@ -160,8 +173,9 @@ export class RepoClient extends GitHubClient {
 			} else {
 				const errorMsg = this.buildErrorMsg(
 					`There was a problem checking if the file '${relativeFilePath}' exists in the` +
-					` repository '${this.repoName}' in the branch '${branchName}'.`,
-					response);
+						` repository '${this.repoName}' in the branch '${branchName}'.`,
+					response,
+				);
 
 				throw new RepoError(errorMsg);
 			}
@@ -185,7 +199,8 @@ export class RepoClient extends GitHubClient {
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the variables for the owner '${this.ownerName}'.`,
-					response);
+					response,
+				);
 
 				throw new RepoError(errorMsg);
 			}
@@ -240,8 +255,9 @@ export class RepoClient extends GitHubClient {
 		if (response.status != GitHubHttpStatusCodes.NoContent) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when updating the variable '${variableName}'` +
-				` for the repository '${this.repoName}'.`,
-				response);
+					` for the repository '${this.repoName}'.`,
+				response,
+			);
 
 			throw new RepoError(errorMsg);
 		}
@@ -291,7 +307,8 @@ export class RepoClient extends GitHubClient {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
 					` for branch '${branchName}'.`,
-				response);
+				response,
+			);
 
 			throw new RepoError(errorMsg);
 		}
@@ -320,11 +337,20 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(fileContent, funcName, "fileContent");
 		Guard.isNothing(commitMessage, funcName, "commitMessage");
 
-		relativeFilePath = Utils.normalizePath(relativeFilePath);
-		Utils.trimAllStartingValue("/", relativeFilePath);
+		relativeFilePath = relativeFilePath.trim();
 
-		if (await this.fileExists(branchName, relativeFilePath)) {
-			const errorMsg = `The file '${relativeFilePath}' already exists in the repository '${this.repoName}'.`;
+		if (isAbsolute(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid relative file path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (Utils.isNotFilePath(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid directory path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (!await this.fileExists(branchName, relativeFilePath)) {
+			const errorMsg = `The file '${relativeFilePath}' does not exist in the repository '${this.repoName}'.`;
 			throw new RepoError(errorMsg);
 		}
 
@@ -342,9 +368,10 @@ export class RepoClient extends GitHubClient {
 
 		if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
-				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` + 
+				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
 					` for branch '${branchName}'.`,
-					response);
+				response,
+			);
 
 			throw new RepoError(errorMsg);
 		}
@@ -363,15 +390,24 @@ export class RepoClient extends GitHubClient {
 		branchName: string,
 		relativeFilePath: string,
 	): Promise<FileContentModel> {
-		const funcName = "getFileContentWithResult";
+		const funcName = "getFileContentResult";
 		Guard.isNothing(branchName, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
-		relativeFilePath = relativeFilePath.trim();
-		relativeFilePath = relativeFilePath.startsWith("/") ? relativeFilePath : `/${relativeFilePath}`;
+		if (isAbsolute(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid relative file path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		if (Utils.isNotFilePath(relativeFilePath)) {
+			const errorMsg = `The relative file path '${relativeFilePath}' is not a valid directory path.`;
+			throw new RepoError(errorMsg);
+		}
+
+		relativeFilePath = relativeFilePath.startsWith("./") ? relativeFilePath.substring(2) : relativeFilePath;
 
 		const queryParams = `?ref=${branchName}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents${relativeFilePath}${queryParams}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
 
@@ -380,7 +416,7 @@ export class RepoClient extends GitHubClient {
 			case GitHubHttpStatusCodes.TemporaryRedirect:
 			case GitHubHttpStatusCodes.Forbidden: {
 				const errorMsg = this.buildErrorMsg("There was an issue getting the file content", response);
-				
+
 				throw new RepoError(errorMsg);
 			}
 		}

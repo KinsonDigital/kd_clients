@@ -1,4 +1,4 @@
-import { Utils } from "./Utils.ts";
+import { Utils } from "../deps.ts";
 import { LinkHeaderParser } from "./LinkHeaderParser.ts";
 import { WebApiClient } from "./WebApiClient.ts";
 import { GetDataFunc } from "./Types.ts";
@@ -11,7 +11,6 @@ export abstract class GitHubClient extends WebApiClient {
 	private headerParser: LinkHeaderParser = new LinkHeaderParser();
 	private _repoName = "";
 	private _ownerName = "";
-	protected readonly headers: Headers = new Headers();
 
 	/**
 	 * Initializes a new instance of the {@link WebAPIClient} class.
@@ -27,11 +26,11 @@ export abstract class GitHubClient extends WebApiClient {
 		this.repoName = Utils.isNothing(repoName) ? "" : repoName.trim();
 
 		this.baseUrl = "https://api.github.com";
-		this.headers.append("Accept", "application/vnd.github+json");
-		this.headers.append("X-GitHub-Api-Version", "2022-11-28");
+		this.updateOrAdd("Accept", "application/vnd.github+json");
+		this.updateOrAdd("X-GitHub-Api-Version", "2022-11-28");
 
 		if (!Utils.isNothing(token)) {
-			this.headers.append("Authorization", `Bearer ${token}`);
+			this.updateOrAdd("Authorization", `Bearer ${token}`);
 		}
 	}
 
@@ -70,7 +69,7 @@ export abstract class GitHubClient extends WebApiClient {
 	 * @returns True if a token was provided; otherwise, false.
 	 */
 	protected containsToken(): boolean {
-		return this.headers.has("Authorization");
+		return this.containsHeader("Authorization");
 	}
 
 	/**

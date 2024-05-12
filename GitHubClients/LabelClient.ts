@@ -1,9 +1,9 @@
-import { LabelModel } from "../core/Models/LabelModel.ts";
-import { Utils } from "../core/Utils.ts";
+import { LabelModel } from "../deps.ts";
+import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../core/GitHubClient.ts";
+import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
-import { LabelError } from "./Errors/LabelError.ts";
+import { LabelError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with labels.
@@ -90,7 +90,8 @@ export class LabelClient extends GitHubClient {
 		} else {
 			const errorMsg = this.buildErrorMsg(
 				`There was an issue checking if the repository label '${label}' exists.`,
-				response);
+				response,
+			);
 
 			throw new LabelError(errorMsg);
 		}

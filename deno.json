@@ -1,5 +1,12 @@
 {
-	"version": "v1.0.0-preview.4",
+	"version": "v1.0.0-preview.9",
+    "tasks": {
+        "build": "powershell cls && deno run -A ./.github/cicd/scripts/deno-check.ts",
+        "test": "powershell cls && deno test -A ./tests/*Tests.ts",
+        "lint": "powershell cls && deno lint",
+        "format": "powershell cls && deno fmt",
+        "reload-cache": "powershell cls && deno cache --reload --lock=deno.lock --lock-write \"./deps.ts\""
+    },
 	"lint": {
 		"include": [
 			"core/",

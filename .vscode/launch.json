@@ -1,7 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
-		{
+		{ // PLAYGROUND
             "name": "Playground",
             "request": "launch",
             "type": "node",
@@ -29,7 +29,7 @@
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
         },
-		{
+		{ // DEBUG TEST TILE
             "name": "Debug Test File",
             "request": "launch",
             "type": "node",
@@ -52,7 +52,7 @@
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
         },
-		{
+		{ // VERSION CHECKER
             "name": "Version Checker",
             "request": "launch",
             "type": "node",
@@ -83,7 +83,7 @@
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
         },
-		{
+		{ // GET VERSION
             "name": "Get Version",
             "request": "launch",
             "type": "node",
@@ -109,7 +109,7 @@
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
 		},
-		{
+		{ // CHECK RELEASE NOTES
             "name": "Check Release Notes",
             "request": "launch",
             "type": "node",
@@ -137,8 +137,8 @@
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
 		},
-		{
-            "name": "Deno Check",
+		{ // BUILD (DENO CHECK)
+            "name": "Build (Deno Check)",
             "request": "launch",
             "type": "node",
             "program": "${workspaceFolder}/.github/cicd/scripts/deno-check.ts",
