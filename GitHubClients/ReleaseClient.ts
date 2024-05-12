@@ -48,18 +48,18 @@ export class ReleaseClient extends GitHubClient {
 
 	/**
 	 * Gets a release for a repository.
-	 * @param getByValue The tag or title of the release to get.
+	 * @param tagOrTitle The tag or title of the release to get.
 	 * @param options Various options to use when getting the release.
 	 * @returns The release for a repository.
 	 * @throws A {@link ReleaseError} if there was an issue getting the release or if it was not found.
 	 */
-	public async getRelease(getByValue: string, options?: ReleaseOptions): Promise<ReleaseModel> {
-		Guard.isNothing(getByValue, "getRelease", "getByValue");
+	public async getRelease(tagOrTitle: string, options?: ReleaseOptions): Promise<ReleaseModel> {
+		Guard.isNothing(tagOrTitle, "getRelease", "getByValue");
 
-		getByValue = getByValue.trim();
+		tagOrTitle = tagOrTitle.trim();
 
 		const filterPredicate: (item: ReleaseModel) => boolean = (item: ReleaseModel) => {
-			return options?.getByTitle === true ? item.name === getByValue : item.tag_name === getByValue;
+			return options?.getByTitle === true ? item.name === tagOrTitle : item.tag_name === tagOrTitle;
 		};
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
@@ -77,9 +77,9 @@ export class ReleaseClient extends GitHubClient {
 		const foundRelease: ReleaseModel | undefined = releases.find(filterPredicate);
 
 		if (foundRelease === undefined) {
-			const tagOrTitle = options?.getByTitle === true ? "title" : "tag";
+			const type = options?.getByTitle === true ? "title" : "tag";
 			const errorMsg =
-				`A release with the ${tagOrTitle} '${getByValue}' for the repository '${this.repoName}' could not be found.`;
+				`A release with the ${type} '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
