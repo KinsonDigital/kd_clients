@@ -16,6 +16,7 @@ export class OrgClient extends GitHubClient {
 	 * @param ownerName The name of the organization.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, token: string) {
 		const funcName = "OrgClient.ctor";

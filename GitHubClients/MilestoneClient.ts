@@ -24,6 +24,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "MilestoneClient.ctor";

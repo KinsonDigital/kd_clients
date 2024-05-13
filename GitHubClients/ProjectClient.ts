@@ -25,6 +25,7 @@ export class ProjectClient extends GraphQlClient {
 	 * @param ownerName The name of the owner of the repository to use.
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token: string) {
 		const funcName = "ProjectClient.ctor";
