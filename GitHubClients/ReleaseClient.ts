@@ -43,6 +43,7 @@ export class ReleaseClient extends GitHubClient {
 	 */
 	public async getReleases(page: number, qtyPerPage: number): Promise<ReleaseModel[]> {
 		const [result, _] = await this.getAllReleases(page, qtyPerPage);
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 
 		return result;
 	}
@@ -205,7 +206,7 @@ export class ReleaseClient extends GitHubClient {
 
 		const response = await this.requestPOST(url, file);
 
-		if (response.status === GitHubHttpStatusCodes.Forbidden) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
 		} else if (response.status != GitHubHttpStatusCodes.Created) {
 			const errorMsg =
@@ -237,7 +238,7 @@ export class ReleaseClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
-		if (response.status === GitHubHttpStatusCodes.NotFound) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
 			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
 
