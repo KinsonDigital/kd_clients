@@ -18,8 +18,13 @@ export class RepoClient extends GitHubClient {
 	 * @param ownerName The name of the owner of a repository.
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "RepoClient.ctor";
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
+
 		super(ownerName, repoName, token);
 	}
 

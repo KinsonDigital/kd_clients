@@ -14,8 +14,13 @@ export class UsersClient extends GitHubClient {
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "UsersClient.ctor";
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
+
 		super(ownerName, repoName, token);
 	}
 
