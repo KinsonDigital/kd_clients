@@ -23,6 +23,10 @@ export class IssueClient extends GitHubClient {
 	 * @remarks If no token is provided, then the client will not be authenticated.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "IssueClient.ctor";
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
+
 		super(ownerName, repoName, token);
 		this.labelClient = new LabelClient(ownerName, repoName, token);
 		this.isInitialized = true;
