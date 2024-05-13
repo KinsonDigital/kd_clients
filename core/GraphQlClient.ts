@@ -82,8 +82,9 @@ export abstract class GraphQlClient {
 	 * {@link Response} to that request, whether it is successful or not.
 	 * @param query The GraphQL query to use for the request.
 	 * @returns The response from the request.
+	 * @throws An {@link AuthError} if the request could not be authorized.
 	 */
-	protected async executeQuery(query: string): Promise<GraphQlRequestResponseModel | AuthError> {
+	protected async executeQuery(query: string): Promise<GraphQlRequestResponseModel> {
 		const body: string = JSON.stringify({ query });
 
 		const response = await fetch(this.baseUrl, {

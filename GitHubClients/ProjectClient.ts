@@ -73,7 +73,9 @@ export class ProjectClient extends GraphQlClient {
 	/**
 	 * Gets a list of the GitHub organization projects.
 	 * @returns The list of projects.
-	 * @throws The error {@link ProjectError} if an error occurs while getting the projects.
+	 * @throws Throws the following errors:
+	 * 1. An {@link AuthError} if the client could not authenticate.
+	 * 2. A {@link ProjectError} if an error occurs while getting the projects.
 	 */
 	public async getOrgProjects(): Promise<ProjectModel[]> {
 		const query = createOrgProjectsQuery(super.ownerName);
@@ -93,6 +95,9 @@ export class ProjectClient extends GraphQlClient {
 	 * Returns a value indicating whether or not the project exists with the given {@link projectName}.
 	 * @param projectName The name of the project.
 	 * @returns True if the project exists, otherwise false.
+	 * @throws Throws the following errors:
+	 * 1. An {@link AuthError} if the client could not authenticate.
+	 * 2. A {@link ProjectError} if an error occurs while getting the projects.
 	 */
 	public async exists(projectName: string): Promise<boolean> {
 		Guard.isNothing(projectName, "exists");
@@ -107,7 +112,9 @@ export class ProjectClient extends GraphQlClient {
 	 * Adds an issue with the given {@link issueNumber} to a project with the given {@link projectName}.
 	 * @param issueNumber The issue number.
 	 * @param projectName The name of the project.
-	 * @throws The error {@link ProjectError} if an error occurs while adding the issue to the project.
+	 * @throws Throws the following errors:
+	 * 1. An {@link AuthError} if the client could not authenticate.
+	 * 2. A {@link ProjectError} if an error occurs while getting the projects.
 	 */
 	public async addIssueToProject(issueNumber: number, projectName: string): Promise<void> {
 		Guard.isNothing(projectName, "addIssueToProject");
@@ -151,7 +158,9 @@ export class ProjectClient extends GraphQlClient {
 	 * Adds a pull request with the given {@link prNumber} to a project with the given {@link projectName}.
 	 * @param prNumber The pull request number.
 	 * @param projectName The name of the project.
-	 * @throws The error {@link ProjectError} if an error occurs while adding the pull request to the project.
+	 * @throws Throws the following errors:
+	 * 1. An {@link AuthError} if the client could not authenticate.
+	 * 2. A {@link ProjectError} if an error occurs while getting the projects.
 	 */
 	public async addPullRequestToProject(prNumber: number, projectName: string): Promise<void> {
 		Guard.isNothing(projectName, "addPullRequestToProject");
@@ -196,7 +205,9 @@ export class ProjectClient extends GraphQlClient {
 	 * in a repository with a name that matches the {@link ProjectClient}.{@link repoName}.
 	 * @param issueNumber The issue number.
 	 * @returns The list of organizational projects that the issue is assigned to.
-	 * @throws The error {@link ProjectError} if an error occurs while getting the issues projects.
+	 * @throws Throws the following errors:
+	 * 1. An {@link AuthError} if the client could not authenticate.
+	 * 2. A {@link ProjectError} if an error occurs while getting the projects.
 	 */
 	public async getIssueProjects(issueNumber: number): Promise<ProjectModel[]> {
 		Guard.isLessThanOne(issueNumber, "getIssueProjects");
@@ -220,7 +231,9 @@ export class ProjectClient extends GraphQlClient {
 	 * in a repository with a name that matches the given {@link repoName}.
 	 * @param prNumber The issue number.
 	 * @returns The list of organizational projects that the issue is assigned to.
-	 * @throws The error {@link ProjectError} if an error occurs while getting the pull requests projects.
+	 * @throws Throws the following errors:
+	 * 1. An {@link AuthError} if the client could not authenticate.
+	 * 2. A {@link ProjectError} if an error occurs while getting the projects.
 	 */
 	public async getPullRequestProjects(prNumber: number): Promise<ProjectModel[]> {
 		Guard.isLessThanOne(prNumber, "getPullRequestProjects");
