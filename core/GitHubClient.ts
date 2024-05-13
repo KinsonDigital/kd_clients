@@ -1,4 +1,6 @@
-import { Utils } from "../deps.ts";
+import { GitError, IssueError, LabelError, MilestoneError,
+	OrganizationError, ProjectError, PullRequestError, ReleaseError,
+	RepoError, TagError, UsersError, Utils, WorkflowError } from "../deps.ts";
 import { LinkHeaderParser } from "./LinkHeaderParser.ts";
 import { WebApiClient } from "./WebApiClient.ts";
 import { GetDataFunc } from "./Types.ts";
@@ -122,7 +124,7 @@ export abstract class GitHubClient extends WebApiClient {
 
 			totalPages += dataRequests.length;
 		} catch (error) {
-			if (error instanceof AuthError) {
+			if (this.isKnownGitHubError(error)) {
 				throw error;
 			} else {
 				let errorMsg = "There was an issue getting all of the data using pagination.";
@@ -209,7 +211,7 @@ export abstract class GitHubClient extends WebApiClient {
 
 			return [];
 		} catch (error) {
-			if (error instanceof AuthError) {
+			if (this.isKnownGitHubError(error)) {
 				throw error;
 			} else {
 				let errorMsg = "There was an issue getting all of the data using pagination.";
@@ -269,5 +271,21 @@ export abstract class GitHubClient extends WebApiClient {
 		secondHalf.reverse();
 
 		return [firstHalf, secondHalf];
+	}
+
+	/**
+	 * Returns a value indicating whether the given {@link error} is a valid GitHub error.
+	 * @param error The error to check.
+	 * @returns True if the error is a known GitHub error; otherwise, false.
+	 */
+	private isKnownGitHubError(error: unknown): error is AuthError | GitError | IssueError | LabelError |
+														 MilestoneError | OrganizationError | ProjectError |
+														 PullRequestError | ReleaseError | RepoError |
+														 TagError | UsersError | WorkflowError {
+		return error instanceof AuthError || error instanceof GitError || error instanceof IssueError ||
+			error instanceof LabelError || error instanceof MilestoneError || error instanceof OrganizationError ||
+			error instanceof ProjectError || error instanceof PullRequestError || error instanceof ReleaseError ||
+			error instanceof RepoError || error instanceof TagError || error instanceof UsersError ||
+			error instanceof WorkflowError;
 	}
 }
