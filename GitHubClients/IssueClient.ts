@@ -70,7 +70,7 @@ export class IssueClient extends GitHubClient {
 	 */
 	public async getAllOpenIssues(): Promise<IssueModel[]> {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
-			const [issues, response] = await this.getIssues(page, qtyPerPage);
+			const [issues, response] = await this.getIssuesInternal(page, qtyPerPage);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(`An error occurred trying to get all of the opened issues.`, response);
@@ -89,7 +89,7 @@ export class IssueClient extends GitHubClient {
 	 */
 	public async getAllClosedIssues(): Promise<IssueModel[]> {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
-			const [issues, response] = await this.getIssues(page, qtyPerPage, IssueOrPRState.closed);
+			const [issues, response] = await this.getIssuesInternal(page, qtyPerPage, IssueOrPRState.closed);
 
 			if (response.status != GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg("An error occurred trying to get all of the closed issues.", response);
@@ -109,7 +109,7 @@ export class IssueClient extends GitHubClient {
 	 * @param state The state of the issue.
 	 * @param labels The labels to filter by. A null or empty list will not filter the results.
 	 * @param milestoneNumber The milestone number to filter by. A null value will not filter the results.
-	 * @returns The issue.
+	 * @returns A group of issues.
 	 * @throws An {@link AuthError} or {@link IssueError}.
 	 * @remarks Does not require authentication if the repository is public.
 	 * Open and closed issues can reside on different pages.  Example: if there are 5 open and 100 issues total, there
@@ -126,23 +126,11 @@ export class IssueClient extends GitHubClient {
 		state: IssueOrPRState = IssueOrPRState.open,
 		labels?: string[] | null,
 		milestoneNumber?: number | null,
-	): Promise<[IssueModel[], Response]> {
+	): Promise<IssueModel[]> {
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
-		const labelList = Utils.isNothing(labels)
-			? labels?.filter((l) => !Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
-			: "";
-
-		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
-		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
-
-		const queryParams =
-			`?page=${page}&per_page=${qtyPerPage}&state=${state}${labelListQueryParam}${milestoneNumberQueryParam}`;
-		const url = `${this.baseUrl}/repos/${super.ownerName}/${super.repoName}/issues${queryParams}`;
-
-		const response: Response = await this.requestGET(url);
+		const [issues, response] = await this.getIssuesInternal(page, qtyPerPage, state, labels, milestoneNumber);
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
@@ -161,9 +149,7 @@ export class IssueClient extends GitHubClient {
 			}
 		}
 
-		const issues = (<IssueModel[]> await this.getResponseData(response)).filter((issue) => Utils.isIssue(issue));
-
-		return [issues, response];
+		return issues;
 	}
 
 	/**
@@ -392,7 +378,7 @@ export class IssueClient extends GitHubClient {
 
 		const issues = await this.getAllDataUntil<IssueModel>(
 			async (page: number, qtyPerPage?: number) => {
-				const [issues, response] = await this.getIssues(page, qtyPerPage, state);
+				const [issues, response] = await this.getIssuesInternal(page, qtyPerPage, state);
 
 				return Promise.resolve([issues, response]);
 			},
@@ -404,5 +390,54 @@ export class IssueClient extends GitHubClient {
 		);
 
 		return issues.find((issue: IssueModel) => issue.number === issueNumber) != undefined;
+	}
+
+	/**
+	 * Gets the given {@link page} of issues where the page quantity matches the given {@link qtyPerPage}, in a repository
+	 * with a name that matches the given {@link IssueClient.repoName}, with the given issue {@link state},
+	 * {@link labels}, and in a milestone with a number that matches the given {@link milestoneNumber}.
+	 * @param page The page of results to return.
+	 * @param qtyPerPage The total to return per {@link page}.
+	 * @param state The state of the issue.
+	 * @param labels The labels to filter by. A null or empty list will not filter the results.
+	 * @param milestoneNumber The milestone number to filter by. A null value will not filter the results.
+	 * @returns A group of issues.
+	 * @throws An {@link AuthError} or {@link IssueError}.
+	 * @remarks Does not require authentication if the repository is public.
+	 * Open and closed issues can reside on different pages.  Example: if there are 5 open and 100 issues total, there
+	 * is no guarantee that all of the opened issues will be returned if you request the first page with a quantity of 10.
+	 * This is because no matter what the state of the issue is, it can reside on any page.
+	 *
+	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 */
+	private async getIssuesInternal(
+		page = 1,
+		qtyPerPage = 100,
+		state: IssueOrPRState = IssueOrPRState.open,
+		labels?: string[] | null,
+		milestoneNumber?: number | null,
+	): Promise<[IssueModel[], Response]> {
+		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
+		const labelList = Utils.isNothing(labels)
+			? labels?.filter((l) => !Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
+			: "";
+
+		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
+		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
+
+		const queryParams =
+			`?page=${page}&per_page=${qtyPerPage}&state=${state}${labelListQueryParam}${milestoneNumberQueryParam}`;
+		const url = `${this.baseUrl}/repos/${super.ownerName}/${super.repoName}/issues${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		const issues = (<IssueModel[]> await this.getResponseData(response)).filter((issue) => Utils.isIssue(issue));
+
+		return [issues, response];
 	}
 }
