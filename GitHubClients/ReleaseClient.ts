@@ -39,7 +39,7 @@ export class ReleaseClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
-	 * @throws The {@link ReleaseError} if there was an issue getting the releases.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async getReleases(page: number, qtyPerPage: number): Promise<ReleaseModel[]> {
 		const [result, response] = await this.getAllReleases(page, qtyPerPage);
@@ -61,10 +61,10 @@ export class ReleaseClient extends GitHubClient {
 	 * @param tagOrTitle The tag or title of the release to get.
 	 * @param options Various options to use when getting the release.
 	 * @returns The release for a repository.
-	 * @throws A {@link ReleaseError} if there was an issue getting the release or if it was not found.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async getRelease(tagOrTitle: string, options?: ReleaseOptions): Promise<ReleaseModel> {
-		Guard.isNothing(tagOrTitle, "getRelease", "getByValue");
+		Guard.isNothing(tagOrTitle, "getRelease", "tagOrTitle");
 
 		tagOrTitle = tagOrTitle.trim();
 
@@ -101,7 +101,7 @@ export class ReleaseClient extends GitHubClient {
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
 	 * @returns The release for the given repository and name.
-	 * @throws The {@link ReleaseError} if there was an issue checking if the release exists.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async releaseExists(tagName: string): Promise<boolean> {
 		const funcName = "releaseExists";
@@ -131,10 +131,11 @@ export class ReleaseClient extends GitHubClient {
 	 * @param options Various options to use when uploading the asset.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
 		const funcName = "uploadAsset";
-		Guard.isNothing(tagOrTitle, funcName, "toReleaseBy");
+		Guard.isNothing(tagOrTitle, funcName, "tagOrTitle");
 		Guard.isNothing(tagOrTitle, funcName, "filePath");
 
 		tagOrTitle = tagOrTitle.trim();
@@ -197,6 +198,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @param options Various options to use when uploading the file.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the file.
 	 * @returns An asynchronous promise of the operation.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	private async uploadFile(
 		filePath: string,
@@ -234,7 +236,7 @@ export class ReleaseClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
-	 * @throws The {@link ReleaseError} if there was an issue getting the releases.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	private async getAllReleases(page: number, qtyPerPage: number): Promise<[ReleaseModel[], Response]> {
 		page = page < 1 ? 1 : page;
