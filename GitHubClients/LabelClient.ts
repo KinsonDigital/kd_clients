@@ -87,20 +87,22 @@ export class LabelClient extends GitHubClient {
 	public async labelExists(label: string): Promise<boolean> {
 		Guard.isNothing(label, "labelExists", "label");
 
-		const foundLabels = await this.getAllDataUntil(async (page, qtyPerPage) => {
-			const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
+		const foundLabels = await this.getAllDataUntil(
+			async (page, qtyPerPage) => {
+				const [labels, response] = await this.getLabels(page, qtyPerPage ?? 100);
 
-			if (response.status === GitHubHttpStatusCodes.Unauthorized) {
-				throw new AuthError();
-			}
+				if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+					throw new AuthError();
+				}
 
-			return [labels, response];
-		},
-		1,
-		100,
-		(pageOfLabels: LabelModel[]) => {
-			return pageOfLabels.some((l) => l.name === label);
-		});
+				return [labels, response];
+			},
+			1,
+			100,
+			(pageOfLabels: LabelModel[]) => {
+				return pageOfLabels.some((l) => l.name === label);
+			},
+		);
 
 		return foundLabels.length > 0;
 	}

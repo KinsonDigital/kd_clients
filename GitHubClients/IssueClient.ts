@@ -141,7 +141,8 @@ export class IssueClient extends GitHubClient {
 					const errorMsg = this.buildErrorMsg(mainMsg, response);
 					throw new IssueError(errorMsg);
 				}
-				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
+				case GitHubHttpStatusCodes.Unauthorized:
+					throw new AuthError();
 				case GitHubHttpStatusCodes.NotFound: {
 					const errorMsg = `The organization '${super.ownerName}' or repository '${super.repoName}' does not exist.`;
 					throw new IssueError(errorMsg);
@@ -170,7 +171,8 @@ export class IssueClient extends GitHubClient {
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
-				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
+				case GitHubHttpStatusCodes.Unauthorized:
+					throw new AuthError();
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.NotModified:
 				case GitHubHttpStatusCodes.Gone: {
@@ -231,7 +233,8 @@ export class IssueClient extends GitHubClient {
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
-				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
+				case GitHubHttpStatusCodes.Unauthorized:
+					throw new AuthError();
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.Gone:
 				case GitHubHttpStatusCodes.UnprocessableContent:
@@ -267,7 +270,8 @@ export class IssueClient extends GitHubClient {
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
-				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
+				case GitHubHttpStatusCodes.Unauthorized:
+					throw new AuthError();
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.Gone: {
 					const errorMsg = this.buildErrorMsg(
@@ -309,7 +313,7 @@ export class IssueClient extends GitHubClient {
 	 */
 	public async openIssueExists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "openIssueExist", "issueNumber");
-		
+
 		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.open);
 	}
 
@@ -347,7 +351,8 @@ export class IssueClient extends GitHubClient {
 				throw new IssueError(`An issue with the number '${issueNumber}' does not exist.`);
 			} else {
 				switch (response.status) {
-					case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
+					case GitHubHttpStatusCodes.Unauthorized:
+						throw new AuthError();
 					case GitHubHttpStatusCodes.MovedPermanently:
 					case GitHubHttpStatusCodes.Gone:
 					case GitHubHttpStatusCodes.UnprocessableContent:

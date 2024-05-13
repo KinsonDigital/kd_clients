@@ -13,7 +13,7 @@ Deno.test("getReleases |> with_not_found_response |> throws_error", async () => 
 	});
 
 	let expectedMsg = `The releases for the repository owner '${ownerName}'`;
-		expectedMsg += ` and for the repository '${repoName}' could not be found.`;
+	expectedMsg += ` and for the repository '${repoName}' could not be found.`;
 
 	stub(client, "requestGET", (_) => Promise.resolve(stubbedResponse));
 
