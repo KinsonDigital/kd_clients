@@ -109,15 +109,26 @@ export class MilestoneClient extends GitHubClient {
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
-		return await this.getAllData<IssueModel>(async (page, qtyPerPage) => {
-			return await this.issueClient.getIssues(
+		let page = 1;
+		const qtyPerPage = 100;
+		const collectedIssues: IssueModel[] = [];
+
+		while (true) {
+			const issues = await this.issueClient.getIssues(
 				page,
 				qtyPerPage,
 				IssueOrPRState.any,
 				labels,
 				milestone.number,
 			);
-		});
+
+			if (issues.length === 0) {
+				return collectedIssues;
+			} else {
+				collectedIssues.push(...issues);
+				page++;
+			}
+		}
 	}
 
 	/**
@@ -139,8 +150,12 @@ export class MilestoneClient extends GitHubClient {
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
-		return await this.getAllData<PullRequestModel>(async (page, qtyPerPage) => {
-			return await this.prClient.getPullRequests(
+		let page = 1;
+		const qtyPerPage = 100;
+		const collectedPrs: PullRequestModel[] = [];
+
+		while (true) {
+			const prs = await this.prClient.getPullRequests(
 				page,
 				qtyPerPage,
 				IssueOrPRState.any,
@@ -148,7 +163,14 @@ export class MilestoneClient extends GitHubClient {
 				labels,
 				milestone.number,
 			);
-		});
+
+			if (prs.length === 0) {
+				return collectedPrs;
+			} else {
+				collectedPrs.push(...prs);
+				page++;
+			}
+		}
 	}
 
 	/**
