@@ -87,11 +87,9 @@ export class MilestoneClient extends GitHubClient {
 		const issuesPromise = this.getIssues(milestoneName, labels);
 		const pullRequestsPromise = this.getPullRequests(milestoneName, labels);
 
-		await Promise.all([issuesPromise, pullRequestsPromise]).then((values) => {
-			issuesAndPullRequests.push(...values[0], ...values[1]);
-		}).catch((error) => {
-			throw new MilestoneError(`The request to get issues returned error '${error}'`);
-		});
+		const issueOrPrs = await Promise.all([issuesPromise, pullRequestsPromise]);
+
+		issuesAndPullRequests.push(...issueOrPrs[0], ...issueOrPrs[1]);
 
 		return issuesAndPullRequests;
 	}
