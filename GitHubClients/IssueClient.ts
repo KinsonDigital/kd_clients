@@ -131,7 +131,7 @@ export class IssueClient extends GitHubClient {
 
 		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
 		const labelList = Utils.isNothing(labels)
-			? labels?.filter((l) => Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
+			? labels?.filter((l) => !Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
 			: "";
 
 		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
