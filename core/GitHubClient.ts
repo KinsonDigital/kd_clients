@@ -122,9 +122,13 @@ export abstract class GitHubClient extends WebApiClient {
 
 			totalPages += dataRequests.length;
 		} catch (error) {
-			let errorMsg = "There was an issue getting all of the data using pagination.";
-			errorMsg += `\n${error.message}`;
-			throw new Error(errorMsg);
+			if (error instanceof AuthError) {
+				throw error;
+			} else {
+				let errorMsg = "There was an issue getting all of the data using pagination.";
+				errorMsg += `\n${error.message}`;
+				throw new Error(errorMsg);
+			}
 		}
 
 		return allData;

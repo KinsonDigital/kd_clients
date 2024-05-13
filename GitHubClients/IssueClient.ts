@@ -7,6 +7,7 @@ import { GitHubHttpStatusCodes, IssueOrPRState } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
 import { IssueError } from "../deps.ts";
+import { AuthError } from "./Errors/AuthError.ts";
 
 /**
  * Provides a client for interacting with issues.
@@ -65,7 +66,7 @@ export class IssueClient extends GitHubClient {
 	 * Gets all of the open issues in a repository with a name that matches the given {@link IssueClient.repoName}.
 	 * @returns The issues.
 	 * @remarks Does not require authentication.
-	 * @throws The {@link IssueError} if an error occurs while getting all of the open issues.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async getAllOpenIssues(): Promise<IssueModel[]> {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
@@ -84,7 +85,7 @@ export class IssueClient extends GitHubClient {
 	 * Gets all of the closed issues in a repository with a name that matches the given {@link IssueClient.repoName}.
 	 * @returns The issues.
 	 * @remarks Does not require authentication.
-	 * @throws The {@link IssueError} if an error occurs while getting all of the closed issues.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async getAllClosedIssues(): Promise<IssueModel[]> {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
@@ -109,7 +110,7 @@ export class IssueClient extends GitHubClient {
 	 * @param labels The labels to filter by. A null or empty list will not filter the results.
 	 * @param milestoneNumber The milestone number to filter by. A null value will not filter the results.
 	 * @returns The issue.
-	 * @throws The {@link IssueError} if an error occurs while getting issue data.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 * @remarks Does not require authentication if the repository is public.
 	 * Open and closed issues can reside on different pages.  Example: if there are 5 open and 100 issues total, there
 	 * is no guarantee that all of the opened issues will be returned if you request the first page with a quantity of 10.
@@ -147,12 +148,12 @@ export class IssueClient extends GitHubClient {
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.MovedPermanently:
-				case GitHubHttpStatusCodes.UnprocessableContent:
-				case GitHubHttpStatusCodes.Unauthorized: {
+				case GitHubHttpStatusCodes.UnprocessableContent: {
 					const mainMsg = `An error occurred trying to get the issues for the repository '${super.repoName}'.`;
 					const errorMsg = this.buildErrorMsg(mainMsg, response);
 					throw new IssueError(errorMsg);
 				}
+				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
 				case GitHubHttpStatusCodes.NotFound: {
 					const errorMsg = `The organization '${super.ownerName}' or repository '${super.repoName}' does not exist.`;
 					throw new IssueError(errorMsg);
@@ -170,7 +171,7 @@ export class IssueClient extends GitHubClient {
 	 * {@link IssueClient.repoName}.
 	 * @param issueNumber The issue number.
 	 * @returns The issue.
-	 * @throws The {@link IssueError} if an error occurs while getting an issue.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async getIssue(issueNumber: number): Promise<IssueModel> {
 		Guard.isLessThanOne(issueNumber, "getIssue", "issueNumber");
@@ -183,9 +184,9 @@ export class IssueClient extends GitHubClient {
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
+				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.NotModified:
-				case GitHubHttpStatusCodes.Unauthorized:
 				case GitHubHttpStatusCodes.Gone: {
 					const errorMsg = this.buildErrorMsg(`An error occurred trying to get issue '${issueNumber}'.`, response);
 
@@ -211,7 +212,7 @@ export class IssueClient extends GitHubClient {
 	 * @param issueNumber The number of an issue.
 	 * @param label The name of the label to add.
 	 * @remarks Requires authentication.
-	 * @throws The {@link IssueError} for the following reasons:
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 * 1. If the given {@link label} does not exist in the repository.
 	 * 2. If there is an issue adding the {@link label} to an issue that matches the given {@link issueNumber}.
 	 */
@@ -244,12 +245,12 @@ export class IssueClient extends GitHubClient {
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
+				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.Gone:
 				case GitHubHttpStatusCodes.UnprocessableContent:
 				case GitHubHttpStatusCodes.ServiceUnavailable:
-				case GitHubHttpStatusCodes.Forbidden:
-				case GitHubHttpStatusCodes.Unauthorized: {
+				case GitHubHttpStatusCodes.Forbidden: {
 					const errorMsg = this.buildErrorMsg(
 						`An error occurred trying to add the label '${label}' to issue '${issueNumber}'.`,
 						response,
@@ -268,7 +269,7 @@ export class IssueClient extends GitHubClient {
 	 * @param issueNumber The number of an issue.
 	 * @returns The labels for an issue.
 	 * @remarks Does not require authentication.
-	 * @throws The {@link IssueError} if an error occurs while getting the labels for an issue.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async getLabels(issueNumber: number): Promise<string[]> {
 		Guard.isLessThanOne(issueNumber, "getLabels", "issueNumber");
@@ -280,9 +281,9 @@ export class IssueClient extends GitHubClient {
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
+				case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
 				case GitHubHttpStatusCodes.MovedPermanently:
-				case GitHubHttpStatusCodes.Gone:
-				case GitHubHttpStatusCodes.Unauthorized: {
+				case GitHubHttpStatusCodes.Gone: {
 					const errorMsg = this.buildErrorMsg(
 						`There was an issue getting the labels for issue '${issueNumber}'.`,
 						response,
@@ -305,20 +306,12 @@ export class IssueClient extends GitHubClient {
 	 * of its state, in a repository with a name that matches the given {@link IssueClient.repoName}.
 	 * @param issueNumber The issue number.
 	 * @returns True if the issue exists, otherwise false.
-	 * @throws The {@link IssueError} if an error occurs while checking if an issue exists.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async issueExists(issueNumber: number): Promise<boolean> {
-		Guard.isLessThanOne(issueNumber, "openIssueExist", "issueNumber");
+		Guard.isLessThanOne(issueNumber, "issueExists", "issueNumber");
 
-		try {
-			return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.any);
-		} catch (error) {
-			if (error instanceof IssueError) {
-				throw error;
-			} else {
-				return Promise.resolve(false);
-			}
-		}
+		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.any);
 	}
 
 	/**
@@ -326,20 +319,12 @@ export class IssueClient extends GitHubClient {
 	 * repository with a name that matches the given {@link IssueClient.repoName}.
 	 * @param issueNumber The issue number.
 	 * @returns True if the issue exists and is open, otherwise false.
-	 * @throws The {@link IssueError} if an error occurs while checking if an open issue exists.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async openIssueExists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "openIssueExist", "issueNumber");
-
-		try {
-			return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.open);
-		} catch (error) {
-			if (error instanceof IssueError) {
-				throw error;
-			} else {
-				return Promise.resolve(false);
-			}
-		}
+		
+		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.open);
 	}
 
 	/**
@@ -347,20 +332,12 @@ export class IssueClient extends GitHubClient {
 	 * repository with a name that matches the given {@link IssueClient.repoName}.
 	 * @param issueNumber The issue number.
 	 * @returns True if the issue exists and is open, otherwise false.
-	 * @throws The {@link IssueError} if an error occurs while checking if an closed issue exists.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async closedIssueExists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "closedIssueExist", "issueNumber");
 
-		try {
-			return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.closed);
-		} catch (error) {
-			if (error instanceof IssueError) {
-				throw error;
-			} else {
-				return Promise.resolve(false);
-			}
-		}
+		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.closed);
 	}
 
 	/**
@@ -369,7 +346,7 @@ export class IssueClient extends GitHubClient {
 	 * @param issueNumber The issue number.
 	 * @param issueData The data to update the issue with.
 	 * @remarks Requires authentication.
-	 * @throws The {@link IssueError} if an error occurs while updating an issue.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	public async updateIssue(issueNumber: number, issueData: IssueOrPRRequestData): Promise<void> {
 		Guard.isLessThanOne(issueNumber, "updateIssue", "issueNumber");
@@ -384,11 +361,11 @@ export class IssueClient extends GitHubClient {
 				throw new IssueError(`An issue with the number '${issueNumber}' does not exist.`);
 			} else {
 				switch (response.status) {
+					case GitHubHttpStatusCodes.Unauthorized: throw new AuthError();
 					case GitHubHttpStatusCodes.MovedPermanently:
 					case GitHubHttpStatusCodes.Gone:
 					case GitHubHttpStatusCodes.UnprocessableContent:
 					case GitHubHttpStatusCodes.ServiceUnavailable:
-					case GitHubHttpStatusCodes.Unauthorized:
 					case GitHubHttpStatusCodes.Forbidden: {
 						const errorMsg = this.buildErrorMsg(
 							`An error occurred trying to update issue '${issueNumber}'.`,
@@ -408,23 +385,16 @@ export class IssueClient extends GitHubClient {
 	 * @param issueNumber The number of the issue.
 	 * @returns True if the issue exists, otherwise false.
 	 * @throws The {@link IssueError} if an error occurs while checking if the open or closed issue exists.
+	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
 	private async openOrClosedIssueExists(issueNumber: number, state: IssueOrPRState): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "openOrClosedIssueExists", "issueNumber");
 
 		const issues = await this.getAllDataUntil<IssueModel>(
 			async (page: number, qtyPerPage?: number) => {
-				try {
-					const [issues, response] = await this.getIssues(page, qtyPerPage, state);
+				const [issues, response] = await this.getIssues(page, qtyPerPage, state);
 
-					return Promise.resolve([issues, response]);
-				} catch (error) {
-					if (error instanceof IssueError) {
-						throw error;
-					} else {
-						return Promise.resolve([[], new Response()]);
-					}
-				}
+				return Promise.resolve([issues, response]);
 			},
 			1, // Start page
 			100, // Qty per page
