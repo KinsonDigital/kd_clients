@@ -25,11 +25,14 @@ import {
 	LocationModel,RawGetBranchTargetModel, RawGitBranchModel, RawRefsGetBranchModel
 } from "./core/Models/GraphQlModels/mod.ts";
 
-// Local GitHub Errors
+// Local GitHub Client Errors
 import {
 	AuthError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
-	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError, XError,
+	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError,
 } from "./GitHubClients/Errors/mod.ts"
+
+// Other Client Errors
+import { XError } from "./OtherClients/Errors/XError.ts"
 
 // Local
 import { Utils } from "./core/Utils.ts";
@@ -60,11 +63,14 @@ export type {
 	LocationModel,RawGetBranchTargetModel, RawGitBranchModel, RawRefsGetBranchModel
 }
 
-// Local GitHub Errors
+// Local GitHub Client Errors
 export {
 	AuthError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
-	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError, XError,
+	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError,
 };
+
+// Other Client Errors
+export { XError };
 
 // Local
 export { Utils };

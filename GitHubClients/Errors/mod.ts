@@ -12,4 +12,3 @@ export { RepoError } from "./RepoError.ts";
 export { TagError } from "./TagError.ts";
 export { UsersError } from "./UsersError.ts";
 export { WorkflowError } from "./WorkflowError.ts";
-export { XError } from "./XError.ts";
