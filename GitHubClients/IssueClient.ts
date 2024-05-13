@@ -223,7 +223,7 @@ export class IssueClient extends GitHubClient {
 
 		if (labelDoesNotExist) {
 			const labelsUrl = `https://github.com/KinsonDigital/${super.repoName}/labels`;
-			const issueUrl = `https://github.com/KinsonDigital/${super.repoName}/issues/618`;
+			const issueUrl = `https://github.com/KinsonDigital/${super.repoName}/issues/${issueNumber}`;
 
 			let errorMsg = `The label '${label}' attempting to be added to issue '${issueNumber}'`;
 			errorMsg += ` does not exist in the repository '${super.repoName}'.`;
