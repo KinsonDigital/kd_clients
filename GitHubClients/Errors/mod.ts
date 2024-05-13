@@ -1,4 +1,4 @@
-export { BadCredentialsError } from "./BadCredentialsError.ts";
+export { AuthError } from "./AuthError.ts";
 export { GitError } from "./GitError.ts";
 export { IssueError } from "./IssueError.ts";
 export { LabelError } from "./LabelError.ts";

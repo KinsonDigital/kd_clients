@@ -27,7 +27,7 @@ import {
 
 // Local GitHub Errors
 import {
-	BadCredentialsError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
+	AuthError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
 	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError, XError,
 } from "./GitHubClients/Errors/mod.ts"
 
@@ -62,7 +62,7 @@ export type {
 
 // Local GitHub Errors
 export {
-	BadCredentialsError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
+	AuthError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
 	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError, XError,
 };
 
