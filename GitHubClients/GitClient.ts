@@ -1,4 +1,4 @@
-import { GraphQlClient } from "../deps.ts";
+import { AuthError, GraphQlClient } from "../deps.ts";
 import { createGetBranchesQuery } from "../core/GraphQl/Queries/GetBranchesQuery.ts";
 import { Guard } from "../core/Guard.ts";
 import { PageInfoModel } from "../deps.ts";
@@ -9,7 +9,6 @@ import { Utils } from "../deps.ts";
 import { RepoClient } from "./RepoClient.ts";
 import { getCreateBranchMutation } from "../core/GraphQl/Mutations/CreateBranchMutation.ts";
 import { addCommitMutation } from "../core/GraphQl/Mutations/AddCommitMutation.ts";
-import { OrganizationError } from "../deps.ts";
 import { GitError } from "../deps.ts";
 
 /**
@@ -69,7 +68,7 @@ export class GitClient extends GraphQlClient {
 	 * Gets a branch with the given branch {@link name}.
 	 * @param name The name of the branch.
 	 * @returns The branch.
-	 * @throws {@link OrganizationError} Thrown if the branch does not exist.
+	 * @throws An {@link AuthError} or {@link GitError}.
 	 */
 	public async getBranch(name: string): Promise<GitBranchModel> {
 		Guard.isNothing(name, "getBranch", "name");
@@ -77,7 +76,7 @@ export class GitClient extends GraphQlClient {
 		const branches: GitBranchModel[] = await this.getBranches((branch) => branch.name === name);
 
 		if (branches.length <= 0) {
-			throw new OrganizationError(`The branch '${name}' does not exist.`);
+			throw new GitError(`The branch '${name}' does not exist.`);
 		}
 
 		return branches.filter((branch) => branch.name === name)[0];
@@ -88,7 +87,7 @@ export class GitClient extends GraphQlClient {
 	 * @param untilPredicate Used to determine when to stop getting branches.
 	 * @returns The list of branches for the repository.
 	 * @remarks If the {@link untilPredicate} is not provided, all branches will be returned.
-	 * @throws The error {@link GitError} if an error occurs while getting branches.
+	 * @throws An {@link AuthError} or {@link GitError}.
 	 */
 	public async getBranches(untilPredicate?: (branch: GitBranchModel) => boolean): Promise<GitBranchModel[]> {
 		const result: GitBranchModel[] = [];
@@ -103,6 +102,10 @@ export class GitClient extends GraphQlClient {
 				: createGetBranchesQuery(super.ownerName, super.repoName, 100, cursor);
 
 			const responseData = await this.executeQuery(query);
+
+			if (responseData instanceof AuthError) {
+				throw responseData;
+			}
 
 			if (responseData.errors != undefined) {
 				const mainMsg = `The following errors occurred while getting branches for the repository '${super.repoName}'`;
@@ -145,6 +148,7 @@ export class GitClient extends GraphQlClient {
 	 * Gets a value indicating whether or not a branch with the given branch {@link name} exists.
 	 * @param name The name of the branch.
 	 * @returns True if the branch exists; otherwise, false.
+	 * @throws An {@link AuthError} or {@link GitError}.
 	 */
 	public async branchExists(name: string): Promise<boolean> {
 		Guard.isNothing(name, "branchExists", "name");
@@ -158,9 +162,7 @@ export class GitClient extends GraphQlClient {
 	 * Creates a branch with the given {@link newBranchName} from a branch that matches the given {@link branchFromName}.
 	 * @param newBranchName The name of the branch.
 	 * @remarks Requires authentication.
-	 * @throws The error {@link GitError} for the following reasons:
-	 * 1. If the given {@link newBranchName} already exists.
-	 * 2. If there was an issue creating the new branch.
+	 * @throws An {@link AuthError} or {@link GitError}.
 	 */
 	public async createBranch(newBranchName: string, branchFromName: string): Promise<GitBranchModel> {
 		const funcName = "createBranch";
@@ -185,6 +187,10 @@ export class GitClient extends GraphQlClient {
 
 		const responseData = await this.executeQuery(mutation);
 
+		if (responseData instanceof AuthError) {
+			throw responseData;
+		}
+
 		if (responseData.errors != undefined) {
 			const mainMsg = `The following errors occurred while creating the branch '${newBranchName}'`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
@@ -205,7 +211,7 @@ export class GitClient extends GraphQlClient {
 	 * Adds a commit with the given {@link commitMessage} to a branch with the given {@link branchName}.
 	 * @param branchName The name of the branch.
 	 * @param commitMessage The commit message.
-	 * @throws The error {@link GitError} if the commit could not be added.
+	 * @throws An {@link AuthError} or {@link GitError}.
 	 */
 	public async addCommit(branchName: string, commitMessage: string): Promise<void> {
 		const funcName = "addCommit";
@@ -217,6 +223,10 @@ export class GitClient extends GraphQlClient {
 		const mutation = addCommitMutation(super.ownerName, super.repoName, branchName, branch.oid, commitMessage);
 
 		const response = await this.executeQuery(mutation);
+
+		if (response instanceof AuthError) {
+			throw response;
+		}
 
 		if (response.errors != undefined) {
 			const mainMsg = `The following errors occurred while adding a commit to the branch '${branchName}'`;

@@ -83,7 +83,7 @@ export abstract class GraphQlClient {
 	 * @param query The GraphQL query to use for the request.
 	 * @returns The response from the request.
 	 */
-	protected async executeQuery(query: string): Promise<GraphQlRequestResponseModel> {
+	protected async executeQuery(query: string): Promise<GraphQlRequestResponseModel | AuthError> {
 		const body: string = JSON.stringify({ query });
 
 		const response = await fetch(this.baseUrl, {
