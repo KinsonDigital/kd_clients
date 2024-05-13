@@ -42,8 +42,16 @@ export class ReleaseClient extends GitHubClient {
 	 * @throws The {@link ReleaseError} if there was an issue getting the releases.
 	 */
 	public async getReleases(page: number, qtyPerPage: number): Promise<ReleaseModel[]> {
-		const [result, _] = await this.getAllReleases(page, qtyPerPage);
+		const [result, response] = await this.getAllReleases(page, qtyPerPage);
+
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
+			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
+			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
+
+			throw new ReleaseError(errorMsg);
+		}
 
 		return result;
 	}
@@ -124,7 +132,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
 	 */
-	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void | AuthError | ReleaseError> {
+	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
 		const funcName = "uploadAsset";
 		Guard.isNothing(tagOrTitle, funcName, "toReleaseBy");
 		Guard.isNothing(tagOrTitle, funcName, "filePath");
@@ -193,7 +201,7 @@ export class ReleaseClient extends GitHubClient {
 	private async uploadFile(
 		filePath: string,
 		releaseId: number,
-	): Promise<void | AuthError | ReleaseError> {
+	): Promise<void> {
 		const file = Deno.readFileSync(filePath);
 		const fileName = basename(filePath);
 
@@ -217,7 +225,7 @@ export class ReleaseClient extends GitHubClient {
 
 	/**
 	 * Gets the given {@link page} where each page quantity is the given {@link qtyPerPage},
-	 *  for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName},
+	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName},
 	 * @param this.repoName The name of the repository to get the releases for.
 	 * @param page The page number of the results to get.
 	 * @param qtyPerPage The quantity of results to get per page.
@@ -239,6 +247,8 @@ export class ReleaseClient extends GitHubClient {
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
 			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
 			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
 
