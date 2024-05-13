@@ -3,7 +3,6 @@ export { GitError } from "./GitError.ts";
 export { IssueError } from "./IssueError.ts";
 export { LabelError } from "./LabelError.ts";
 export { MilestoneError } from "./MilestoneError.ts";
-export { NuGetError } from "./NuGetError.ts";
 export { OrganizationError } from "./OrganizationError.ts";
 export { ProjectError } from "./ProjectError.ts";
 export { PullRequestError } from "./PullRequestError.ts";

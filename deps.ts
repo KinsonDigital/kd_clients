@@ -27,9 +27,12 @@ import {
 
 // Local GitHub Client Errors
 import {
-	AuthError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
+	AuthError, GitError, IssueError, LabelError, MilestoneError, OrganizationError,
 	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError,
 } from "./GitHubClients/Errors/mod.ts"
+
+// Package Client Errors
+import { NuGetError } from "./PackageClients/Errors/NuGetError.ts"
 
 // Other Client Errors
 import { XError } from "./OtherClients/Errors/XError.ts"
@@ -65,9 +68,12 @@ export type {
 
 // Local GitHub Client Errors
 export {
-	AuthError, GitError, IssueError, LabelError, MilestoneError, NuGetError, OrganizationError,
+	AuthError, GitError, IssueError, LabelError, MilestoneError, OrganizationError,
 	ProjectError, PullRequestError, ReleaseError, RepoError, TagError, UsersError, WorkflowError,
 };
+
+// Package Client Errors
+export { NuGetError };
 
 // Other Client Errors
 export { XError };
