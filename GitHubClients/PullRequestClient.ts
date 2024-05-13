@@ -39,7 +39,7 @@ export class PullRequestClient extends GitHubClient {
 	 */
 	public async getAllOpenPullRequests(): Promise<PullRequestModel[]> {
 		return await this.getAllData<PullRequestModel>(async (page, qtyPerPage) => {
-			return await this.getPullRequests(page, qtyPerPage, IssueOrPRState.open);
+			return await this.getPullRequestsInternal(page, qtyPerPage, IssueOrPRState.open);
 		});
 	}
 
@@ -52,7 +52,7 @@ export class PullRequestClient extends GitHubClient {
 	 */
 	public async getAllClosedPullRequests(): Promise<PullRequestModel[]> {
 		return await this.getAllData<PullRequestModel>(async (page, qtyPerPage) => {
-			return await this.getPullRequests(page, qtyPerPage, IssueOrPRState.closed);
+			return await this.getPullRequestsInternal(page, qtyPerPage, IssueOrPRState.closed);
 		});
 	}
 
@@ -64,7 +64,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @param qtyPerPage The total to return per {@link page}.
 	 * @param state The state of the pull request.
 	 * @param labels The labels to filter by. A null or empty list will not filter the results.
-	 * @returns The issue.
+	 * @returns A group of pull requests.
 	 * @remarks Does not require authentication if the repository is public.
 	 * Open and closed pull requests can reside on different pages.  Example: if there are 5 open and 100 pull requests total, there
 	 * is no guarantee that all of the opened pull requests will be returned if you request the first page with a quantity of 10.
@@ -82,26 +82,13 @@ export class PullRequestClient extends GitHubClient {
 		mergeState: MergeState = MergeState.any,
 		labels?: string[] | null,
 		milestoneNumber?: number,
-	): Promise<[PullRequestModel[], Response]> {
+	): Promise<PullRequestModel[]> {
 		Guard.isLessThanOne(page, "getPullRequests", "page");
 
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
-
-		const labelList = Utils.isNothing(labels)
-			? labels?.filter((l) => Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
-			: "";
-
-		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
-		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
-
-		const queryParams =
-			`?page=${page}&per_page=${qtyPerPage}&state=${state}${labelListQueryParam}${milestoneNumberQueryParam}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/issues${queryParams}`;
-
-		const response: Response = await this.requestGET(url);
+		const [prs, response] = await this.getPullRequestsInternal(page, qtyPerPage, state, mergeState, labels, milestoneNumber);
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
@@ -123,24 +110,7 @@ export class PullRequestClient extends GitHubClient {
 			}
 		}
 
-		// Get all of the pull requests that are with any merge state
-		const allPullRequests = (<PullRequestModel[]> await this.getResponseData(response))
-			.filter((pr) => Utils.isPr(pr));
-
-		const filteredResults = allPullRequests.filter((pr) => {
-			switch (mergeState) {
-				case MergeState.any:
-					return true;
-				case MergeState.unmerged:
-					return pr.pull_request?.merged_at === null;
-				case MergeState.merged:
-					return pr.pull_request?.merged_at != null;
-				default:
-					break;
-			}
-		});
-
-		return [filteredResults, response];
+		return prs;
 	}
 
 	/**
@@ -465,7 +435,7 @@ export class PullRequestClient extends GitHubClient {
 
 		const issues = await this.getAllDataUntil<PullRequestModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getPullRequests(page, qtyPerPage, state);
+				return await this.getPullRequestsInternal(page, qtyPerPage, state);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -475,5 +445,72 @@ export class PullRequestClient extends GitHubClient {
 		);
 
 		return issues.find((issue: PullRequestModel) => issue.number === prNumber) != undefined;
+	}
+
+	/**
+	 * Gets a {@link page} of pull requests where the quantity for each page matches the given {@link qtyPerPage},
+	 * where the pull request has the given {@link state} and {@link labels}, for a repository with a name that matches the
+	 * given {@link PullRequestClient}.{@link repoName}.
+	 * @param page The page of results to return.
+	 * @param qtyPerPage The total to return per {@link page}.
+	 * @param state The state of the pull request.
+	 * @param labels The labels to filter by. A null or empty list will not filter the results.
+	 * @returns A group of pull requests.
+	 * @remarks Does not require authentication if the repository is public.
+	 * Open and closed pull requests can reside on different pages.  Example: if there are 5 open and 100 pull requests total, there
+	 * is no guarantee that all of the opened pull requests will be returned if you request the first page with a quantity of 10.
+	 * This is because no matter what the state of the pull request is, it can reside on any page.
+	 *
+	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value of 100 will be used.
+	 * @thrown The {@link PullRequestError} when something goes wrong with getting the pull requests.
+	 */
+	private async getPullRequestsInternal(
+		page = 1,
+		qtyPerPage = 100,
+		state: IssueOrPRState = IssueOrPRState.open,
+		mergeState: MergeState = MergeState.any,
+		labels?: string[] | null,
+		milestoneNumber?: number,
+	): Promise<[PullRequestModel[], Response]> {
+		Guard.isLessThanOne(page, "getPullRequests", "page");
+
+		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
+
+		const labelList = Utils.isNothing(labels)
+			? labels?.filter((l) => Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
+			: "";
+
+		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
+		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
+
+		const queryParams =
+			`?page=${page}&per_page=${qtyPerPage}&state=${state}${labelListQueryParam}${milestoneNumberQueryParam}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/issues${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		// Get all of the pull requests that are with any merge state
+		const allPullRequests = (<PullRequestModel[]> await this.getResponseData(response))
+			.filter((pr) => Utils.isPr(pr));
+
+		const filteredResults = allPullRequests.filter((pr) => {
+			switch (mergeState) {
+				case MergeState.any:
+					return true;
+				case MergeState.unmerged:
+					return pr.pull_request?.merged_at === null;
+				case MergeState.merged:
+					return pr.pull_request?.merged_at != null;
+				default:
+					break;
+			}
+		});
+
+		return [filteredResults, response];
 	}
 }
