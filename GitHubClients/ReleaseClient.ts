@@ -58,6 +58,29 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Gets a release with and id that matches the given {@link releaseId}.
+	 * @param releaseId The id of the release.
+	 * @returns The release.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getReleaseById(releaseId: number): Promise<ReleaseModel> {
+		Guard.isLessThanOne(releaseId);
+
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}`;
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== 200) {
+			const errorMsg = `Status Code: ${response.status} ${response.statusText}`;
+			throw new Error(errorMsg);
+		}
+
+		return await response.json() as ReleaseModel;
+	}
+
+	/**
 	 * Gets a release for a repository.
 	 * @param tagOrTitle The tag or title of the release to get.
 	 * @param options Various options to use when getting the release.
