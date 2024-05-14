@@ -67,7 +67,7 @@ export class RepoClient extends GitHubClient {
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 * @throws The {@link RepoError} if the repository owner does not exist.
 	 */
-	public async getOwnerRepos(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
+	public async getAllRepos(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
