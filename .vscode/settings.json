@@ -20,6 +20,7 @@
 	},
     "deno.enable": true,
 	"deno.lint": true,
+	"files.eol": "\n",
     "[typescript]": {
 		"editor.insertSpaces": false,
 		"editor.tabSize": 4,
