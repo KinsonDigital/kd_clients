@@ -146,8 +146,7 @@ export class ReleaseClient extends GitHubClient {
 		const foundRelease: ReleaseModel | undefined = releases.find((item) => item.name === name);
 
 		if (foundRelease === undefined) {
-			const errorMsg =
-				`A release with the name '${name}' for the repository '${this.repoName}' could not be found.`;
+			const errorMsg = `A release with the name '${name}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
@@ -346,7 +345,9 @@ export class ReleaseClient extends GitHubClient {
 			if (overwrite === true) {
 				Deno.removeSync(downloadFilePath);
 			} else {
-				throw new ReleaseError(`The file '${downloadFilePath}' already exists.\nUse 'overwrite = true' to overwrite the file.`);
+				throw new ReleaseError(
+					`The file '${downloadFilePath}' already exists.\nUse 'overwrite = true' to overwrite the file.`,
+				);
 			}
 		}
 
@@ -373,7 +374,7 @@ export class ReleaseClient extends GitHubClient {
 
 		Deno.writeFileSync(downloadFilePath, arrayData);
 	}
-	
+
 	/**
 	 * Downloads all assets for a release with the given {@link tagName} to the given {@link dirPath}.
 	 * @param tagName The name of the release tag.
@@ -413,7 +414,7 @@ export class ReleaseClient extends GitHubClient {
 	 * 2. An {@link AuthError} if the request is unauthorized.
 	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
 	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
-	*/
+	 */
 	public async downloadAllAssetsByReleaseName(name: string, dirPath: string, overwrite?: boolean): Promise<void> {
 		Guard.isNothing(name);
 
@@ -467,9 +468,7 @@ export class ReleaseClient extends GitHubClient {
 			: await this.getReleaseByTag(releaseIdOrTag);
 
 		const foundAsset = release.assets.find((asset) => {
-			return Utils.isNumber(assetIdOrName)
-				? asset.id === assetIdOrName
-				: asset.name === assetIdOrName;
+			return Utils.isNumber(assetIdOrName) ? asset.id === assetIdOrName : asset.name === assetIdOrName;
 		});
 
 		if (foundAsset === undefined) {
