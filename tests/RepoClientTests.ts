@@ -11,12 +11,11 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 		name: "test-repo",
 		url: "test-url",
 	}];
-	const response: Response = new Response(null, { status: 200 });
 
 	const spy_getOwnerRepos = stub(
 		sut,
-		"getOwnerRepos",
-		(_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]),
+		"getAllRepos",
+		(_page, _qtyPerPage) => Promise.resolve<RepoModel[]>(data),
 	);
 
 	// Act
@@ -35,9 +34,8 @@ Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
 		name: "other-repo",
 		url: "test-url",
 	}];
-	const response: Response = new Response(null, { status: 200 });
 
-	stub(sut, "getOwnerRepos", (_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
+	stub(sut, "getAllRepos", (_page, _qtyPerPage) => Promise.resolve<RepoModel[]>(data));
 
 	// Act & Assert
 	await assertRejects(async () => await sut.getRepo(), RepoError, "The repository 'test-repo' was not found.");

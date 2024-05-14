@@ -8,7 +8,7 @@ export class AuthError extends Error {
 	 */
 	constructor(message?: string) {
 		const errorMessage = message === undefined
-			? "Authentication error occurred. Please check your credentials and try again."
+			? "Authentication error occurred. Please check the GitHub token used and try again."
 			: message;
 
 		super(errorMessage);
