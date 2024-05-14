@@ -41,11 +41,11 @@ export abstract class GitHubClient extends WebApiClient {
 		this.repoName = Utils.isNothing(repoName) ? "" : repoName.trim();
 
 		this.baseUrl = "https://api.github.com";
-		this.updateOrAdd("Accept", "application/vnd.github+json");
-		this.updateOrAdd("X-GitHub-Api-Version", "2022-11-28");
+		this.updateOrAddHeader("Accept", "application/vnd.github+json");
+		this.updateOrAddHeader("X-GitHub-Api-Version", "2022-11-28");
 
 		if (!Utils.isNothing(token)) {
-			this.updateOrAdd("Authorization", `Bearer ${token}`);
+			this.updateOrAddHeader("Authorization", `Bearer ${token}`);
 		}
 	}
 

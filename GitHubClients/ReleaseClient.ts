@@ -372,8 +372,8 @@ export class ReleaseClient extends GitHubClient {
 		const queryParams = `?name=${fileName}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}/assets${queryParams}`;
 
-		this.updateOrAdd("Content-Type", "application/octet-stream");
-		this.updateOrAdd("Content-Length", file.byteLength.toString());
+		this.updateOrAddHeader("Content-Type", "application/octet-stream");
+		this.updateOrAddHeader("Content-Length", file.byteLength.toString());
 
 		const response = await this.requestPOST(url, file);
 
