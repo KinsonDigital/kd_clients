@@ -252,6 +252,46 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Gets a single asset with an id or name that matches the given {@link assetIdOrName},
+	 * for a release with an id or tag that matches the given {@link releaseIdOrTag}.
+	 * @param releaseIdOrTag The release id or tag name.
+	 * @param assetIdOrName The asset id or name.
+	 * @returns The asset with the given {@link assetIdOrName}.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getAsset(releaseIdOrTag: number | string, assetIdOrName: number | string): Promise<AssetModel> {
+		Guard.isNothing(releaseIdOrTag);
+		Guard.isNothing(assetIdOrName);
+
+		if (Utils.isNumber(releaseIdOrTag)) {
+			Guard.isLessThanOne(releaseIdOrTag);
+		}
+
+		if (Utils.isNumber(assetIdOrName)) {
+			Guard.isLessThanOne(assetIdOrName);
+		}
+
+		const release = Utils.isNumber(releaseIdOrTag)
+			? await this.getReleaseById(releaseIdOrTag)
+			: await this.getReleaseByTag(releaseIdOrTag);
+
+		const foundAsset = release.assets.find((asset) => {
+			return Utils.isNumber(assetIdOrName)
+				? asset.id === assetIdOrName
+				: asset.name === assetIdOrName;
+		});
+
+		if (foundAsset === undefined) {
+			const assetType = Utils.isNumber(assetIdOrName) ? "id" : "name";
+			const errorMsg = `An asset with the ${assetType} '${assetIdOrName}' could not be found.`;
+
+			throw new ReleaseError(errorMsg);
+		}
+
+		return foundAsset;
+	}
+
+	/**
 	 * Uploads a file using the given {@link filePath} to a release that matches the given {@link releaseId}.
 	 * @param filePath The path of the file to upload.
 	 * @param releaseId The id of the release to upload the file to.
