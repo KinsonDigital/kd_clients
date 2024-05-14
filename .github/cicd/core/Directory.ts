@@ -57,7 +57,7 @@ export class Directory {
 		dirPath = dirPath === "." || dirPath === "./" ? Deno.cwd() : dirPath;
 
 		for (const dirEntry of Deno.readDirSync(dirPath)) {
-			const entry = dirPath == "/"
+			const entry = dirPath === "/"
 				? dirPath + dirEntry.name
 				: dirPath + "/" + dirEntry.name;
 
