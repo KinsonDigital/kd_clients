@@ -37,7 +37,7 @@ export class Directory {
 		extension = extension.trim();
 		extension = Utils.isNothing(extension) ? "*.*" : extension;
 
-		if (extension != "*.*") {
+		if (extension !== "*.*") {
 			extension = extension.startsWith("*.") ? extension.substring(1) : extension;
 
 			if (!extension.startsWith(".") || extension.length === 1) {

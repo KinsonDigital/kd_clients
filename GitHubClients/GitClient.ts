@@ -107,7 +107,7 @@ export class GitClient extends GraphQlClient {
 				throw responseData;
 			}
 
-			if (responseData.errors != undefined) {
+			if (responseData.errors !== undefined) {
 				const mainMsg = `The following errors occurred while getting branches for the repository '${super.repoName}'`;
 				const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
 
@@ -129,8 +129,8 @@ export class GitClient extends GraphQlClient {
 			for (let i = 0; i < branches.length; i++) {
 				const branch = branches[i];
 
-				const stopPulling: boolean = untilPredicate != null &&
-					untilPredicate != undefined &&
+				const stopPulling: boolean = untilPredicate !== null &&
+					untilPredicate !== undefined &&
 					untilPredicate(branch);
 
 				result.push(branch);
@@ -191,7 +191,7 @@ export class GitClient extends GraphQlClient {
 			throw responseData;
 		}
 
-		if (responseData.errors != undefined) {
+		if (responseData.errors !== undefined) {
 			const mainMsg = `The following errors occurred while creating the branch '${newBranchName}'`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
 
@@ -228,7 +228,7 @@ export class GitClient extends GraphQlClient {
 			throw response;
 		}
 
-		if (response.errors != undefined) {
+		if (response.errors !== undefined) {
 			const mainMsg = `The following errors occurred while adding a commit to the branch '${branchName}'`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, response);
 

@@ -62,7 +62,7 @@ export class WorkflowClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred trying to get the workflow runs for the repository '${this.repoName}'.`,
 				response,
@@ -398,7 +398,7 @@ export class WorkflowClient extends GitHubClient {
 			100, // Qty per page,
 			(pageOfData: WorkflowRunModel[]) => {
 				return pageOfData.some((workflowRun: WorkflowRunModel) => {
-					const containsPRData = workflowRun.pull_requests != null && workflowRun.pull_requests.length > 0;
+					const containsPRData = workflowRun.pull_requests !== null && workflowRun.pull_requests.length > 0;
 					const prFound = workflowRun.pull_requests.some((pr) => pr.number === prNumber);
 
 					return containsPRData && prFound;
@@ -439,7 +439,7 @@ export class WorkflowClient extends GitHubClient {
 			100,
 			(pageOfData: WorkflowRunModel[]) => {
 				return pageOfData.filter((workflowRun) =>
-					workflowRun.pull_requests != null && workflowRun.pull_requests.length > 0
+					workflowRun.pull_requests !== null && workflowRun.pull_requests.length > 0
 				);
 			},
 		);
@@ -537,7 +537,7 @@ export class WorkflowClient extends GitHubClient {
 
 		const response: Response = await this.requestPOST(url, body);
 
-		if (response.status != GitHubHttpStatusCodes.NoContent) {
+		if (response.status !== GitHubHttpStatusCodes.NoContent) {
 			let errorMsg = "";
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:

@@ -229,7 +229,7 @@ export class MilestoneClient extends GitHubClient {
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			let errorMsg = `The milestones for the repository owner '${super.ownerName}'`;
 			errorMsg += ` and for the repository '${super.repoName}' could not be found.`;
 
@@ -262,7 +262,7 @@ export class MilestoneClient extends GitHubClient {
 			},
 		);
 
-		return milestones.find((m) => m.title.trim() === milestoneName) != undefined;
+		return milestones.find((m) => m.title.trim() === milestoneName) !== undefined;
 	}
 
 	/**
@@ -285,7 +285,7 @@ export class MilestoneClient extends GitHubClient {
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`,
 				response,

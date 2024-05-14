@@ -145,7 +145,7 @@ export class PullRequestClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();
@@ -204,7 +204,7 @@ export class PullRequestClient extends GitHubClient {
 		const response: Response = await this.requestPATCH(url, JSON.stringify({ labels: prLabels }));
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();
@@ -244,7 +244,7 @@ export class PullRequestClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();
@@ -305,7 +305,7 @@ export class PullRequestClient extends GitHubClient {
 		const prBody: string = JSON.stringify(prRequestData);
 		const response = await this.requestPATCH(url, prBody);
 
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				throw new PullRequestError(`An pull request with the number '${prNumber}' does not exist.`);
 			} else {
@@ -432,7 +432,7 @@ export class PullRequestClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.Created) {
+		} else if (response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg("There was an issue creating the pull request.", response);
 
 			throw new PullRequestError(errorMsg);
@@ -469,7 +469,7 @@ export class PullRequestClient extends GitHubClient {
 			},
 		);
 
-		return issues.find((issue: PullRequestModel) => issue.number === prNumber) != undefined;
+		return issues.find((issue: PullRequestModel) => issue.number === prNumber) !== undefined;
 	}
 
 	/**
@@ -532,7 +532,7 @@ export class PullRequestClient extends GitHubClient {
 				case MergeState.unmerged:
 					return pr.pull_request?.merged_at === null;
 				case MergeState.merged:
-					return pr.pull_request?.merged_at != null;
+					return pr.pull_request?.merged_at !== null;
 				default:
 					break;
 			}
@@ -546,7 +546,7 @@ export class PullRequestClient extends GitHubClient {
 	 * @param response The response from a request.
 	 */
 	private processPossibleErrors(response: Response): void {
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();

@@ -72,7 +72,7 @@ export class IssueClient extends GitHubClient {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
 			const [issues, response] = await this.getIssuesInternal(page, qtyPerPage);
 
-			if (response.status != GitHubHttpStatusCodes.OK) {
+			if (response.status !== GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(`An error occurred trying to get all of the opened issues.`, response);
 				throw new IssueError(errorMsg);
 			}
@@ -91,7 +91,7 @@ export class IssueClient extends GitHubClient {
 		return await this.getAllData<IssueModel>(async (page: number, qtyPerPage?: number) => {
 			const [issues, response] = await this.getIssuesInternal(page, qtyPerPage, IssueOrPRState.closed);
 
-			if (response.status != GitHubHttpStatusCodes.OK) {
+			if (response.status !== GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg("An error occurred trying to get all of the closed issues.", response);
 				throw new IssueError(errorMsg);
 			}
@@ -133,7 +133,7 @@ export class IssueClient extends GitHubClient {
 		const [issues, response] = await this.getIssuesInternal(page, qtyPerPage, state, labels, milestoneNumber);
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.MovedPermanently:
 				case GitHubHttpStatusCodes.UnprocessableContent: {
@@ -169,7 +169,7 @@ export class IssueClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();
@@ -231,7 +231,7 @@ export class IssueClient extends GitHubClient {
 		const response: Response = await this.requestPATCH(url, JSON.stringify({ labels: prLabels }));
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();
@@ -268,7 +268,7 @@ export class IssueClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			switch (response.status) {
 				case GitHubHttpStatusCodes.Unauthorized:
 					throw new AuthError();
@@ -346,7 +346,7 @@ export class IssueClient extends GitHubClient {
 		const issueBody: string = JSON.stringify(issueData);
 		const response = await this.requestPATCH(url, issueBody);
 
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status !== GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				throw new IssueError(`An issue with the number '${issueNumber}' does not exist.`);
 			} else {
@@ -394,7 +394,7 @@ export class IssueClient extends GitHubClient {
 			},
 		);
 
-		return issues.find((issue: IssueModel) => issue.number === issueNumber) != undefined;
+		return issues.find((issue: IssueModel) => issue.number === issueNumber) !== undefined;
 	}
 
 	/**

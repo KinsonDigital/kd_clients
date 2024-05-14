@@ -259,7 +259,7 @@ export class Utils {
 	 * @returns True if the value is a valid release type, otherwise false.
 	 */
 	public static invalidReleaseType(value: string): value is ReleaseType {
-		return value != "preview" && value != "production";
+		return value !== "preview" && value !== "production";
 	}
 
 	/**

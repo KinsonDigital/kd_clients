@@ -42,7 +42,7 @@ export class XClient extends WebApiClient {
 			}),
 		});
 
-		if (response.status != 200 && response.status != 201) {
+		if (response.status !== 200 && response.status !== 201) {
 			throw new XError(`Failed to send tweet.\n${response.status} - ${response.statusText}`);
 		}
 	}

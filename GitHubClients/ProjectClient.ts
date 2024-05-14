@@ -81,7 +81,7 @@ export class ProjectClient extends GraphQlClient {
 		const query = createOrgProjectsQuery(super.ownerName);
 		const responseData = await this.executeQuery(query);
 
-		if (responseData.errors != undefined) {
+		if (responseData.errors !== undefined) {
 			const mainMsg = "The following errors occurred while getting the organizational projects.";
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
 
@@ -145,7 +145,7 @@ export class ProjectClient extends GraphQlClient {
 		const query = createLinkItemToProjectMutation(issue.node_id, project.id);
 		const response = await this.executeQuery(query);
 
-		if (response.errors != undefined) {
+		if (response.errors !== undefined) {
 			const mainMsg =
 				`The following errors occurred while adding the issue '${issueNumber}' to the project '${projectName}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, response);
@@ -191,7 +191,7 @@ export class ProjectClient extends GraphQlClient {
 		const query = createLinkItemToProjectMutation(pr.node_id, project.id);
 		const response = await this.executeQuery(query);
 
-		if (response.errors != undefined) {
+		if (response.errors !== undefined) {
 			const mainMsg =
 				`The following errors occurred while adding the pull request '${prNumber}' to the project '${projectName}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, response);
@@ -215,7 +215,7 @@ export class ProjectClient extends GraphQlClient {
 		const query = createGetIssueProjectsQuery(super.ownerName, super.repoName, issueNumber);
 		const responseData = await this.executeQuery(query);
 
-		if (responseData.errors != undefined) {
+		if (responseData.errors !== undefined) {
 			const mainMsg =
 				`The following errors occurred while getting the organizational projects for the issue '${issueNumber}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);
@@ -241,7 +241,7 @@ export class ProjectClient extends GraphQlClient {
 		const query = createGetPullRequestProjectsQuery(super.ownerName, super.repoName, prNumber);
 		const responseData = await this.executeQuery(query);
 
-		if (responseData.errors != undefined) {
+		if (responseData.errors !== undefined) {
 			const mainMsg =
 				`The following errors occurred while getting the organizational projects for the pull request '${prNumber}'.`;
 			const errorMsg = Utils.toErrorMessage(mainMsg, responseData);

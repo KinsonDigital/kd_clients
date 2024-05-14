@@ -122,7 +122,7 @@ export class ReleaseClient extends GitHubClient {
 			},
 		);
 
-		return releases.find((item: ReleaseModel) => item.tag_name === tagName) != undefined;
+		return releases.find((item: ReleaseModel) => item.tag_name === tagName) !== undefined;
 	}
 
 	/**
@@ -219,7 +219,7 @@ export class ReleaseClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.Created) {
+		} else if (response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = `The asset '${fileName}' could not be uploaded to the release with the release id '${releaseId}'.`;
 			throw new ReleaseError(errorMsg);
 		}

@@ -74,6 +74,6 @@ export class LinkHeaderParser {
 	}
 
 	private isResponse(responseOrHeaderString: Response | string): responseOrHeaderString is Response {
-		return (<Response> responseOrHeaderString).headers != undefined;
+		return (<Response> responseOrHeaderString).headers !== undefined;
 	}
 }

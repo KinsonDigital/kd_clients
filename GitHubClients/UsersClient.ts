@@ -43,7 +43,7 @@ export class UsersClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			// If there is an error
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				throw new UsersError(`The user '${userName}' does not exist.`, response.status);
@@ -73,7 +73,7 @@ export class UsersClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				return false;
 			} else {

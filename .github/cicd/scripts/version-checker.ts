@@ -1,7 +1,7 @@
 import { RepoClient, TagClient, UsersClient } from "../../../GitHubClients/mod.ts";
 import { Utils } from "../../../core/Utils.ts";
 
-if (Deno.args.length != 5) {
+if (Deno.args.length !== 5) {
 	let errorMsg = `The required number of arguments is 5 but only ${Deno.args.length}.`;
 	errorMsg += `\nPlease provide the following arguments: version, owner name, repo name, and token.`;
 	Utils.printError(errorMsg);
@@ -42,7 +42,7 @@ if (await tagClient.tagExists(version)) {
 	Deno.exit(1);
 }
 
-if (versionType != "preview" && versionType != "production") {
+if (versionType !== "preview" && versionType !== "production") {
 	const errorMsg = `The version type '${versionType}' is not valid. Valid values are 'preview' or 'production' version type.`;
 	Utils.printError(errorMsg);
 	Deno.exit(1);

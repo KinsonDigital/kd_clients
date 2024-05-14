@@ -193,7 +193,7 @@ export class RepoClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				return false;
 			} else {
@@ -226,7 +226,7 @@ export class RepoClient extends GitHubClient {
 
 			if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 				throw new AuthError();
-			} else if (response.status != GitHubHttpStatusCodes.OK) {
+			} else if (response.status !== GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the variables for the owner '${this.ownerName}'.`,
 					response,
@@ -257,7 +257,7 @@ export class RepoClient extends GitHubClient {
 		const variables = await this.getVariables();
 		const variable = variables.find((v) => v.name === variableName);
 
-		return variable != undefined && variable != null;
+		return variable !== undefined && variable !== null;
 	}
 
 	/**
@@ -290,7 +290,7 @@ export class RepoClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.NoContent) {
+		} else if (response.status !== GitHubHttpStatusCodes.NoContent) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when updating the variable '${variableName}'` +
 					` for the repository '${this.repoName}'.`,
@@ -346,7 +346,7 @@ export class RepoClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK && response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
 					` for branch '${branchName}'.`,
@@ -414,7 +414,7 @@ export class RepoClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
-		} else if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
+		} else if (response.status !== GitHubHttpStatusCodes.OK && response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
 					` for branch '${branchName}'.`,

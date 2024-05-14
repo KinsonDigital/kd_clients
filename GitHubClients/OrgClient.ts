@@ -248,7 +248,7 @@ export class OrgClient extends GitHubClient {
 
 			if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 				throw new AuthError();
-			} else if (response.status != GitHubHttpStatusCodes.OK) {
+			} else if (response.status !== GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the variables for the organization '${this.ownerName}'.`,
 					response,

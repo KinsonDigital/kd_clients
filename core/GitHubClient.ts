@@ -180,8 +180,8 @@ export abstract class GitHubClient extends WebApiClient {
 			let [groupA, groupB] = this.createAlternatePagesGroups(totalPagesLeft);
 
 			// Remove the first page, this has already been pulled
-			groupA = groupA.filter((i) => i != 1);
-			groupB = groupB.filter((i) => i != 1);
+			groupA = groupA.filter((i) => i !== 1);
+			groupB = groupB.filter((i) => i !== 1);
 
 			const maxLen = Math.max(groupA.length, groupB.length);
 
