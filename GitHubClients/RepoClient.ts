@@ -127,7 +127,7 @@ export class RepoClient extends GitHubClient {
 		const funcName = "getFileContent";
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
-		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
+		const fileContentModel = await this.getFileContentInternal(branchName, relativeFilePath);
 
 		const decodedContent = decodeBase64(fileContentModel.content);
 
@@ -355,7 +355,7 @@ export class RepoClient extends GitHubClient {
 			throw new RepoError(errorMsg);
 		}
 
-		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
+		const fileContentModel = await this.getFileContentInternal(branchName, relativeFilePath);
 
 		const body = {
 			message: commitMessage,
@@ -387,7 +387,7 @@ export class RepoClient extends GitHubClient {
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
 	 * @throws The {@link RepoError} if there was a problem getting the file content.
 	 */
-	private async getFileContentResult(
+	private async getFileContentInternal(
 		branchName: string,
 		relativeFilePath: string,
 	): Promise<FileContentModel> {
