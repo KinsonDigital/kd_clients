@@ -21,6 +21,10 @@
     "deno.enable": true,
 	"deno.lint": true,
 	"files.eol": "\n",
+	"window.title": "🦕KD_CLIENTS",
+	"workbench.colorCustomizations": {
+		"titleBar.activeBackground": "#1a2519"
+	},
     "[typescript]": {
 		"editor.insertSpaces": false,
 		"editor.tabSize": 4,
