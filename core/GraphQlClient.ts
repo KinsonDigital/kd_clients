@@ -1,7 +1,7 @@
 import { GraphQlRequestResponseModel } from "./Models/GraphQlModels/mod.ts";
 import { Utils } from "../deps.ts";
 import { Guard } from "./Guard.ts";
-import { BadCredentialsError } from "../GitHubClients/Errors/BadCredentialsError.ts";
+import { AuthError } from "../GitHubClients/Errors/AuthError.ts";
 
 /**
  * Provides a base class for HTTP clients.
@@ -82,6 +82,7 @@ export abstract class GraphQlClient {
 	 * {@link Response} to that request, whether it is successful or not.
 	 * @param query The GraphQL query to use for the request.
 	 * @returns The response from the request.
+	 * @throws An {@link AuthError} if the request could not be authorized.
 	 */
 	protected async executeQuery(query: string): Promise<GraphQlRequestResponseModel> {
 		const body: string = JSON.stringify({ query });
@@ -95,7 +96,7 @@ export abstract class GraphQlClient {
 		const result = await this.getResponseData(response);
 
 		if (!Utils.isNothing(result.message) && result.message === "Bad credentials") {
-			throw new BadCredentialsError("The GraphQL query could not be executed because the credentials are invalid.");
+			throw new AuthError("Could not authorize the request.");
 		}
 
 		return result;

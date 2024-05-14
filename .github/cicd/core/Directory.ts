@@ -37,7 +37,7 @@ export class Directory {
 		extension = extension.trim();
 		extension = Utils.isNothing(extension) ? "*.*" : extension;
 
-		if (extension != "*.*") {
+		if (extension !== "*.*") {
 			extension = extension.startsWith("*.") ? extension.substring(1) : extension;
 
 			if (!extension.startsWith(".") || extension.length === 1) {
@@ -57,7 +57,7 @@ export class Directory {
 		dirPath = dirPath === "." || dirPath === "./" ? Deno.cwd() : dirPath;
 
 		for (const dirEntry of Deno.readDirSync(dirPath)) {
-			const entry = dirPath == "/"
+			const entry = dirPath === "/"
 				? dirPath + dirEntry.name
 				: dirPath + "/" + dirEntry.name;
 

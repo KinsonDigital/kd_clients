@@ -1,7 +1,7 @@
 import { Utils } from "../../../core/Utils.ts";
 import { File } from "../core/File.ts";
 
-if (Deno.args.length != 2) {
+if (Deno.args.length !== 2) {
 	let errorMsg = `The required number of arguments is 2 but received ${Deno.args.length}.`;
 	errorMsg += `\nPlease provide the following arguments: version type, version.`;
 	Utils.printError(errorMsg);

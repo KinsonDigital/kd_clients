@@ -17,11 +17,11 @@ export class Guard {
 		if (Utils.isNothing(value)) {
 			let errorMsg = "The value is null, undefined, or empty.";
 
-			if (funcName != "") {
+			if (funcName !== "") {
 				errorMsg += `\nFunction Name: ${funcName}`;
 			}
 
-			if (paramName != "") {
+			if (paramName !== "") {
 				errorMsg += `\nParam Name: ${paramName}`;
 			}
 
@@ -40,11 +40,11 @@ export class Guard {
 		if (isNullOrUndefined || isNaN(value) || !isFinite(value)) {
 			let errorMsg = "The value is undefined, null, NaN, Infinite, -Infinity.";
 
-			if (funcName != "") {
+			if (funcName !== "") {
 				errorMsg += `\nFunction Name: ${funcName}`;
 			}
 
-			if (paramName != "") {
+			if (paramName !== "") {
 				errorMsg += `\nParam Name: ${paramName}`;
 			}
 
@@ -54,11 +54,11 @@ export class Guard {
 		if (value < 1) {
 			let errorMsg = "The value is less than or equal to zero.";
 
-			if (funcName != "") {
+			if (funcName !== "") {
 				errorMsg += `\nFunction Name: ${funcName}`;
 			}
 
-			if (paramName != "") {
+			if (paramName !== "") {
 				errorMsg += `\nParam Name: ${paramName}`;
 			}
 

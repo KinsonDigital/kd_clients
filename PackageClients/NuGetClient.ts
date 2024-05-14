@@ -1,7 +1,7 @@
 import { WebApiClient } from "../core/WebApiClient.ts";
 import { Guard } from "../core/Guard.ts";
 import { NuGetHttpStatusCodes } from "../core/Enums.ts";
-import { NuGetError } from "../GitHubClients/Errors/NuGetError.ts";
+import { NuGetError } from "./Errors/NuGetError.ts";
 
 /**
  * References:

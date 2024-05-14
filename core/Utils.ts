@@ -12,7 +12,6 @@ import { ErrorModel } from "../deps.ts";
 export class Utils {
 	private static readonly prodVersionRegex = /^v[0-9]+\.[0-9]+\.[0-9]+$/;
 	private static readonly prevVersionRegex = /^v[0-9]+\.[0-9]+\.[0-9]+-preview\.[0-9]+$/;
-	private static readonly featureBranchRegex = /^feature\/[1-9][0-9]*-(?!-)[a-z-]+/gm;
 
 	/**
 	 * Checks if the value is null, undefined, or empty.
@@ -260,7 +259,7 @@ export class Utils {
 	 * @returns True if the value is a valid release type, otherwise false.
 	 */
 	public static invalidReleaseType(value: string): value is ReleaseType {
-		return value != "preview" && value != "production";
+		return value !== "preview" && value !== "production";
 	}
 
 	/**

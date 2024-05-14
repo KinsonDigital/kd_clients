@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
+import { AuthError, decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
@@ -18,20 +18,33 @@ export class RepoClient extends GitHubClient {
 	 * @param ownerName The name of the owner of a repository.
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
+		const funcName = "RepoClient.ctor";
+		Guard.isNothing(ownerName, funcName, "ownerName");
+		Guard.isNothing(repoName, funcName, "repoName");
+
 		super(ownerName, repoName, token);
 	}
 
 	/**
 	 * Gets information about a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @returns A repository information.
-	 * @throws The {@link RepoError} if the repository does not exist.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if there was a problem with the authentication.
+	 * 2. The {@link RepoError} if the repository owner does not exist.
 	 */
 	public async getRepo(): Promise<RepoModel> {
 		const foundRepos = await this.getAllDataUntil<RepoModel>(
 			async (page, qtyPerPage) => {
-				return await this.getOwnerRepos(page, qtyPerPage ?? 100);
+				const [allRepos, response] = await this.getAllReposInternal(page, qtyPerPage ?? 100);
+
+				if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+					throw new AuthError();
+				}
+
+				return [allRepos, response];
 			},
 			1, // Start page
 			100, // Qty per page
@@ -60,19 +73,19 @@ export class RepoClient extends GitHubClient {
 	 * @remarks The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
-	 * @throws The {@link RepoError} if the repository owner does not exist.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if there was a problem with the authentication.
+	 * 2. The {@link RepoError} if the repository owner does not exist.
 	 */
-	public async getOwnerRepos(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
+	public async getAllRepos(page: number, qtyPerPage: number): Promise<RepoModel[]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/users/${this.ownerName}/repos${queryParams}`;
+		const [allRepos, response] = await this.getAllReposInternal(page, qtyPerPage);
 
-		const response: Response = await this.requestGET(url);
-
-		// If there is an error
-		if (response.status === GitHubHttpStatusCodes.NotFound) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
 			const errorMsg = this.buildErrorMsg(
 				`Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`,
 				response,
@@ -81,13 +94,15 @@ export class RepoClient extends GitHubClient {
 			throw new RepoError(errorMsg);
 		}
 
-		return [<RepoModel[]> await this.getResponseData(response), response];
+		return allRepos;
 	}
 
 	/**
 	 * Checks if a repository with a name that matches the {@link RepoClient}.{@link repoName} exists.
 	 * @returns True if the repo exists; otherwise, false.
-	 * @throws The {@link RepoError} if there was a problem checking if the repository exists.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if there was a problem with the authentication.
+	 * 2. The {@link RepoError} if the repository owner does not exist.
 	 */
 	public async exists(): Promise<boolean> {
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}`;
@@ -100,6 +115,8 @@ export class RepoClient extends GitHubClient {
 		}
 
 		switch (response.status) {
+			case GitHubHttpStatusCodes.Unauthorized:
+				throw new AuthError();
 			case GitHubHttpStatusCodes.MovedPermanently:
 			case GitHubHttpStatusCodes.Forbidden: {
 				const errorMsg = this.buildErrorMsg(
@@ -120,13 +137,17 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns The content of the file.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
-	 * @throws The {@link RepoError} if there was a problem getting the file content.
+	 * @throws The following errors:
+	 * 1. If any of the parameters are undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the file content does not exist.
 	 */
 	public async getFileContent(branchName: string, relativeFilePath: string): Promise<string> {
 		const funcName = "getFileContent";
+		Guard.isNothing(branchName, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
-		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
+		const fileContentModel = await this.getFileContentInternal(branchName, relativeFilePath);
 
 		const decodedContent = decodeBase64(fileContentModel.content);
 
@@ -143,7 +164,10 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns True if the file exists; otherwise, false.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
-	 * @throws The {@link RepoError} if there was problem checking if the file exists.
+	 * @throws The following errors:
+	 * 1. If any of the parameters are undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the there was a problem checking if the file exists or if the file path is invalid.
 	 */
 	public async fileExists(branchName: string, relativeFilePath: string): Promise<boolean> {
 		const funcName = "fileExists";
@@ -167,7 +191,9 @@ export class RepoClient extends GitHubClient {
 
 		const response: Response = await this.requestGET(url);
 
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
 				return false;
 			} else {
@@ -187,7 +213,9 @@ export class RepoClient extends GitHubClient {
 	/**
 	 * Gets a list of all the variables for a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @returns A list of all repositories variables.
-	 * @throws The {@link RepoError} if there was a problem getting the variables.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if there was a problem with the authentication.
+	 * 2. The {@link RepoError} if the there was a problem getting all of the repository variables.
 	 */
 	public async getVariables(): Promise<GitHubVarModel[]> {
 		return await this.getAllData<GitHubVarModel>(async (page: number, qtyPerPage?: number) => {
@@ -196,7 +224,9 @@ export class RepoClient extends GitHubClient {
 
 			const response = await this.requestGET(url);
 
-			if (response.status != GitHubHttpStatusCodes.OK) {
+			if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+				throw new AuthError();
+			} else if (response.status !== GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the variables for the owner '${this.ownerName}'.`,
 					response,
@@ -216,7 +246,10 @@ export class RepoClient extends GitHubClient {
 	 * in a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @param variableName The name of the variable.
 	 * @returns True if the variable exists; otherwise, false.
-	 * @throws The {@link RepoError} if there was a problem checking if the variable exists.
+	 * @throws The following errors:
+	 * 1. If the parameter is undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the there was a problem getting all of the repository variables.
 	 */
 	public async repoVariableExists(variableName: string): Promise<boolean> {
 		Guard.isNothing(variableName, "repoVariableExists", "variableName");
@@ -224,7 +257,7 @@ export class RepoClient extends GitHubClient {
 		const variables = await this.getVariables();
 		const variable = variables.find((v) => v.name === variableName);
 
-		return variable != undefined && variable != null;
+		return variable !== undefined && variable !== null;
 	}
 
 	/**
@@ -232,7 +265,10 @@ export class RepoClient extends GitHubClient {
 	 * the given {@link variableName} in a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
 	 * @param variableName The name of the variable.
 	 * @param variableValue The value of the variable.
-	 * @throws The {@link RepoError} if there was a problem updating the variable or if the variable does not exist.
+	 * @throws The following errors:
+	 * 1. If any of the parameters are undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the a variable with the given {@link variableName} does not exist or a problem updating the variable.
 	 */
 	public async updateVariable(variableName: string, variableValue: string): Promise<void> {
 		const funcName = "updateVariable";
@@ -252,7 +288,9 @@ export class RepoClient extends GitHubClient {
 
 		const response = await this.requestPATCH(url, JSON.stringify(body));
 
-		if (response.status != GitHubHttpStatusCodes.NoContent) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.NoContent) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when updating the variable '${variableName}'` +
 					` for the repository '${this.repoName}'.`,
@@ -272,7 +310,10 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of where to add the file.
 	 * @param fileContent The content of the file.
 	 * @param commitMessage The commit message.
-	 * @throws The {@link RepoError} if there was a problem creating the file or if the file already exists.
+	 * @throws The following errors:
+	 * 1. If any of the parameters are undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the file already exists or a problem creating the file.
 	 */
 	public async createFile(
 		branchName: string,
@@ -303,7 +344,9 @@ export class RepoClient extends GitHubClient {
 
 		const response = await this.requestPUT(url, JSON.stringify(body));
 
-		if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK && response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
 					` for branch '${branchName}'.`,
@@ -323,7 +366,10 @@ export class RepoClient extends GitHubClient {
 	 * @param fileContent The content of the file.
 	 * @param commitMessage The commit message.
 	 * @remarks If the file does not exist, an error will be thrown.
-	 * @throws The {@link RepoError} if there was a problem updating the file or if the file does not exist.
+	 * @throws The following errors:
+	 * 1. If any of the parameters are undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the file does not exist or a problem updating the file.
 	 */
 	public async updateFile(
 		branchName: string,
@@ -354,7 +400,7 @@ export class RepoClient extends GitHubClient {
 			throw new RepoError(errorMsg);
 		}
 
-		const fileContentModel = await this.getFileContentResult(branchName, relativeFilePath);
+		const fileContentModel = await this.getFileContentInternal(branchName, relativeFilePath);
 
 		const body = {
 			message: commitMessage,
@@ -366,7 +412,9 @@ export class RepoClient extends GitHubClient {
 
 		const response = await this.requestPUT(url, JSON.stringify(body));
 
-		if (response.status != GitHubHttpStatusCodes.OK && response.status != GitHubHttpStatusCodes.Created) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK && response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred when creating the file '${relativeFilePath}' in the repository '${this.repoName}'` +
 					` for branch '${branchName}'.`,
@@ -384,9 +432,12 @@ export class RepoClient extends GitHubClient {
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns The content of the file and a boolean flag indicating whether or not the file exists.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
-	 * @throws The {@link RepoError} if there was a problem getting the file content.
+	 * @throws The following errors:
+	 * 1. If any of the parameters are undefined, null, or empty.
+	 * 2. An {@link AuthError} if there was a problem with the authentication.
+	 * 3. The {@link RepoError} if the file does not exist or a problem getting the file content.
 	 */
-	private async getFileContentResult(
+	private async getFileContentInternal(
 		branchName: string,
 		relativeFilePath: string,
 	): Promise<FileContentModel> {
@@ -412,6 +463,8 @@ export class RepoClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		switch (response.status) {
+			case GitHubHttpStatusCodes.Unauthorized:
+				throw new AuthError();
 			case GitHubHttpStatusCodes.NotFound:
 			case GitHubHttpStatusCodes.TemporaryRedirect:
 			case GitHubHttpStatusCodes.Forbidden: {
@@ -424,5 +477,28 @@ export class RepoClient extends GitHubClient {
 		const responseData = <FileContentModel> await this.getResponseData(response);
 
 		return responseData;
+	}
+
+	/**
+	 * Gets a {@link page} of repositories owned by the currently set {@link RepoClient}.{@link ownerName} with a quantity that
+	 * matches the given {@link qtyPerPage}.
+	 * @param page The page number of the results to get.
+	 * @param qtyPerPage The quantity of results to get per page.
+	 * @returns A list of repositories.
+	 * @remarks The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link RepoError} if the repository owner does not exist.
+	 */
+	private async getAllReposInternal(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
+		page = page < 1 ? 1 : page;
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
+		const url = `${this.baseUrl}/users/${this.ownerName}/repos${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		return [<RepoModel[]> await this.getResponseData(response), response];
 	}
 }

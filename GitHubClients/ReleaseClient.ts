@@ -6,6 +6,7 @@ import { Utils } from "../deps.ts";
 import { basename, existsSync } from "../deps.ts";
 import { ReleaseError } from "../deps.ts";
 import { ReleaseOptions } from "./ReleaseOptions.ts";
+import { AuthError } from "./Errors/AuthError.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.
@@ -18,6 +19,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @param this.repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "ReleaseClient.ctor";
@@ -29,7 +31,7 @@ export class ReleaseClient extends GitHubClient {
 
 	/**
 	 * Gets the given {@link page} where each page quantity is the given {@link qtyPerPage},
-	 *  for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName},
+	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName},
 	 * @param this.repoName The name of the repository to get the releases for.
 	 * @param page The page number of the results to get.
 	 * @param qtyPerPage The quantity of results to get per page.
@@ -38,47 +40,42 @@ export class ReleaseClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
-	 * @throws The {@link ReleaseError} if there was an issue getting the releases.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async getReleases(page: number, qtyPerPage: number): Promise<[ReleaseModel[], Response]> {
-		page = page < 1 ? 1 : page;
-		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+	public async getReleases(page: number, qtyPerPage: number): Promise<ReleaseModel[]> {
+		const [result, response] = await this.getAllReleases(page, qtyPerPage);
 
-		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases${queryParams}`;
-
-		const response: Response = await this.requestGET(url);
-
-		// If there is an error
-		if (response.status === GitHubHttpStatusCodes.NotFound) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
 			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
 			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
 
 			throw new ReleaseError(errorMsg);
 		}
 
-		return [<ReleaseModel[]> await this.getResponseData(response), response];
+		return result;
 	}
 
 	/**
 	 * Gets a release for a repository.
-	 * @param getByValue The tag or title of the release to get.
+	 * @param tagOrTitle The tag or title of the release to get.
 	 * @param options Various options to use when getting the release.
 	 * @returns The release for a repository.
-	 * @throws A {@link ReleaseError} if there was an issue getting the release or if it was not found.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async getRelease(getByValue: string, options?: ReleaseOptions): Promise<ReleaseModel> {
-		Guard.isNothing(getByValue, "getRelease", "getByValue");
+	public async getRelease(tagOrTitle: string, options?: ReleaseOptions): Promise<ReleaseModel> {
+		Guard.isNothing(tagOrTitle, "getRelease", "tagOrTitle");
 
-		getByValue = getByValue.trim();
+		tagOrTitle = tagOrTitle.trim();
 
 		const filterPredicate: (item: ReleaseModel) => boolean = (item: ReleaseModel) => {
-			return options?.getByTitle === true ? item.name === getByValue : item.tag_name === getByValue;
+			return options?.getByTitle === true ? item.name === tagOrTitle : item.tag_name === tagOrTitle;
 		};
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getReleases(page, qtyPerPage ?? 100);
+				return await this.getAllReleases(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -91,9 +88,9 @@ export class ReleaseClient extends GitHubClient {
 		const foundRelease: ReleaseModel | undefined = releases.find(filterPredicate);
 
 		if (foundRelease === undefined) {
-			const tagOrTitle = options?.getByTitle === true ? "title" : "tag";
+			const type = options?.getByTitle === true ? "title" : "tag";
 			const errorMsg =
-				`A release with the ${tagOrTitle} '${getByValue}' for the repository '${this.repoName}' could not be found.`;
+				`A release with the ${type} '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
@@ -105,7 +102,7 @@ export class ReleaseClient extends GitHubClient {
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
 	 * @returns The release for the given repository and name.
-	 * @throws The {@link ReleaseError} if there was an issue checking if the release exists.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async releaseExists(tagName: string): Promise<boolean> {
 		const funcName = "releaseExists";
@@ -115,7 +112,7 @@ export class ReleaseClient extends GitHubClient {
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getReleases(page, qtyPerPage ?? 100);
+				return await this.getAllReleases(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -125,26 +122,27 @@ export class ReleaseClient extends GitHubClient {
 			},
 		);
 
-		return releases.find((item: ReleaseModel) => item.tag_name === tagName) != undefined;
+		return releases.find((item: ReleaseModel) => item.tag_name === tagName) !== undefined;
 	}
 
 	/**
-	 * Uploads one or more assets to a release that matches a tag or title by the given {@link toReleaseBy}.
-	 * @param toReleaseBy The tag or title of the release to upload the asset to.
+	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tagOrTitle}.
+	 * @param tagOrTitle The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
 	 * @param options Various options to use when uploading the asset.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async uploadAssets(toReleaseBy: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
+	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
 		const funcName = "uploadAsset";
-		Guard.isNothing(toReleaseBy, funcName, "toReleaseBy");
-		Guard.isNothing(toReleaseBy, funcName, "filePath");
+		Guard.isNothing(tagOrTitle, funcName, "tagOrTitle");
+		Guard.isNothing(tagOrTitle, funcName, "filePath");
 
-		toReleaseBy = toReleaseBy.trim();
+		tagOrTitle = tagOrTitle.trim();
 
-		if (!(await this.releaseExists(toReleaseBy))) {
-			const errorMsg = `A release with the tag '${toReleaseBy}' for the repository '${this.repoName}' could not be found.`;
+		if (!(await this.releaseExists(tagOrTitle))) {
+			const errorMsg = `A release with the tag '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
@@ -166,14 +164,14 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		const release = await this.getRelease(toReleaseBy, options);
+		const release = await this.getRelease(tagOrTitle, options);
 
 		// All of the upload work
 		const uploadWork: Promise<void | ReleaseError>[] = [];
 
 		// Gather all of the work to be done
 		for (const filePath of filesToUpload) {
-			uploadWork.push(this.uploadFile(toReleaseBy, filePath, release.id, options?.getByTitle === true));
+			uploadWork.push(this.uploadFile(filePath, release.id));
 		}
 
 		// Wait for completion of all the uploads
@@ -196,19 +194,17 @@ export class ReleaseClient extends GitHubClient {
 
 	/**
 	 * Uploads a file using the given {@link filePath} to a release that matches the given {@link releaseId}.
-	 * @param tagOrTitle The tag or title of the release to upload the file to.
 	 * @param filePath The path of the file to upload.
 	 * @param releaseId The id of the release to upload the file to.
 	 * @param options Various options to use when uploading the file.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the file.
 	 * @returns An asynchronous promise of the operation.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	private async uploadFile(
-		tagOrTitle: string,
 		filePath: string,
 		releaseId: number,
-		getByTitle: boolean,
-	): Promise<void | ReleaseError> {
+	): Promise<void> {
 		const file = Deno.readFileSync(filePath);
 		const fileName = basename(filePath);
 
@@ -221,11 +217,46 @@ export class ReleaseClient extends GitHubClient {
 
 		const response = await this.requestPOST(url, file);
 
-		if (response.status != GitHubHttpStatusCodes.Created) {
-			const errorSection = getByTitle === true ? "title" : "tag";
-			const errorMsg =
-				`The asset '${fileName}' could not be uploaded to the release with the ${errorSection} '${tagOrTitle}'.`;
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.Created) {
+			const errorMsg = `The asset '${fileName}' could not be uploaded to the release with the release id '${releaseId}'.`;
 			throw new ReleaseError(errorMsg);
 		}
+	}
+
+	/**
+	 * Gets the given {@link page} where each page quantity is the given {@link qtyPerPage},
+	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName},
+	 * @param this.repoName The name of the repository to get the releases for.
+	 * @param page The page number of the results to get.
+	 * @param qtyPerPage The quantity of results to get per page.
+	 * @returns The releases for the given repository and page.
+	 * @remarks Does not require authentication if the repository is public.
+	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	private async getAllReleases(page: number, qtyPerPage: number): Promise<[ReleaseModel[], Response]> {
+		page = page < 1 ? 1 : page;
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		// If there is an error
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
+			let errorMsg = `The releases for the repository owner '${this.ownerName}'`;
+			errorMsg += ` and for the repository '${this.repoName}' could not be found.`;
+
+			throw new ReleaseError(errorMsg);
+		}
+
+		return [<ReleaseModel[]> await this.getResponseData(response), response];
 	}
 }

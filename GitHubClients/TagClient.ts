@@ -1,5 +1,5 @@
 import { Guard } from "../core/Guard.ts";
-import { TagModel } from "../deps.ts";
+import { AuthError, TagModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
@@ -15,6 +15,7 @@ export class TagClient extends GitHubClient {
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "TagClient.ctor";
@@ -33,37 +34,43 @@ export class TagClient extends GitHubClient {
 	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
 	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
 	 * be set to 1, if greater than 100, the value will be set to 100.
-	 * @throws The {@link TagError} if there was an issue getting the tags.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if the request was unauthorized.
+	 * 2. The {@link TagError} if there was an issue getting the tags.
 	 */
-	public async getTags(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
+	public async getTags(page: number, qtyPerPage: number): Promise<TagModel[]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/tags${queryParams}`;
+		const [tags, response] = await this.getTagsInternal(page, qtyPerPage);
 
-		const response: Response = await this.requestGET(url);
-
-		// If there is an error
-		if (response.status === GitHubHttpStatusCodes.NotFound) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
 			const errorMsg = this.buildErrorMsg("There was an issue getting the tags.", response);
 
 			throw new TagError(errorMsg);
 		}
 
-		return [<TagModel[]> await this.getResponseData(response), response];
+		return tags;
 	}
 
 	/**
 	 * Gets all of the tags in a repository with a name that matches the {@link TagClient}.{@link repoName}.
 	 * @returns All of the tags.
-	 * @throws The {@link TagError} if there was an issue getting all of the tags.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if the request was unauthorized.
+	 * 2. The {@link TagError} if there was an issue getting the tags.
 	 */
 	public async getAllTags(): Promise<TagModel[]> {
 		const result: TagModel[] = [];
 
 		await this.getAllData(async (page: number, qtyPerPage?: number) => {
-			const [tags, response] = await this.getTags(page, qtyPerPage ?? 100);
+			const [tags, response] = await this.getTagsInternal(page, qtyPerPage ?? 100);
+
+			if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+				throw new AuthError();
+			}
 
 			result.push(...tags);
 
@@ -77,7 +84,10 @@ export class TagClient extends GitHubClient {
 	 * Gets a tag with the given {@link tagName} in a repository with a name that matches the {@link TagClient}.{@link repoName}.
 	 * @param tagName The name of the tag.
 	 * @returns Returns the tag with the given name.
-	 * @throws The {@link TagError} if there was an issue getting the tag.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the parameter is undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request was unauthorized.
+	 * 3. The {@link TagError} if there was an issue getting the tags.
 	 */
 	public async getTagByName(tagName: string): Promise<TagModel> {
 		Guard.isNothing(tagName, "getTagByName", "tagName");
@@ -86,7 +96,13 @@ export class TagClient extends GitHubClient {
 
 		const foundTags = await this.getAllDataUntil<TagModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getTags(page, qtyPerPage ?? 100);
+				const [tags, response] = await this.getTagsInternal(page, qtyPerPage ?? 100);
+
+				if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+					throw new AuthError();
+				}
+
+				return [tags, response];
 			},
 			1, // Start page
 			100, // Qty per page
@@ -108,7 +124,10 @@ export class TagClient extends GitHubClient {
 	 * Searches for a tag with the given {@link tagName} in a repository that matches the {@link TagClient}.{@link repoName}.
 	 * @param tagName The name of the tag.
 	 * @returns True if the tag exists, false otherwise.
-	 * @throws The {@link TagError} if there was an issue checking if the tag exists.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the parameter is undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request was unauthorized.
+	 * 3. The {@link TagError} if there was an issue getting the tags.
 	 */
 	public async tagExists(tagName: string): Promise<boolean> {
 		Guard.isNothing(tagName, "tagExists", "tagName");
@@ -117,7 +136,13 @@ export class TagClient extends GitHubClient {
 
 		const foundTags = await this.getAllDataUntil<TagModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getTags(page, qtyPerPage ?? 100);
+				const [tags, response] = await this.getTagsInternal(page, qtyPerPage ?? 100);
+
+				if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+					throw new AuthError();
+				}
+
+				return [tags, response];
 			},
 			1, // Start page
 			100, // Qty per page
@@ -127,5 +152,27 @@ export class TagClient extends GitHubClient {
 		);
 
 		return foundTags.length > 0;
+	}
+
+	/**
+	 * Gets a {@link page} of tags for a repository.
+	 * @param page The page number of the results to get.
+	 * @param qtyPerPage The quantity of results to get per page.
+	 * @returns The tags.
+	 * @remarks Does not require authentication.
+	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 */
+	private async getTagsInternal(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
+		page = page < 1 ? 1 : page;
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/tags${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		return [<TagModel[]> await this.getResponseData(response), response];
 	}
 }

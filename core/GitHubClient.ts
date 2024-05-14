@@ -1,8 +1,23 @@
-import { Utils } from "../deps.ts";
+import {
+	GitError,
+	IssueError,
+	LabelError,
+	MilestoneError,
+	OrganizationError,
+	ProjectError,
+	PullRequestError,
+	ReleaseError,
+	RepoError,
+	TagError,
+	UsersError,
+	Utils,
+	WorkflowError,
+} from "../deps.ts";
 import { LinkHeaderParser } from "./LinkHeaderParser.ts";
 import { WebApiClient } from "./WebApiClient.ts";
 import { GetDataFunc } from "./Types.ts";
 import { Guard } from "./Guard.ts";
+import { AuthError } from "../GitHubClients/Errors/AuthError.ts";
 
 /**
  * Provides a base class for HTTP clients.
@@ -121,9 +136,13 @@ export abstract class GitHubClient extends WebApiClient {
 
 			totalPages += dataRequests.length;
 		} catch (error) {
-			let errorMsg = "There was an issue getting all of the data using pagination.";
-			errorMsg += `\n${error.message}`;
-			throw new Error(errorMsg);
+			if (this.isKnownGitHubError(error)) {
+				throw error;
+			} else {
+				let errorMsg = "There was an issue getting all of the data using pagination.";
+				errorMsg += `\n${error.message}`;
+				throw new Error(errorMsg);
+			}
 		}
 
 		return allData;
@@ -161,8 +180,8 @@ export abstract class GitHubClient extends WebApiClient {
 			let [groupA, groupB] = this.createAlternatePagesGroups(totalPagesLeft);
 
 			// Remove the first page, this has already been pulled
-			groupA = groupA.filter((i) => i != 1);
-			groupB = groupB.filter((i) => i != 1);
+			groupA = groupA.filter((i) => i !== 1);
+			groupB = groupB.filter((i) => i !== 1);
 
 			const maxLen = Math.max(groupA.length, groupB.length);
 
@@ -204,10 +223,14 @@ export abstract class GitHubClient extends WebApiClient {
 
 			return [];
 		} catch (error) {
-			let errorMsg = "There was an issue getting all of the data using pagination.";
-			errorMsg += `\n${error.message}`;
+			if (this.isKnownGitHubError(error)) {
+				throw error;
+			} else {
+				let errorMsg = "There was an issue getting all of the data using pagination.";
+				errorMsg += `\n${error.message}`;
 
-			throw new Error(errorMsg);
+				throw new Error(errorMsg);
+			}
 		}
 	}
 
@@ -260,5 +283,33 @@ export abstract class GitHubClient extends WebApiClient {
 		secondHalf.reverse();
 
 		return [firstHalf, secondHalf];
+	}
+
+	/**
+	 * Returns a value indicating whether the given {@link error} is a valid GitHub error.
+	 * @param error The error to check.
+	 * @returns True if the error is a known GitHub error; otherwise, false.
+	 */
+	private isKnownGitHubError(
+		error: unknown,
+	): error is
+		| AuthError
+		| GitError
+		| IssueError
+		| LabelError
+		| MilestoneError
+		| OrganizationError
+		| ProjectError
+		| PullRequestError
+		| ReleaseError
+		| RepoError
+		| TagError
+		| UsersError
+		| WorkflowError {
+		return error instanceof AuthError || error instanceof GitError || error instanceof IssueError ||
+			error instanceof LabelError || error instanceof MilestoneError || error instanceof OrganizationError ||
+			error instanceof ProjectError || error instanceof PullRequestError || error instanceof ReleaseError ||
+			error instanceof RepoError || error instanceof TagError || error instanceof UsersError ||
+			error instanceof WorkflowError;
 	}
 }

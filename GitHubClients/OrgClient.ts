@@ -1,11 +1,16 @@
 import { GitHubHttpStatusCodes, OrgMemberRole } from "../core/Enums.ts";
-import { GitHubClient } from "../deps.ts";
+import { AuthError, GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
 import { GitHubVarModel } from "../deps.ts";
 import { GitHubVariablesModel } from "../deps.ts";
 import { UserModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { OrganizationError } from "../deps.ts";
+
+/**
+ * Represents the type of member visibility in a GitHub organization.
+ */
+type MemberVisibility = "public" | "private";
 
 /**
  * Provides a client for interacting with issues.
@@ -16,6 +21,7 @@ export class OrgClient extends GitHubClient {
 	 * @param ownerName The name of the organization.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, token: string) {
 		const funcName = "OrgClient.ctor";
@@ -27,10 +33,15 @@ export class OrgClient extends GitHubClient {
 	/**
 	 * Gets a value indicating whether or not an organization exists with a name that matches the given {@link orgName}.
 	 * @returns True if the organization exists; otherwise, false.
+	 * @throws An {@link AuthError}.
 	 */
 	public async exists(): Promise<boolean> {
 		const url = `${this.baseUrl}/orgs/${this.ownerName}`;
 		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		}
 
 		return response.status === GitHubHttpStatusCodes.OK;
 	}
@@ -44,21 +55,19 @@ export class OrgClient extends GitHubClient {
 	 * @param role The member role to filter by.
 	 * @returns The list of private members for the organization.
 	 * @remarks Requires authentication.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getPrivateMembers(
 		page = 1,
 		qtyPerPage = 100,
 		role: OrgMemberRole = OrgMemberRole.all,
-	): Promise<[UserModel[], Response]> {
+	): Promise<UserModel[]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		const queryString = `?role=${role}&page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/orgs/${this.ownerName}/members${queryString}`;
-
-		const response = await this.requestGET(url);
-
-		return [await this.getResponseData<UserModel[]>(response), response];
+		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
+			return await this.getAll("private", page, qtyPerPage, role);
+		});
 	}
 
 	/**
@@ -69,21 +78,19 @@ export class OrgClient extends GitHubClient {
 	 * @param role The member role to filter by.
 	 * @returns The list of public members for the organization.
 	 * @remarks Does not require authentication.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getPublicMembers(
 		page = 1,
 		qtyPerPage = 100,
 		role: OrgMemberRole = OrgMemberRole.all,
-	): Promise<[UserModel[], Response]> {
+	): Promise<UserModel[]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		const queryString = `?role=${role}&page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/orgs/${this.ownerName}/public_members${queryString}`;
-
-		const response = await this.requestGET(url);
-
-		return [await this.getResponseData<UserModel[]>(response), response];
+		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
+			return await this.getAll("public", page, qtyPerPage, role);
+		});
 	}
 
 	/**
@@ -91,22 +98,11 @@ export class OrgClient extends GitHubClient {
 	 * that has the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
-	 * @throws The error {@type OrganizationError} if the request to get private admin members fails.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getPrivateAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [userModels, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.admin);
-
-			if (response.status != GitHubHttpStatusCodes.OK) {
-				const errorMsg = this.buildErrorMsg(
-					`An error occurred when getting the private admin members for the organization '${this.ownerName}'.`,
-					response,
-				);
-
-				throw new OrganizationError(errorMsg);
-			}
-
-			return [userModels, response];
+			return await this.getAll("private", page, qtyPerPage, OrgMemberRole.admin);
 		});
 	}
 
@@ -115,22 +111,11 @@ export class OrgClient extends GitHubClient {
 	 * that has the {@link OrgMemberRole.member} role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
-	 * @throws The error {@link OrganizationError} if the request to get private non-admin members fails.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getPrivateNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [users, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.member);
-
-			if (response.status != GitHubHttpStatusCodes.OK) {
-				const errorMsg = this.buildErrorMsg(
-					`An error occurred when getting the private non-admin members for the organization '${this.ownerName}'.`,
-					response,
-				);
-
-				throw new OrganizationError(errorMsg);
-			}
-
-			return Promise.resolve([users, response]);
+			return await this.getAll("private", page, qtyPerPage, OrgMemberRole.member);
 		});
 	}
 
@@ -139,22 +124,11 @@ export class OrgClient extends GitHubClient {
 	 * and has any role.
 	 * @returns The list of private members for an organization.
 	 * @remarks Requires authentication.
-	 * @throws The error {@link OrganizationError} if the request to get all private members fails.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getAllPrivateMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [users, response] = await this.getPrivateMembers(page, qtyPerPage, OrgMemberRole.all);
-
-			if (response.status != GitHubHttpStatusCodes.OK) {
-				const errorMsg = this.buildErrorMsg(
-					`An error occurred when getting the private members for the organization '${this.ownerName}'.`,
-					response,
-				);
-
-				throw new OrganizationError(errorMsg);
-			}
-
-			return Promise.resolve([users, response]);
+			return await this.getAll("private", page, qtyPerPage, OrgMemberRole.all);
 		});
 	}
 
@@ -163,22 +137,11 @@ export class OrgClient extends GitHubClient {
 	 * and has the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of public members for an organization.
 	 * @remarks Does not require authentication.
-	 * @throws The error {@link OrganizationError} if the request to get all public admin members fails.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getPublicAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.admin);
-
-			if (response.status != GitHubHttpStatusCodes.OK) {
-				const errorMsg = this.buildErrorMsg(
-					`An error occurred when getting the public admin members for the organization '${this.ownerName}'.`,
-					response,
-				);
-
-				throw new OrganizationError(errorMsg);
-			}
-
-			return Promise.resolve([users, response]);
+			return await this.getAll("public", page, qtyPerPage, OrgMemberRole.admin);
 		});
 	}
 
@@ -187,22 +150,11 @@ export class OrgClient extends GitHubClient {
 	 * that does not have the given {@link OrgMemberRole.admin} role.
 	 * @returns The list of public members for an organization.
 	 * @remarks Does not require authentication.
-	 * @throws The error {@type OrganizationError} if the request to get all public non-admin members fails.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getPublicNonAdminMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.member);
-
-			if (response.status != GitHubHttpStatusCodes.OK) {
-				const errorMsg = this.buildErrorMsg(
-					`An error occurred when getting the public non-admin members for the organization '${this.ownerName}'.`,
-					response,
-				);
-
-				throw new OrganizationError(errorMsg);
-			}
-
-			return Promise.resolve([users, response]);
+			return await this.getAll("public", page, qtyPerPage, OrgMemberRole.member);
 		});
 	}
 
@@ -211,22 +163,11 @@ export class OrgClient extends GitHubClient {
 	 * given {@link OrgClient}.{@link ownerName} with an {@link OrgMemberRole.admin} role.
 	 * @returns The list of public members for an organization.
 	 * @remarks Does not require authentication.
-	 * @throws The error {@link OrganizationError} if the request to get all public members fails.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getAllPublicMembers(): Promise<UserModel[]> {
 		return await this.getAllData<UserModel>(async (page: number, qtyPerPage?: number) => {
-			const [users, response] = await this.getPublicMembers(page, qtyPerPage, OrgMemberRole.all);
-
-			if (response.status != GitHubHttpStatusCodes.OK) {
-				const errorMsg = this.buildErrorMsg(
-					`An error occurred when getting the public members for the organization '${this.ownerName}'.`,
-					response,
-				);
-
-				throw new OrganizationError(errorMsg);
-			}
-
-			return Promise.resolve([users, response]);
+			return await this.getAll("public", page, qtyPerPage, OrgMemberRole.all);
 		});
 	}
 
@@ -235,15 +176,15 @@ export class OrgClient extends GitHubClient {
 	 * that matches the {@link OrgClient}.{@link ownerName}.
 	 * @returns The list of members for an organization.
 	 * @remarks Requires authentication.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getAllOrgMembers(): Promise<UserModel[]> {
 		const result: UserModel[] = [];
 
-		const allOrgPrivateMembers = await this.getAllPrivateMembers();
-		const allOrgPublicMembers = await this.getAllPublicMembers();
+		const allOrgMembers = await Promise.all([this.getAllPublicMembers(), this.getAllPrivateMembers()]);
 
-		result.push(...allOrgPrivateMembers);
-		result.push(...allOrgPublicMembers);
+		result.push(...allOrgMembers[0]);
+		result.push(...allOrgMembers[1]);
 
 		return result;
 	}
@@ -252,15 +193,15 @@ export class OrgClient extends GitHubClient {
 	 * Gets a list of all public and private members for an organization with a name that
 	 * matches the {@link OrgClient}.{@link ownerName}.
 	 * @returns The list of admin members for an organization.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getAllAdminMembers(): Promise<UserModel[]> {
 		const result: UserModel[] = [];
 
-		const allPrivateOrgMembers = await this.getPrivateAdminMembers();
-		const allPublicOrgMembers = await this.getPublicAdminMembers();
+		const allAdminMembers = await Promise.all([this.getPublicAdminMembers(), this.getPrivateAdminMembers()]);
 
-		result.push(...allPrivateOrgMembers);
-		result.push(...allPublicOrgMembers);
+		result.push(...allAdminMembers[0]);
+		result.push(...allAdminMembers[1]);
 
 		return result;
 	}
@@ -271,6 +212,7 @@ export class OrgClient extends GitHubClient {
 	 * matches the {@link OrgClient}.{@link ownerName}.
 	 * @param username The username of the user that might exist in the organization.
 	 * @returns True if the user is a member of the organization, false otherwise.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async userIsOrgMember(username: string): Promise<boolean> {
 		const allOrgMembers = await this.getAllOrgMembers();
@@ -279,11 +221,12 @@ export class OrgClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets a value indicating whether or not a user with a name that matches the
+	 * Gets a value indicating whether or not a public or private user with a name that matches the
 	 * given {@link username} is a member of an organization with a name that matches,
 	 * the {@link OrgClient}.{@link ownerName} and has an admin role.
 	 * @param username The username of the user that might exist in the organization.
 	 * @returns True if the user is a member of the organization, false otherwise.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async userIsOrgAdminMember(username: string): Promise<boolean> {
 		const allOrgMembers = await this.getAllAdminMembers();
@@ -294,6 +237,7 @@ export class OrgClient extends GitHubClient {
 	/**
 	 * Gets a list of all the variables for an organization that matches the {@link OrgClient}.{@link ownerName}.
 	 * @returns A list of all the organization's variables.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
 	public async getVariables(): Promise<GitHubVarModel[]> {
 		return await this.getAllData<GitHubVarModel>(async (page: number, qtyPerPage?: number) => {
@@ -302,7 +246,9 @@ export class OrgClient extends GitHubClient {
 
 			const response = await this.requestGET(url);
 
-			if (response.status != GitHubHttpStatusCodes.OK) {
+			if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+				throw new AuthError();
+			} else if (response.status !== GitHubHttpStatusCodes.OK) {
 				const errorMsg = this.buildErrorMsg(
 					`An error occurred when getting the variables for the organization '${this.ownerName}'.`,
 					response,
@@ -315,5 +261,45 @@ export class OrgClient extends GitHubClient {
 
 			return [vars.variables, response];
 		});
+	}
+
+	/**
+	 * Gets the given {@link page} of public or private members where the quantity of the page is the the given {@link qtyPerPage},
+	 * where the members have the given {@link qtyPerPage},
+	 * where the members have the given member {@link role}.
+	 * @param page The page of results to return.
+	 * @param qtyPerPage The total to return per {@link page}.
+	 * @param role The member role to filter by.
+	 * @returns The list of private members for the organization.
+	 * @remarks Requires authentication.
+	 * @throws An {@link AuthError} or {@link OrganizationError}.
+	 */
+	private async getAll(
+		privateOrPublic: MemberVisibility,
+		page = 1,
+		qtyPerPage = 100,
+		role: OrgMemberRole = OrgMemberRole.all,
+	): Promise<[UserModel[], Response]> {
+		page = page < 1 ? 1 : page;
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		const queryString = `?role=${role}&page=${page}&per_page=${qtyPerPage}`;
+		const visibility = privateOrPublic === "public" ? "public_members" : "";
+		const url = `${this.baseUrl}/orgs/${this.ownerName}/${visibility}${queryString}`;
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
+			const errorMsg = this.buildErrorMsg(
+				`An error occurred when getting the private members for the organization '${this.ownerName}'.`,
+				response,
+			);
+
+			throw new OrganizationError(errorMsg);
+		}
+
+		return [await this.getResponseData<UserModel[]>(response), response];
 	}
 }

@@ -11,12 +11,15 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 		name: "test-repo",
 		url: "test-url",
 	}];
-	const response: Response = new Response(null, { status: 200 });
 
-	const spy_getOwnerRepos = stub(
+	const getRequestResponse = new Response(JSON.stringify(data), {
+		status: 200,
+	});
+
+	const spy_requestGET = stub(
 		sut,
-		"getOwnerRepos",
-		(_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]),
+		"requestGET",
+		(_url) => Promise.resolve<Response>(getRequestResponse),
 	);
 
 	// Act
@@ -24,7 +27,7 @@ Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 
 	// Assert
 	assertEquals(actual, data[0]);
-	assertSpyCalls(spy_getOwnerRepos, 1);
+	assertSpyCalls(spy_requestGET, 1);
 });
 
 Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
@@ -35,12 +38,16 @@ Deno.test("getRepo |> when-repo-does-not-exist |> throws-error", async () => {
 		name: "other-repo",
 		url: "test-url",
 	}];
-	const response: Response = new Response(null, { status: 200 });
 
-	stub(sut, "getOwnerRepos", (_page, _qtyPerPage) => Promise.resolve<[RepoModel[], Response]>([data, response]));
+	const getRequestResponse = new Response(JSON.stringify(data), {
+		status: 200,
+	});
+
+	const spy_requestGET = stub(sut, "requestGET", (_url) => Promise.resolve<Response>(getRequestResponse));
 
 	// Act & Assert
 	await assertRejects(async () => await sut.getRepo(), RepoError, "The repository 'test-repo' was not found.");
+	assertSpyCalls(spy_requestGET, 1);
 });
 
 Deno.test("fileExists |> when-branch-name-param-is-nothing |> throws-error", async () => {

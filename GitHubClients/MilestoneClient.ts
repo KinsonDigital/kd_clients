@@ -1,5 +1,5 @@
 import { Guard } from "../core/Guard.ts";
-import { IssueModel } from "../deps.ts";
+import { AuthError, IssueModel } from "../deps.ts";
 import { MilestoneModel } from "../deps.ts";
 import { PullRequestModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
@@ -24,6 +24,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @param repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
 	 * @remarks If no token is provided, then the client will not be authenticated.
+	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
 	constructor(ownerName: string, repoName: string, token?: string) {
 		const funcName = "MilestoneClient.ctor";
@@ -86,11 +87,9 @@ export class MilestoneClient extends GitHubClient {
 		const issuesPromise = this.getIssues(milestoneName, labels);
 		const pullRequestsPromise = this.getPullRequests(milestoneName, labels);
 
-		await Promise.all([issuesPromise, pullRequestsPromise]).then((values) => {
-			issuesAndPullRequests.push(...values[0], ...values[1]);
-		}).catch((error) => {
-			throw new MilestoneError(`The request to get issues returned error '${error}'`);
-		});
+		const issueOrPrs = await Promise.all([issuesPromise, pullRequestsPromise]);
+
+		issuesAndPullRequests.push(...issueOrPrs[0], ...issueOrPrs[1]);
 
 		return issuesAndPullRequests;
 	}
@@ -102,6 +101,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @param labels The labels to filter the issues by.
 	 * @returns The issues in the milestone.
 	 * @remarks Does not require authentication.
+	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
 	public async getIssues(milestoneName: string, labels?: string[]): Promise<IssueModel[]> {
 		const funcName = "getIssues";
@@ -109,15 +109,26 @@ export class MilestoneClient extends GitHubClient {
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
-		return await this.getAllData<IssueModel>(async (page, qtyPerPage) => {
-			return await this.issueClient.getIssues(
+		let page = 1;
+		const qtyPerPage = 100;
+		const collectedIssues: IssueModel[] = [];
+
+		while (true) {
+			const issues = await this.issueClient.getIssues(
 				page,
 				qtyPerPage,
 				IssueOrPRState.any,
 				labels,
 				milestone.number,
 			);
-		});
+
+			if (issues.length === 0) {
+				return collectedIssues;
+			} else {
+				collectedIssues.push(...issues);
+				page++;
+			}
+		}
 	}
 
 	/**
@@ -128,6 +139,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @param labels The labels to filter the pull requests by.
 	 * @returns The pull requests in the milestone.
 	 * @remarks Does not require authentication.
+	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
 	public async getPullRequests(
 		milestoneName: string,
@@ -138,8 +150,12 @@ export class MilestoneClient extends GitHubClient {
 
 		const milestone: MilestoneModel = await this.getMilestoneByName(milestoneName);
 
-		return await this.getAllData<PullRequestModel>(async (page, qtyPerPage) => {
-			return await this.prClient.getPullRequests(
+		let page = 1;
+		const qtyPerPage = 100;
+		const collectedPrs: PullRequestModel[] = [];
+
+		while (true) {
+			const prs = await this.prClient.getPullRequests(
 				page,
 				qtyPerPage,
 				IssueOrPRState.any,
@@ -147,7 +163,14 @@ export class MilestoneClient extends GitHubClient {
 				labels,
 				milestone.number,
 			);
-		});
+
+			if (prs.length === 0) {
+				return collectedPrs;
+			} else {
+				collectedPrs.push(...prs);
+				page++;
+			}
+		}
 	}
 
 	/**
@@ -156,6 +179,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @param milestoneName The name of the milestone.
 	 * @returns The milestone.
 	 * @remarks Does not require authentication.
+	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
 	public async getMilestoneByName(milestoneName: string): Promise<MilestoneModel> {
 		const funcName = "getMilestoneByName";
@@ -191,6 +215,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @param page The page number of the results to get.
 	 * @param qtyPerPage The quantity of results to get per page.
 	 * @remarks Does not require authentication.
+	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
 	public async getMilestones(page: number, qtyPerPage: number): Promise<[MilestoneModel[], Response]> {
 		page = page < 1 ? 1 : page;
@@ -202,7 +227,9 @@ export class MilestoneClient extends GitHubClient {
 		const response: Response = await this.requestGET(url);
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			let errorMsg = `The milestones for the repository owner '${super.ownerName}'`;
 			errorMsg += ` and for the repository '${super.repoName}' could not be found.`;
 
@@ -216,7 +243,8 @@ export class MilestoneClient extends GitHubClient {
 	 * Checks if a milestone with a name that matches in the given {@link milestoneName}, exists in a repository
 	 * with a name that matches the given {@link MilestoneClient}.{@link repoName}.
 	 * @param milestoneName The name of the milestone to check for.
-	 * @remarks Does not require authentication.
+	 * @remarks Does not require authentication.|
+	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
 	public async milestoneExists(milestoneName: string): Promise<boolean> {
 		Guard.isNothing(milestoneName, "milestoneExists", "milestoneName");
@@ -234,7 +262,7 @@ export class MilestoneClient extends GitHubClient {
 			},
 		);
 
-		return milestones.find((m) => m.title.trim() === milestoneName) != undefined;
+		return milestones.find((m) => m.title.trim() === milestoneName) !== undefined;
 	}
 
 	/**
@@ -242,6 +270,7 @@ export class MilestoneClient extends GitHubClient {
 	 * has a name that matches the given {@link MilestoneClient}.{@link repoName}.
 	 * @param milestoneName The name of the milestone to close.
 	 * @remarks Requires authentication.
+	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
 	public async closeMilestone(milestoneName: string): Promise<void> {
 		Guard.isNothing(milestoneName, "closeMilestone", "milestoneName");
@@ -254,7 +283,9 @@ export class MilestoneClient extends GitHubClient {
 		const response: Response = await this.requestPATCH(url, JSON.stringify({ state: "closed" }));
 
 		// If there is an error
-		if (response.status != GitHubHttpStatusCodes.OK) {
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			const errorMsg = this.buildErrorMsg(
 				`An error occurred trying to close milestone '${milestoneName}(${milestone.number})'.`,
 				response,
