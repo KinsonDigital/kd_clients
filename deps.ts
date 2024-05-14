@@ -16,7 +16,7 @@ import { GraphQlClient } from "./core/GraphQlClient.ts";
 import {
 	CommitModel, FileContentModel, GitHubVariablesModel, GitHubVarModel, IssueModel, LabelModel, MilestoneModel,
 	ProjectModel, PullRequestHeadOrBaseModel, PullRequestInfoModel, PullRequestModel, ReleaseModel, RepoModel,
-	TagModel, UserModel, WorkflowRunModel, WorkflowRunsModel
+	TagModel, UserModel, WorkflowRunModel, WorkflowRunsModel, AssetModel
 } from "./core/Models/mod.ts"
 
 // Local GraphQL Models
@@ -57,7 +57,7 @@ export { GitHubClient, GraphQlClient };
 export type {
 	CommitModel, FileContentModel, GitHubVariablesModel, GitHubVarModel, IssueModel, LabelModel, MilestoneModel,
 	ProjectModel, PullRequestHeadOrBaseModel, PullRequestInfoModel, PullRequestModel, ReleaseModel, RepoModel,
-	TagModel, UserModel, WorkflowRunModel, WorkflowRunsModel
+	TagModel, UserModel, WorkflowRunModel, WorkflowRunsModel, AssetModel
 };
 
 // Local GraphQL Models

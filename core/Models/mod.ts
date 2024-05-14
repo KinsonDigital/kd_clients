@@ -16,6 +16,7 @@ export type { TagModel } from "./TagModel.ts";
 export type { UserModel } from "./UserModel.ts";
 export type { WorkflowRunModel } from "./WorkflowRunModel.ts";
 export type { WorkflowRunsModel } from "./WorkflowRunsModel.ts";
+export type { AssetModel } from "./AssetModel.ts";
 
 // GraphQl API Models
 export type { ErrorModel } from "./GraphQlModels/ErrorModel.ts";
