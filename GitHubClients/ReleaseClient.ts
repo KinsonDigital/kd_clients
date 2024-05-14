@@ -1,5 +1,5 @@
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../deps.ts";
+import { GitHubClient, ensureDirSync } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
 import { ReleaseModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
@@ -299,7 +299,82 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(`${errorTitle}${errorList}`);
 		}
 	}
-		
+
+	/**
+	 * Downloads an asset with an id that matches the given {@link assetId} to the given {@link dirPath}.
+	 * @param assetId The id of the asset to download.
+	 * @param dirPath The directory path to download the asset to.
+	 * @param fileName The name of the file when downloaded.
+	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @remarks The {@link fileName} is the name of the file when downloads.  Not the name of the asset.
+	 * @throws The following errors:
+	 * 1. A {@link Error} if the {@link assetId}, {@link dirPath}, or {@link fileName} are undefined, null, or empty.
+	 * 2. A {@link AuthError} if the request is unauthorized.
+	 * 3. A {@link ReleaseError} if the asset could not be downloaded.
+	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
+	 */
+	public async downloadAssetById(assetId: number, dirPath: string, fileName: string, overwrite?: boolean): Promise<void> {
+		Guard.isNothing(assetId);
+		Guard.isNothing(dirPath);
+		Guard.isNothing(fileName);
+
+		if (Utils.isNumber(assetId)) {
+			Guard.isLessThanOne(assetId);
+		}
+
+		dirPath = dirPath.trim();
+		dirPath = dirPath.replace(/\\/g, "/");
+		dirPath = dirPath.endsWith("/") ? dirPath.slice(0, -1) : dirPath;
+
+		fileName = fileName.trim();
+		fileName = fileName.replace(/\\/g, "/");
+
+		fileName = fileName.includes("/")
+			? fileName.split("/").pop() ?? ""
+			: fileName;
+
+		const downloadFilePath = `${dirPath}/${fileName}`;
+
+		if (existsSync(downloadFilePath, { isFile: true })) {
+			if (overwrite === true) {
+				Deno.removeSync(downloadFilePath);
+			} else {
+				throw new ReleaseError(`The file '${downloadFilePath}' already exists.\nUse 'overwrite = true' to overwrite the file.`);
+			}
+		}
+
+		const url = `https://api.github.com/repos/${this.ownerName}/${this.repoName}/releases/assets/${assetId}`;
+
+		// Change the default 'Accept' header from 'application/vnd.github+json' to 'application/octet-stream'
+		// This is required for download as a file
+		this.updateOrAddHeader("Accept", "application/octet-stream");
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
+			const errorMsg = `The asset with the id '${assetId}' could not be downloaded.`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		ensureDirSync(dirPath);
+
+		const data = await response.blob();
+		const arrayBuffer = await data.arrayBuffer();
+		const arrayData = new Uint8Array(arrayBuffer);
+
+		Deno.writeFileSync(downloadFilePath, arrayData);
+	}
+
+	public async downloadAllAssetsByReleaseTag(tag: string): Promise<void> {
+		Guard.isNothing(tag);
+	}
+	
+	public async downloadAllAssetsByReleaseName(name: string): Promise<void> {
+		Guard.isNothing(name);
+	}
+
 	/**
 	 * Gets all assets for a release with the given {@link releaseTagName}.
 	 * @param releaseTagName The tag name of the release where the asset lives.
