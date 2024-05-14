@@ -322,16 +322,8 @@ export class ReleaseClient extends GitHubClient {
 			Guard.isLessThanOne(assetId);
 		}
 
-		dirPath = dirPath.trim();
-		dirPath = dirPath.replace(/\\/g, "/");
-		dirPath = dirPath.endsWith("/") ? dirPath.slice(0, -1) : dirPath;
-
-		fileName = fileName.trim();
-		fileName = fileName.replace(/\\/g, "/");
-
-		fileName = fileName.includes("/")
-			? fileName.split("/").pop() ?? ""
-			: fileName;
+		dirPath = this.normalizePath(dirPath);
+		fileName = basename(fileName.trim());
 
 		const downloadFilePath = `${dirPath}/${fileName}`;
 
@@ -425,6 +417,19 @@ export class ReleaseClient extends GitHubClient {
 		}
 
 		return foundAsset;
+	}
+
+	/**
+	 * Normalizes the given {@link path} by removing any trailing slashes and converting backslashes to forward slashes.
+	 * @param path The path to normalize.
+	 * @returns The normalized path.
+	 */
+	private normalizePath(path: string): string {
+		path = path.trim();
+		path = path.replace(/\\/g, "/");
+		path = path.endsWith("/") ? path.slice(0, -1) : path;
+
+		return path;
 	}
 
 	/**
