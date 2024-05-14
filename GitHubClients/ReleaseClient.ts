@@ -370,6 +370,34 @@ export class ReleaseClient extends GitHubClient {
 	 * 2. An {@link AuthError} if the request is unauthorized.
 	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
 	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
+	 */
+	public async downloadAllAssetsByReleaseTag(tagName: string, dirPath: string, overwrite?: boolean): Promise<void> {
+		Guard.isNothing(tagName);
+
+		dirPath = this.normalizePath(dirPath);
+
+		const assets = await this.getAllAssetsByTag(tagName);
+
+		const downloadWork: Promise<void>[] = [];
+
+		for (const asset of assets) {
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+		}
+
+		await Promise.all(downloadWork);
+	}
+
+	/**
+	 * Downloads all assets for a release with the given {@link tagName} to the given {@link dirPath}.
+	 * @param tagName The name of the release tag.
+	 * @param dirPath The directory path to download the assets to.
+	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @remarks The name of each file will be set to the name of the asset.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the {@link tagName} or {@link dirPath} are undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request is unauthorized.
+	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
+	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
 	*/
 	public async downloadAllAssetsByReleaseName(name: string, dirPath: string, overwrite?: boolean): Promise<void> {
 		Guard.isNothing(name);
