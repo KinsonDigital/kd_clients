@@ -36,14 +36,11 @@ export class TagClient extends GitHubClient {
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 * @throws The {@link TagError} if there was an issue getting the tags.
 	 */
-	public async getTags(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
+	public async getTags(page: number, qtyPerPage: number): Promise<TagModel[]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/tags${queryParams}`;
-
-		const response: Response = await this.requestGET(url);
+		const [tags, response] = await this.getTagsInternal(page, qtyPerPage);
 
 		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
@@ -52,7 +49,7 @@ export class TagClient extends GitHubClient {
 			throw new TagError(errorMsg);
 		}
 
-		return [<TagModel[]> await this.getResponseData(response), response];
+		return tags;
 	}
 
 	/**
@@ -64,7 +61,7 @@ export class TagClient extends GitHubClient {
 		const result: TagModel[] = [];
 
 		await this.getAllData(async (page: number, qtyPerPage?: number) => {
-			const [tags, response] = await this.getTags(page, qtyPerPage ?? 100);
+			const [tags, response] = await this.getTagsInternal(page, qtyPerPage ?? 100);
 
 			result.push(...tags);
 
@@ -128,5 +125,28 @@ export class TagClient extends GitHubClient {
 		);
 
 		return foundTags.length > 0;
+	}
+
+	/**
+	 * Gets a {@link page} of tags for a repository.
+	 * @param page The page number of the results to get.
+	 * @param qtyPerPage The quantity of results to get per page.
+	 * @returns The tags.
+	 * @remarks Does not require authentication.
+	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link TagError} if there was an issue getting the tags.
+	 */
+	private async getTagsInternal(page: number, qtyPerPage: number): Promise<[TagModel[], Response]> {
+		page = page < 1 ? 1 : page;
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/tags${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		return [<TagModel[]> await this.getResponseData(response), response];
 	}
 }
