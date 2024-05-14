@@ -125,6 +125,7 @@ export class RepoClient extends GitHubClient {
 	 */
 	public async getFileContent(branchName: string, relativeFilePath: string): Promise<string> {
 		const funcName = "getFileContent";
+		Guard.isNothing(branchName, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		const fileContentModel = await this.getFileContentInternal(branchName, relativeFilePath);
