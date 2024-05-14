@@ -105,20 +105,16 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets a release for a repository.
-	 * @param tagOrTitle The tag or title of the release to get.
-	 * @param options Various options to use when getting the release.
+	 * Gets a release with a name that matches the given release {@link name}.
+	 * @param name The tag or title of the release to get.
 	 * @returns The release for a repository.
+	 * @remarks The {@link name} is just the release title.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async getRelease(tagOrTitle: string, options?: ReleaseOptions): Promise<ReleaseModel> {
-		Guard.isNothing(tagOrTitle, "getRelease", "tagOrTitle");
+	public async getReleaseByName(name: string): Promise<ReleaseModel> {
+		Guard.isNothing(name, "getReleaseByName", "name");
 
-		tagOrTitle = tagOrTitle.trim();
-
-		const filterPredicate: (item: ReleaseModel) => boolean = (item: ReleaseModel) => {
-			return options?.getByTitle === true ? item.name === tagOrTitle : item.tag_name === tagOrTitle;
-		};
+		name = name.trim();
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
 			async (page: number, qtyPerPage?: number) => {
@@ -128,16 +124,15 @@ export class ReleaseClient extends GitHubClient {
 			100, // Qty per page
 			(pageOfData: ReleaseModel[]) => {
 				// If a release with the tag has been found, stop getting data.
-				return pageOfData.some(filterPredicate);
+				return pageOfData.some((item) => item.name === name);
 			},
 		);
 
-		const foundRelease: ReleaseModel | undefined = releases.find(filterPredicate);
+		const foundRelease: ReleaseModel | undefined = releases.find((item) => item.name === name);
 
 		if (foundRelease === undefined) {
-			const type = options?.getByTitle === true ? "title" : "tag";
 			const errorMsg =
-				`A release with the ${type} '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
+				`A release with the name '${name}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
@@ -211,7 +206,9 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		const release = await this.getRelease(tagOrTitle, options);
+		const release = options?.getByTitle
+			? await this.getReleaseByName(tagOrTitle)
+			: await this.getReleaseByTag(tagOrTitle);
 
 		// All of the upload work
 		const uploadWork: Promise<void | ReleaseError>[] = [];
