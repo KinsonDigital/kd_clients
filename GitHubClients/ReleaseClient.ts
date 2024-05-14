@@ -59,6 +59,26 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Gets the latest release.
+	 * @returns The current latest release.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getLatestRelease(): Promise<ReleaseModel> {
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/latest`;
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== 200) {
+			const errorMsg = `Status Code: ${response.status} ${response.statusText}`;
+			throw new Error(errorMsg);
+		}
+
+		return await response.json() as ReleaseModel;
+	}
+
+	/**
 	 * Gets a release with and id that matches the given {@link releaseId}.
 	 * @param releaseId The id of the release.
 	 * @returns The release.
