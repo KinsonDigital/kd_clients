@@ -168,8 +168,74 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tagOrTitle}.
-	 * @param tagOrTitle The tag or title of the release to upload the asset to.
+	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tag}.
+	 * @param tag The tag or title of the release to upload the asset to.
+	 * @param filePaths One or more relative or fully qualified paths of files to upload.
+	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
+	 * @returns An asynchronous promise of the operation.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async uploadAssetsByReleaseTag(tag: string, filePaths: string | string[]): Promise<void> {
+		const funcName = "uploadAssetsByReleaseTag";
+		Guard.isNothing(tag, funcName, "tagOrTitle");
+		Guard.isNothing(filePaths, funcName, "filePaths");
+
+		tag = tag.trim();
+
+		if (!(await this.releaseExists(tag))) {
+			const errorMsg = `A release with the tag '${tag}' for the repository '${this.repoName}' could not be found.`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		const filesToUpload = Array.isArray(filePaths) ? filePaths.map((p) => p.trim()) : [filePaths.trim()];
+
+		const invalidPaths = filesToUpload.filter((filePath: string) => Utils.isNotFilePath(filePath));
+
+		if (invalidPaths.length > 0) {
+			const fileList = invalidPaths.length > 1 ? invalidPaths.join("\n\t") : invalidPaths[0];
+			const errorMsg = `The following file paths are not valid file:\n${fileList}`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		const nonExistentPaths = filesToUpload.filter((filePath: string) => !existsSync(filePath));
+
+		if (nonExistentPaths.length > 0) {
+			const fileList = nonExistentPaths.length > 1 ? nonExistentPaths.join("\n\t") : nonExistentPaths[0];
+			const errorMsg = `The following file paths do not exist:\n${fileList}`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		const release = await this.getReleaseByTag(tag);
+
+		// All of the upload work
+		const uploadWork: Promise<void | ReleaseError>[] = [];
+
+		// Gather all of the work to be done
+		for (const filePath of filesToUpload) {
+			uploadWork.push(this.uploadFile(filePath, release.id));
+		}
+
+		// Wait for completion of all the uploads
+		const uploadResults = await Promise.all(uploadWork);
+
+		const errors = uploadResults.filter((result: void | ReleaseError) => result instanceof ReleaseError) as ReleaseError[];
+
+		if (errors.length > 0) {
+			const errorTitle = errors.length > 1
+				? `The following errors occurred uploading the assets:`
+				: "There was an error uploading the asset:";
+
+			const errorList = errors.length > 1
+				? errors.map((error: ReleaseError) => `\n\t${error.message}`).join("")
+				: `\n\t${errors[0].message}`;
+
+			throw new ReleaseError(`${errorTitle}${errorList}`);
+		}
+	}
+
+	/**
+	 * Uploads one or more assets to a release that matches a tag or title by the given {@link name}.
+	 * @param name The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
 	 * @param options Various options to use when uploading the asset.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
