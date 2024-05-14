@@ -308,8 +308,8 @@ export class ReleaseClient extends GitHubClient {
 	 * @param overwrite True to overwrite the file if it exists, otherwise false.
 	 * @remarks The {@link fileName} is the name of the file when downloads.  Not the name of the asset.
 	 * @throws The following errors:
-	 * 1. A {@link Error} if the {@link assetId}, {@link dirPath}, or {@link fileName} are undefined, null, or empty.
-	 * 2. A {@link AuthError} if the request is unauthorized.
+	 * 1. An {@link Error} if the {@link assetId}, {@link dirPath}, or {@link fileName} are undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request is unauthorized.
 	 * 3. A {@link ReleaseError} if the asset could not be downloaded.
 	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
 	 */
