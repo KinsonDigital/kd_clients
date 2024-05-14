@@ -176,19 +176,19 @@ export class ReleaseClient extends GitHubClient {
 	 * @returns An asynchronous promise of the operation.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
-		const funcName = "uploadAsset";
-		Guard.isNothing(tagOrTitle, funcName, "tagOrTitle");
-		Guard.isNothing(tagOrTitle, funcName, "filePath");
+	public async uploadAssetsByReleaseName(name: string, filePaths: string | string[]): Promise<void> {
+		const funcName = "uploadAssetsByReleaseName";
+		Guard.isNothing(name, funcName, "name");
+		Guard.isNothing(filePaths, funcName, "filePaths");
 
-		tagOrTitle = tagOrTitle.trim();
+		name = name.trim();
 
-		if (!(await this.releaseExists(tagOrTitle))) {
-			const errorMsg = `A release with the tag '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
+		if (!(await this.releaseExists(name))) {
+			const errorMsg = `A release with the tag '${name}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
-		const filesToUpload = Array.isArray(filePaths) ? filePaths : [filePaths];
+		const filesToUpload = Array.isArray(filePaths) ? filePaths.map((p) => p.trim()) : [filePaths.trim()];
 
 		const invalidPaths = filesToUpload.filter((filePath: string) => Utils.isNotFilePath(filePath));
 
@@ -206,9 +206,7 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		const release = options?.getByTitle
-			? await this.getReleaseByName(tagOrTitle)
-			: await this.getReleaseByTag(tagOrTitle);
+		const release = await this.getReleaseByName(name);
 
 		// All of the upload work
 		const uploadWork: Promise<void | ReleaseError>[] = [];
@@ -235,7 +233,7 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(`${errorTitle}${errorList}`);
 		}
 	}
-
+		
 	/**
 	 * Gets all assets for a release with the given {@link releaseTagName}.
 	 * @param releaseTagName The tag name of the release where the asset lives.
