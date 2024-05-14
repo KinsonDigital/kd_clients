@@ -1,12 +1,8 @@
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient, ensureDirSync } from "../deps.ts";
-import { Guard } from "../core/Guard.ts";
-import { ReleaseModel } from "../deps.ts";
-import { Utils } from "../deps.ts";
-import { basename, existsSync } from "../deps.ts";
-import { ReleaseError } from "../deps.ts";
-import { AuthError } from "./Errors/AuthError.ts";
-import { AssetModel } from "../core/Models/AssetModel.ts";
+import { basename, ensureDirSync, existsSync } from "../deps.ts";
+import { GitHubHttpStatusCodes, Guard, Utils } from "../deps.ts";
+import { GitHubClient } from "../deps.ts";
+import { AssetModel, ReleaseModel } from "../deps.ts";
+import { AuthError, ReleaseError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.

@@ -39,6 +39,8 @@ import { XError } from "./OtherClients/Errors/XError.ts"
 
 // Local
 import { Utils } from "./core/Utils.ts";
+import { Guard } from "./core/Guard.ts";
+import { GitHubHttpStatusCodes } from "./core/Enums.ts";
 
 // ----EXPORTS----
 
@@ -79,4 +81,4 @@ export { NuGetError };
 export { XError };
 
 // Local
-export { Utils };
+export { Utils, Guard, GitHubHttpStatusCodes };
