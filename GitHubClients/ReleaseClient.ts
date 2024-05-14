@@ -5,7 +5,6 @@ import { ReleaseModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { basename, existsSync } from "../deps.ts";
 import { ReleaseError } from "../deps.ts";
-import { ReleaseOptions } from "./ReleaseOptions.ts";
 import { AuthError } from "./Errors/AuthError.ts";
 import { AssetModel } from "../core/Models/AssetModel.ts";
 
