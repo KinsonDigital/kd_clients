@@ -36,7 +36,7 @@ export class RepoClient extends GitHubClient {
 	public async getRepo(): Promise<RepoModel> {
 		const foundRepos = await this.getAllDataUntil<RepoModel>(
 			async (page, qtyPerPage) => {
-				return await this.getOwnerRepos(page, qtyPerPage ?? 100);
+				return await this.getAllReposInternal(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -67,16 +67,12 @@ export class RepoClient extends GitHubClient {
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 * @throws The {@link RepoError} if the repository owner does not exist.
 	 */
-	public async getAllRepos(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
+	public async getAllRepos(page: number, qtyPerPage: number): Promise<RepoModel[]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
-		const url = `${this.baseUrl}/users/${this.ownerName}/repos${queryParams}`;
+		const [allRepos, response] = await this.getAllReposInternal(page, qtyPerPage);
 
-		const response: Response = await this.requestGET(url);
-
-		// If there is an error
 		if (response.status === GitHubHttpStatusCodes.NotFound) {
 			const errorMsg = this.buildErrorMsg(
 				`Not found. Check that the repository owner '${this.ownerName}' is a valid repository owner.`,
@@ -86,7 +82,7 @@ export class RepoClient extends GitHubClient {
 			throw new RepoError(errorMsg);
 		}
 
-		return [<RepoModel[]> await this.getResponseData(response), response];
+		return allRepos;
 	}
 
 	/**
@@ -429,5 +425,28 @@ export class RepoClient extends GitHubClient {
 		const responseData = <FileContentModel> await this.getResponseData(response);
 
 		return responseData;
+	}
+
+	/**
+	 * Gets a {@link page} of repositories owned by the currently set {@link RepoClient}.{@link ownerName} with a quantity that
+	 * matches the given {@link qtyPerPage}.
+	 * @param page The page number of the results to get.
+	 * @param qtyPerPage The quantity of results to get per page.
+	 * @returns A list of repositories.
+	 * @remarks The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 * @throws The {@link RepoError} if the repository owner does not exist.
+	 */
+	private async getAllReposInternal(page: number, qtyPerPage: number): Promise<[RepoModel[], Response]> {
+		page = page < 1 ? 1 : page;
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		const queryParams = `?page=${page}&per_page=${qtyPerPage}`;
+		const url = `${this.baseUrl}/users/${this.ownerName}/repos${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		return [<RepoModel[]> await this.getResponseData(response), response];
 	}
 }
