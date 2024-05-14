@@ -7,6 +7,7 @@ import { basename, existsSync } from "../deps.ts";
 import { ReleaseError } from "../deps.ts";
 import { ReleaseOptions } from "./ReleaseOptions.ts";
 import { AuthError } from "./Errors/AuthError.ts";
+import { AssetModel } from "../core/Models/AssetModel.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.
@@ -236,6 +237,18 @@ export class ReleaseClient extends GitHubClient {
 
 			throw new ReleaseError(`${errorTitle}${errorList}`);
 		}
+	}
+
+	/**
+	 * Gets all assets for a release with the given {@link releaseTagName}.
+	 * @param releaseTagName The tag name of the release where the asset lives.
+	 * @returns All assets for a release with the given {@link releaseTagName}.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getAllAssetsByTag(releaseTagName: string): Promise<AssetModel[]> {
+		Guard.isNothing(releaseTagName);
+
+		return (await this.getReleaseByTag(releaseTagName)).assets;
 	}
 
 	/**
