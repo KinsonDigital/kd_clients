@@ -51,19 +51,12 @@ export class WorkflowClient extends GitHubClient {
 		status: WorkflowRunStatus,
 		page = 1,
 		qtyPerPage = 100,
-	): Promise<[WorkflowRunModel[], Response]> {
+	): Promise<WorkflowRunModel[]> {
 		branch = branch?.trim() ?? "";
 		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		// GitHub API: https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-repository
-		const branchParam = Utils.isNothing(branch) ? "" : `&branch=${branch}`;
-		const eventParam = event === WorkflowEvent.any ? "" : `&event=${event}`;
-		const statusParam = status === WorkflowRunStatus.any ? "" : `&status=${status}`;
-		const queryParams = `?page=${page}&per_page=${qtyPerPage}${branchParam}${eventParam}${statusParam}`;
-		const url = `${this.baseUrl}/repos/${this.repoName}/${this.repoName}/actions/runs${queryParams}`;
-
-		const response: Response = await this.requestGET(url);
+		const [workflowRuns, response] = await this.getWorkflowRunsInternal(branch, event, status, page, qtyPerPage);
 
 		// If there is an error
 		if (response.status != GitHubHttpStatusCodes.OK) {
@@ -75,9 +68,7 @@ export class WorkflowClient extends GitHubClient {
 			throw new WorkflowError(errorMsg);
 		}
 
-		const workflowRuns: WorkflowRunsModel = await this.getResponseData(response);
-
-		return [workflowRuns.workflow_runs, response];
+		return workflowRuns;
 	}
 
 	/**
@@ -89,7 +80,7 @@ export class WorkflowClient extends GitHubClient {
 		Guard.isNothing(this.repoName, "getAllWorkflowRuns", "repoName");
 
 		return await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(
+			return await this.getWorkflowRunsInternal(
 				this.AnyBranch,
 				WorkflowEvent.any,
 				WorkflowRunStatus.any,
@@ -117,7 +108,7 @@ export class WorkflowClient extends GitHubClient {
 		branch = branch.trim();
 
 		const workflowRuns = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(branch, event, WorkflowRunStatus.completed, page, qtyPerPage);
+			return await this.getWorkflowRunsInternal(branch, event, WorkflowRunStatus.completed, page, qtyPerPage);
 		});
 
 		return workflowRuns;
@@ -133,7 +124,7 @@ export class WorkflowClient extends GitHubClient {
 	 */
 	public async getCompletedWorkflowRuns(event: WorkflowEvent): Promise<WorkflowRunModel[]> {
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(this.AnyBranch, event, WorkflowRunStatus.completed, page, qtyPerPage);
+			return await this.getWorkflowRunsInternal(this.AnyBranch, event, WorkflowRunStatus.completed, page, qtyPerPage);
 		});
 
 		return result;
@@ -158,7 +149,7 @@ export class WorkflowClient extends GitHubClient {
 		branch = branch.trim();
 
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(branch, event, WorkflowRunStatus.failure, page, qtyPerPage);
+			return await this.getWorkflowRunsInternal(branch, event, WorkflowRunStatus.failure, page, qtyPerPage);
 		});
 
 		return result;
@@ -176,7 +167,7 @@ export class WorkflowClient extends GitHubClient {
 		Guard.isNothing("getFailedWorkflowRuns", "repoName");
 
 		const result = await this.getAllData<WorkflowRunModel>(async (page: number, qtyPerPage?: number) => {
-			return await this.getWorkflowRuns(this.AnyBranch, event, WorkflowRunStatus.failure, page, qtyPerPage);
+			return await this.getWorkflowRunsInternal(this.AnyBranch, event, WorkflowRunStatus.failure, page, qtyPerPage);
 		});
 
 		return result;
@@ -195,7 +186,7 @@ export class WorkflowClient extends GitHubClient {
 	public async getWorkflowRunsBetweenDates(startDate: Date, endDate: Date): Promise<WorkflowRunModel[]> {
 		const result = await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getWorkflowRuns(
+				return await this.getWorkflowRunsInternal(
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -234,7 +225,7 @@ export class WorkflowClient extends GitHubClient {
 
 		return await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getWorkflowRuns(
+				return await this.getWorkflowRunsInternal(
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -264,7 +255,7 @@ export class WorkflowClient extends GitHubClient {
 
 		const workflowRuns = await this.getAllDataUntil<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getWorkflowRuns(
+				return await this.getWorkflowRunsInternal(
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -301,7 +292,7 @@ export class WorkflowClient extends GitHubClient {
 
 		const result = await this.getAllDataUntil<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getWorkflowRuns(
+				return await this.getWorkflowRunsInternal(
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -334,7 +325,7 @@ export class WorkflowClient extends GitHubClient {
 	public async getPullRequestWorkflowRuns(): Promise<WorkflowRunModel[]> {
 		return await this.getAllFilteredData<WorkflowRunModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getWorkflowRuns(
+				return await this.getWorkflowRunsInternal(
 					this.AnyBranch,
 					WorkflowEvent.any,
 					WorkflowRunStatus.any,
@@ -466,5 +457,44 @@ export class WorkflowClient extends GitHubClient {
 
 			throw new WorkflowError(errorMsg);
 		}
+	}
+
+	/**
+	 * Gets all workflow runs for the given {@link branch}, with the given {@link event} and {@link status},
+	 * for a repository with a name that matches the {@link WorkflowClient}.{@link repoName}.
+	 * @param branch The branch that contains the workflow runs.
+	 * @param event The event that triggered the workflow runs.
+	 * @param status The status of the workflow runs.
+	 * @param page The page of results to return.
+	 * @param qtyPerPage The total to return per {@link page}.
+	 * @returns The workflow runs.
+	 * @remarks Does not require authentication if the repository is public.
+	 * The {@link page} value must be greater than 0. If less than 1, the value of 1 will be used.
+	 * The {@link qtyPerPage} value must be a value between 1 and 100. If less than 1, the value will
+	 * be set to 1, if greater than 100, the value will be set to 100.
+	 */
+	public async getWorkflowRunsInternal(
+		branch: string | null | AnyBranch,
+		event: WorkflowEvent,
+		status: WorkflowRunStatus,
+		page = 1,
+		qtyPerPage = 100,
+	): Promise<[WorkflowRunModel[], Response]> {
+		branch = branch?.trim() ?? "";
+		page = Utils.clamp(page, 1, Number.MAX_SAFE_INTEGER);
+		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
+
+		// GitHub API: https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-repository
+		const branchParam = Utils.isNothing(branch) ? "" : `&branch=${branch}`;
+		const eventParam = event === WorkflowEvent.any ? "" : `&event=${event}`;
+		const statusParam = status === WorkflowRunStatus.any ? "" : `&status=${status}`;
+		const queryParams = `?page=${page}&per_page=${qtyPerPage}${branchParam}${eventParam}${statusParam}`;
+		const url = `${this.baseUrl}/repos/${this.repoName}/${this.repoName}/actions/runs${queryParams}`;
+
+		const response: Response = await this.requestGET(url);
+
+		const workflowRuns: WorkflowRunsModel = await this.getResponseData(response);
+
+		return [workflowRuns.workflow_runs, response];
 	}
 }
