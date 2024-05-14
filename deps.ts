@@ -1,7 +1,7 @@
 // ----IMPORTS----
 
 // Official Deno Modules
-import { exists, existsSync, walkSync } from "https://deno.land/std@0.203.0/fs/mod.ts";
+import { exists, existsSync, walkSync, ensureDirSync } from "https://deno.land/std@0.203.0/fs/mod.ts";
 import { extname, basename, isAbsolute } from "https://deno.land/std@0.203.0/path/mod.ts";
 import { decodeBase64, encodeBase64 } from "https://deno.land/std@0.203.0/encoding/base64.ts";
 import { assert, assertEquals, assertThrows, assertRejects, equal } from "https://deno.land/std@0.204.0/assert/mod.ts";
@@ -43,7 +43,7 @@ import { Utils } from "./core/Utils.ts";
 // ----EXPORTS----
 
 // Official Deno Modules
-export { exists, existsSync, walkSync };
+export { exists, existsSync, walkSync, ensureDirSync };
 export { extname, basename, isAbsolute };
 export { decodeBase64, encodeBase64 };
 export { assert, assertEquals, assertThrows, assertRejects, equal };
