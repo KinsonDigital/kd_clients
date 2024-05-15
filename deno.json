@@ -6,6 +6,7 @@
         "./packaging": "./PackageClients/mod.ts",
         "./social": "./OtherClients/mod.ts",
         "./github": "./GitHubClients/mod.ts",
+        "./core": "./core/mod.ts",
         "./github/errors": "./GitHubClients/Errors/mod.ts",
         "./github/models": "./core/Models/mod.ts"
     },

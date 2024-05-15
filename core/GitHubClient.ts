@@ -1,3 +1,4 @@
+import type { GetDataFunc } from "./Types.ts";
 import {
 	GitError,
 	IssueError,
@@ -15,7 +16,6 @@ import {
 } from "../deps.ts";
 import { LinkHeaderParser } from "./LinkHeaderParser.ts";
 import { WebApiClient } from "./WebApiClient.ts";
-import { GetDataFunc } from "./Types.ts";
 import { Guard } from "./Guard.ts";
 import { AuthError } from "../GitHubClients/Errors/AuthError.ts";
 
