@@ -18,35 +18,35 @@
         "format-check": "powershell cls && deno fmt --check",
         "reload-cache": "powershell cls && deno cache --reload --lock=deno.lock --lock-write \"./deps.ts\""
     },
-	"lint": {
-		"include": [
-			"core/",
-			"GitHubClients/",
-			"OtherClients/",
-			"PackageClients/",
-			"tests/"
-		]
-	},
-	"fmt": {
-		"include": [
-			"core/",
-			"GitHubClients/",
-			"OtherClients/",
-			"PackageClients/",
-			"tests/"
-		],
-		"exclude": [
-			"**/*.md",
-			"**/*.json",
-			"**/*.js",
-			"**/*.yml",
-			"**/*.yaml"
-		],
-		"useTabs": true,
-		"lineWidth": 130,
-		"indentWidth": 4,
-		"semiColons": true,
-		"singleQuote": false
+    "lint": {
+        "include": [
+            "core/",
+            "GitHubClients/",
+            "OtherClients/",
+            "PackageClients/",
+            "tests/"
+        ]
+    },
+    "fmt": {
+        "include": [
+            "core/",
+            "GitHubClients/",
+            "OtherClients/",
+            "PackageClients/",
+            "tests/"
+        ],
+        "exclude": [
+            "**/*.md",
+            "**/*.json",
+            "**/*.js",
+            "**/*.yml",
+            "**/*.yaml"
+        ],
+        "useTabs": true,
+        "lineWidth": 130,
+        "indentWidth": 4,
+        "semiColons": true,
+        "singleQuote": false
     },
     "imports": {
         "@std/fs": "jsr:@std/fs@0.224.0",
