@@ -1,11 +1,11 @@
 // ----IMPORTS----
 
 // Official Deno Modules
-import { exists, existsSync, walkSync, ensureDirSync } from "https://deno.land/std@0.224.0/fs/mod.ts";
-import { extname, basename, isAbsolute } from "https://deno.land/std@0.224.0/path/mod.ts";
-import { decodeBase64, encodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
-import { assert, assertEquals, assertThrows, assertRejects, equal } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg } from "https://deno.land/std@0.224.0/testing/mock.ts";
+import { exists, existsSync, walkSync, ensureDirSync } from "@std/fs";
+import { extname, basename, isAbsolute } from "@std/path";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
+import { assert, assertEquals, assertThrows, assertRejects, equal } from "@std/assert";
+import { assertSpyCall, assertSpyCalls, spy, stub, returnsNext, returnsArg } from "@std/testing/mock";
 import { oauth1a } from "jsr:@nexterias/twitter-api-fetch@3.0.1";
 
 // Local Core Types
