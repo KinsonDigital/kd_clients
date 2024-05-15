@@ -1,7 +1,7 @@
 /**
  * Represents a GitHub repository.
  */
-export type RepoModel = {
+export interface RepoModel {
 	/**
 	 * Gets or sets the ID of the repository.
 	 */
@@ -31,4 +31,4 @@ export type RepoModel = {
 	 * Gets or sets the URL of the repository.
 	 */
 	url: string;
-};
+}

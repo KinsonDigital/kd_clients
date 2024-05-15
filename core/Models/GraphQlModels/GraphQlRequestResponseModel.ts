@@ -3,7 +3,7 @@ import { ErrorModel } from "./mod.ts";
 /**
  * Represents a request response from a GraphQL request.
  */
-export type GraphQlRequestResponseModel = {
+export interface GraphQlRequestResponseModel {
 	/**
 	 * The data returned from the request.
 	 */
@@ -19,4 +19,4 @@ export type GraphQlRequestResponseModel = {
 	 * The errors returned from the request.
 	 */
 	errors?: ErrorModel[];
-};
+}

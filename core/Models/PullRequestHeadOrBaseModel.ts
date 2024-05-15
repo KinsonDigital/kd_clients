@@ -3,7 +3,7 @@ import { RepoModel } from "./mod.ts";
 /**
  * Holds information about a pull requests head or base branches.
  */
-export type PullRequestHeadOrBaseModel = {
+export interface PullRequestHeadOrBaseModel {
 	/**
 	 * Gets or sets the ref.
 	 */
@@ -18,4 +18,4 @@ export type PullRequestHeadOrBaseModel = {
 	 * Gets or sets the repository info.
 	 */
 	repo: RepoModel;
-};
+}

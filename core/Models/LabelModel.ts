@@ -1,7 +1,7 @@
 /**
  * Represents a GitHub label.
  */
-export type LabelModel = {
+export interface LabelModel {
 	/**
 	 * The name of the label.
 	 */
@@ -36,4 +36,4 @@ export type LabelModel = {
 	 * Gets or sets the default value of the label.
 	 */
 	default: false;
-};
+}

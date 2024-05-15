@@ -3,7 +3,7 @@ import { WorkflowRunModel } from "./mod.ts";
 /**
  * Represents a list of workflow runs.
  */
-export type WorkflowRunsModel = {
+export interface WorkflowRunsModel {
 	/**
 	 * Gets or sets the number of workflows runs.
 	 */
@@ -13,4 +13,4 @@ export type WorkflowRunsModel = {
 	 * Gets or sets the list of workflow runs.
 	 */
 	workflow_runs: WorkflowRunModel[];
-};
+}

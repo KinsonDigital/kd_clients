@@ -3,7 +3,7 @@ import { RawGetBranchTargetModel } from "./mod.ts";
 /**
  * Represents a raw git branch model that is unchanged from the GraphQL query.
  */
-export type RawGitBranchModel = {
+export interface RawGitBranchModel {
 	/**
 	 * Gets or sets the id of the branch.
 	 */
@@ -18,4 +18,4 @@ export type RawGitBranchModel = {
 	 * Gets or sets the target of the branch.
 	 */
 	target: RawGetBranchTargetModel;
-};
+}
