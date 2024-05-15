@@ -254,6 +254,7 @@ jobs:
             "${{ secrets.CICD_TOKEN }}";
 
       - name: Send X Announcement
+        if: ${{ inputs.dry-run == false }}
         run: |
           $baseScriptUrl = "${{ needs.construct_infrastructure_url.outputs.url }}";
           $scriptUrl = "$baseScriptUrl/send-release-tweet.ts";
