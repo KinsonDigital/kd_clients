@@ -258,7 +258,7 @@ export class ReleaseClient extends GitHubClient {
 
 		// Gather all of the work to be done
 		for (const filePath of filesToUpload) {
-			uploadWork.push(this.uploadAsset(filePath, release.id));
+			uploadWork.push(this.uploadAssetInternal(filePath, release.id));
 		}
 
 		// Wait for completion of all the uploads
@@ -325,7 +325,7 @@ export class ReleaseClient extends GitHubClient {
 
 		// Gather all of the work to be done
 		for (const filePath of filesToUpload) {
-			uploadWork.push(this.uploadAsset(filePath, release.id));
+			uploadWork.push(this.uploadAssetInternal(filePath, release.id));
 		}
 
 		// Wait for completion of all the uploads
@@ -590,7 +590,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @returns An asynchronous promise of the operation.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	private async uploadAsset(
+	private async uploadAssetInternal(
 		filePath: string,
 		releaseId: number,
 	): Promise<void> {
