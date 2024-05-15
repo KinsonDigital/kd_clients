@@ -489,16 +489,23 @@ export class ReleaseClient extends GitHubClient {
 
 		const url = `https://api.github.com/repos/${this.ownerName}/${this.repoName}/releases/assets/${assetId}`;
 
+		// Get the current accept header to set it back after the download
+		const acceptHeader = this.getHeader("Accept") ?? "";
+
 		// Change the default 'Accept' header from 'application/vnd.github+json' to 'application/octet-stream'
 		// This is required for download as a file
 		this.updateOrAddHeader("Accept", "application/octet-stream");
 
 		const response = await this.requestGET(url);
 
+		// Reset the `Accept` header back to the original value
+		this.updateOrAddHeader("Accept", acceptHeader);
+
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
 		} else if (response.status !== GitHubHttpStatusCodes.OK) {
 			const errorMsg = `The asset with the id '${assetId}' could not be downloaded.`;
+
 			throw new ReleaseError(errorMsg);
 		}
 
