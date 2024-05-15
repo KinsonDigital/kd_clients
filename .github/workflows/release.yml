@@ -166,22 +166,60 @@ jobs:
     runs-on: ubuntu-latest
     needs: [get_version, validate_release, construct_infrastructure_url]
     steps:
-      - name: Setup Deno
+      - name: Setup Deno (${{ vars.DENO_VERSION }})
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ vars.DENO_VERSION }}
 
-      - name: Checkout Repository
+      - name: Checkout Repository (${{ github.repository }})
         uses: actions/checkout@v4
 
-      - name: Run Build
+      - name: Deno Check
+        id: deno-check
+        continue-on-error: true
         run: deno run --allow-read --allow-run ./.github/cicd/scripts/deno-check.ts
 
-      - name: Run Lint
+      - name: Deno Lint
+        id: deno-lint
+        continue-on-error: true
         run: deno lint
 
-      - name: Run Tests
+      - name: Deno Format
+        id: deno-format
+        continue-on-error: true
+        run: deno fmt --check
+
+      - name: Deno Tests
+        id: deno-tests
+        continue-on-error: true
         run: deno test --allow-read ./tests/*Tests.ts;
+
+      - name: Validate Checks
+        run: |
+          $lintFailed = "${{ steps.deno-lint.outcome }}" -eq "failure";
+          $formatFailed = "${{ steps.deno-format.outcome }}" -eq "failure";
+          $checkFailed = "${{ steps.deno-check.outcome }}" -eq "failure";
+          $testsFailed = "${{ steps.deno-tests.outcome }}" -eq "failure";
+
+          if ($lintFailed) {
+            Write-Host "::error::The lint check has failed.";
+          }
+
+          if ($formatFailed) {
+            Write-Host "::error::The format has failed.";
+          }
+
+          if ($checkFailed) {
+            Write-Host "::error::The check has failed.";
+          }
+
+          if ($testsFailed) {
+            Write-Host "::error::The tests have failed.";
+          }
+
+          if ($lintFailed -or $formatFailed -or $checkFailed -or $testsFailed) {
+            exit "${{ inputs.dry-run }}" -eq "true" ? 0 : 1;
+          }
 
       - name: Creating ${{ inputs.release-type }} GitHub Release
         if: ${{ inputs.dry-run == false }}
@@ -216,6 +254,7 @@ jobs:
             "${{ secrets.CICD_TOKEN }}";
 
       - name: Send X Announcement
+        if: ${{ inputs.dry-run == false }}
         run: |
           $baseScriptUrl = "${{ needs.construct_infrastructure_url.outputs.url }}";
           $scriptUrl = "$baseScriptUrl/send-release-tweet.ts";
