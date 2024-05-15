@@ -1,5 +1,5 @@
 {
-	"version": "v1.0.0-preview.11",
+	"version": "v1.0.0-preview.12",
     "tasks": {
         "check": "powershell cls && deno run -A ./.github/cicd/scripts/deno-check.ts",
         "test": "powershell cls && deno test -A ./tests/*Tests.ts",
