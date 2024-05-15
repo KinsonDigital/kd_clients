@@ -182,6 +182,10 @@ jobs:
         continue-on-error: true
         run: deno lint
 
+      - name: Deno Format
+        continue-on-error: true
+        run: deno fmt --check
+
       - name: Run Tests
         continue-on-error: true
         run: deno test --allow-read ./tests/*Tests.ts;
