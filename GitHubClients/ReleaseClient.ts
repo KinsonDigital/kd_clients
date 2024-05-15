@@ -214,6 +214,51 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Uploads an asset to a release that matches a tag or id by the given {@link releaseIdOrTag}.
+	 * @param releaseIdOrTag The release id or tag name.
+	 * @param filePath The fully qualified or relative path to the asset to upload.
+	 * @param overwrite True to overwrite the asset if it exists, otherwise false.
+	 * @remarks If the {@link overwrite} is set to 'false', an error will be thrown if the asset already exists.
+	 * @throws Throws the following errors:
+	 * 1. An {@link Error} if the {@link releaseIdOrTag} or {@link filePath} are undefined, null, or empty.
+	 * 2. A {@link ReleaseError} if the file path does not exist.
+	 * 3. A {@link ReleaseError} if the asset already exists and {@link overwrite} is set to false.
+	 * 4. An {@link AuthError} if the request is unauthorized.
+	 */
+	public async uploadAsset(releaseIdOrTag: number | string, filePath: string, overwrite?: boolean): Promise<void> {
+		const funcName = "uploadAsset";
+		Guard.isNothing(releaseIdOrTag, funcName, "releaseIdOrTag");
+		Guard.isNothing(filePath, funcName, "filePath");
+
+		if (Utils.isNumber(releaseIdOrTag)) {
+			Guard.isLessThanOne(releaseIdOrTag);
+		}
+
+		filePath = this.normalizePath(filePath);
+
+		if (overwrite === true) {
+			const assetName = basename(filePath);
+			const assetExists = await this.assetExists(releaseIdOrTag, assetName);
+			
+			if (assetExists) {
+				const asset = await this.getAsset(releaseIdOrTag, assetName);
+
+				await this.deleteAsset(releaseIdOrTag, asset.id);
+			}
+		}
+
+		if (!existsSync(filePath)) {
+			throw new ReleaseError(`The file path '${filePath}' does not exist.`);
+		}
+
+		const release = Utils.isNumber(releaseIdOrTag)
+			? await this.getReleaseById(releaseIdOrTag)
+			: await this.getReleaseByTag(releaseIdOrTag);
+
+		await this.uploadAssetInternal(filePath, release.id);
+	}
+
+	/**
 	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tag}.
 	 * @param tag The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
@@ -608,8 +653,12 @@ export class ReleaseClient extends GitHubClient {
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.UnprocessableContent) {
+			// This status code is returned when the asset already exists
+			throw new ReleaseError(`The asset '${fileName}' already exists in the release with the release id '${releaseId}'.`);
 		} else if (response.status !== GitHubHttpStatusCodes.Created) {
 			const errorMsg = `The asset '${fileName}' could not be uploaded to the release with the release id '${releaseId}'.`;
+
 			throw new ReleaseError(errorMsg);
 		}
 	}
