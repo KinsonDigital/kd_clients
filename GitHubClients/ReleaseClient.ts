@@ -239,7 +239,7 @@ export class ReleaseClient extends GitHubClient {
 		if (overwrite === true) {
 			const assetName = basename(filePath);
 			const assetExists = await this.assetExists(releaseIdOrTag, assetName);
-			
+
 			if (assetExists) {
 				const asset = await this.getAsset(releaseIdOrTag, assetName);
 
@@ -402,7 +402,11 @@ export class ReleaseClient extends GitHubClient {
 	 * 2. An {@link AuthError} if the request is unauthorized.
 	 * 3. A {@link ReleaseError} if the asset did not exist.  This only occurs if the {@link errorWhenNotFound} is set to true.
 	 */
-	public async deleteAsset(releaseIdOrTag: number | string, assetIdOrName: number | string, errorWhenNotFound?:boolean): Promise<void> {
+	public async deleteAsset(
+		releaseIdOrTag: number | string,
+		assetIdOrName: number | string,
+		errorWhenNotFound?: boolean,
+	): Promise<void> {
 		const funcName = "deleteAsset";
 		Guard.isNothing(releaseIdOrTag, funcName, "releaseIdOrTag");
 		Guard.isNothing(assetIdOrName, funcName, "assetIdOrName");
@@ -429,11 +433,11 @@ export class ReleaseClient extends GitHubClient {
 
 			throw new ReleaseError(errorMsg);
 		}
-			
+
 		const url = `https://api.github.com/repos/${this.ownerName}/${this.repoName}/releases/assets/${assetIdOrName}`;
-		
+
 		const response = await this.requestDELETE(url);
-		
+
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
 		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
