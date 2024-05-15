@@ -5,6 +5,7 @@
         "test": "powershell cls && deno test -A ./tests/*Tests.ts",
         "lint": "powershell cls && deno lint",
         "format": "powershell cls && deno fmt",
+        "format-check": "powershell cls && deno fmt --check",
         "reload-cache": "powershell cls && deno cache --reload --lock=deno.lock --lock-write \"./deps.ts\""
     },
 	"lint": {
