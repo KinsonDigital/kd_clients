@@ -182,6 +182,38 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Returns a value indicating whether a release with an id or tag matches the given {@link releaseIdOrTag},
+	 * and a release asset with an id or name matches the given {@link assetIdOrName}.
+	 * @param releaseIdOrTag The release id or tag name.
+	 * @param assetIdOrName The asset id or name.
+	 * @returns True if the asset exists, otherwise false.
+	 * @throws The following errors:
+	 * 1. An {@link AuthError} if the request is unauthorized.
+	 * 2. A {@link ReleaseError} if the parameters are a value less than or equal to 0, undefined, null, or empty.
+	 */
+	public async assetExists(releaseIdOrTag: number | string, assetIdOrName: number | string): Promise<boolean> {
+		const funcName = "assetExists";
+		Guard.isNothing(releaseIdOrTag, funcName, "releaseIdOrTag");
+		Guard.isNothing(assetIdOrName, funcName, "assetIdOrName");
+
+		if (Utils.isNumber(releaseIdOrTag)) {
+			Guard.isLessThanOne(releaseIdOrTag);
+		}
+
+		if (Utils.isNumber(assetIdOrName)) {
+			Guard.isLessThanOne(assetIdOrName);
+		}
+
+		const release = Utils.isNumber(releaseIdOrTag)
+			? await this.getReleaseById(releaseIdOrTag)
+			: await this.getReleaseByTag(releaseIdOrTag);
+
+		return release.assets.find((asset) => {
+			return Utils.isNumber(assetIdOrName) ? asset.id === assetIdOrName : asset.name === assetIdOrName;
+		}) !== undefined;
+	}
+
+	/**
 	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tag}.
 	 * @param tag The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
