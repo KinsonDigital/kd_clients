@@ -3,6 +3,7 @@
     "tasks": {
         "check": "powershell cls && deno run -A ./.github/cicd/scripts/deno-check.ts",
         "test": "powershell cls && deno test -A ./tests/*Tests.ts",
+        "test-watch": "powershell cls && deno test --watch -A ./tests/*Tests.ts",
         "lint": "powershell cls && deno lint",
         "format": "powershell cls && deno fmt",
         "format-check": "powershell cls && deno fmt --check",
