@@ -10,7 +10,7 @@ export class Guard {
 	 * @returns True if the value is null, undefined, or empty, otherwise false.
 	 */
 	public static isNothing<T>(
-		value: undefined | null | string | T[] | object,
+		value: undefined | null | string | number | T[] | object,
 		funcName = "",
 		paramName = "",
 	): void {

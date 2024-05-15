@@ -1,12 +1,8 @@
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
+import { basename, ensureDirSync, existsSync } from "../deps.ts";
+import { GitHubHttpStatusCodes, Guard, Utils } from "../deps.ts";
 import { GitHubClient } from "../deps.ts";
-import { Guard } from "../core/Guard.ts";
-import { ReleaseModel } from "../deps.ts";
-import { Utils } from "../deps.ts";
-import { basename, existsSync } from "../deps.ts";
-import { ReleaseError } from "../deps.ts";
-import { ReleaseOptions } from "./ReleaseOptions.ts";
-import { AuthError } from "./Errors/AuthError.ts";
+import { AssetModel, ReleaseModel } from "../deps.ts";
+import { AuthError, ReleaseError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.
@@ -18,13 +14,13 @@ export class ReleaseClient extends GitHubClient {
 	 * @param repoName The name of a repository.
 	 * @param this.repoName The name of a repository.
 	 * @param token The GitHub token to use for authentication.
-	 * @remarks If no token is provided, then the client will not be authenticated.
 	 * @throws An {@link Error} if the parameters are undefined, null, or empty.
 	 */
-	constructor(ownerName: string, repoName: string, token?: string) {
+	constructor(ownerName: string, repoName: string, token: string) {
 		const funcName = "ReleaseClient.ctor";
 		Guard.isNothing(ownerName, funcName, "ownerName");
 		Guard.isNothing(repoName, funcName, "repoName");
+		Guard.isNothing(token, funcName, "token");
 
 		super(ownerName, repoName, token);
 	}
@@ -58,20 +54,82 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Gets a release for a repository.
-	 * @param tagOrTitle The tag or title of the release to get.
-	 * @param options Various options to use when getting the release.
-	 * @returns The release for a repository.
+	 * Gets the latest release.
+	 * @returns The current latest release.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async getRelease(tagOrTitle: string, options?: ReleaseOptions): Promise<ReleaseModel> {
-		Guard.isNothing(tagOrTitle, "getRelease", "tagOrTitle");
+	public async getLatestRelease(): Promise<ReleaseModel> {
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/latest`;
 
-		tagOrTitle = tagOrTitle.trim();
+		const response = await this.requestGET(url);
 
-		const filterPredicate: (item: ReleaseModel) => boolean = (item: ReleaseModel) => {
-			return options?.getByTitle === true ? item.name === tagOrTitle : item.tag_name === tagOrTitle;
-		};
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== 200) {
+			const errorMsg = `Status Code: ${response.status} ${response.statusText}`;
+			throw new Error(errorMsg);
+		}
+
+		return await response.json() as ReleaseModel;
+	}
+
+	/**
+	 * Gets a release with and id that matches the given {@link releaseId}.
+	 * @param releaseId The id of the release.
+	 * @returns The release.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getReleaseById(releaseId: number): Promise<ReleaseModel> {
+		Guard.isLessThanOne(releaseId);
+
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}`;
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== 200) {
+			const errorMsg = `Status Code: ${response.status} ${response.statusText}`;
+			throw new Error(errorMsg);
+		}
+
+		return await response.json() as ReleaseModel;
+	}
+
+	/**
+	 * Gets a release with and id that matches the given {@link releaseId}.
+	 * @param releaseId The id of the release.
+	 * @returns The release.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getReleaseByTag(tagName: string): Promise<ReleaseModel> {
+		Guard.isNothing(tagName);
+
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/tags/${tagName}`;
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== 200) {
+			const errorMsg = `Status Code: ${response.status} ${response.statusText}`;
+			throw new Error(errorMsg);
+		}
+
+		return await response.json() as ReleaseModel;
+	}
+
+	/**
+	 * Gets a release with a name that matches the given release {@link name}.
+	 * @param name The tag or title of the release to get.
+	 * @returns The release for a repository.
+	 * @remarks The {@link name} is just the release title.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getReleaseByName(name: string): Promise<ReleaseModel> {
+		Guard.isNothing(name, "getReleaseByName", "name");
+
+		name = name.trim();
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
 			async (page: number, qtyPerPage?: number) => {
@@ -81,16 +139,14 @@ export class ReleaseClient extends GitHubClient {
 			100, // Qty per page
 			(pageOfData: ReleaseModel[]) => {
 				// If a release with the tag has been found, stop getting data.
-				return pageOfData.some(filterPredicate);
+				return pageOfData.some((item) => item.name === name);
 			},
 		);
 
-		const foundRelease: ReleaseModel | undefined = releases.find(filterPredicate);
+		const foundRelease: ReleaseModel | undefined = releases.find((item) => item.name === name);
 
 		if (foundRelease === undefined) {
-			const type = options?.getByTitle === true ? "title" : "tag";
-			const errorMsg =
-				`A release with the ${type} '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
+			const errorMsg = `A release with the name '${name}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
@@ -126,27 +182,26 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tagOrTitle}.
-	 * @param tagOrTitle The tag or title of the release to upload the asset to.
+	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tag}.
+	 * @param tag The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
-	 * @param options Various options to use when uploading the asset.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
 	 * @returns An asynchronous promise of the operation.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async uploadAssets(tagOrTitle: string, filePaths: string | string[], options?: ReleaseOptions): Promise<void> {
-		const funcName = "uploadAsset";
-		Guard.isNothing(tagOrTitle, funcName, "tagOrTitle");
-		Guard.isNothing(tagOrTitle, funcName, "filePath");
+	public async uploadAssetsByReleaseTag(tag: string, filePaths: string | string[]): Promise<void> {
+		const funcName = "uploadAssetsByReleaseTag";
+		Guard.isNothing(tag, funcName, "tagOrTitle");
+		Guard.isNothing(filePaths, funcName, "filePaths");
 
-		tagOrTitle = tagOrTitle.trim();
+		tag = tag.trim();
 
-		if (!(await this.releaseExists(tagOrTitle))) {
-			const errorMsg = `A release with the tag '${tagOrTitle}' for the repository '${this.repoName}' could not be found.`;
+		if (!(await this.releaseExists(tag))) {
+			const errorMsg = `A release with the tag '${tag}' for the repository '${this.repoName}' could not be found.`;
 			throw new ReleaseError(errorMsg);
 		}
 
-		const filesToUpload = Array.isArray(filePaths) ? filePaths : [filePaths];
+		const filesToUpload = Array.isArray(filePaths) ? filePaths.map((p) => p.trim()) : [filePaths.trim()];
 
 		const invalidPaths = filesToUpload.filter((filePath: string) => Utils.isNotFilePath(filePath));
 
@@ -164,7 +219,7 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		const release = await this.getRelease(tagOrTitle, options);
+		const release = await this.getReleaseByTag(tag);
 
 		// All of the upload work
 		const uploadWork: Promise<void | ReleaseError>[] = [];
@@ -193,6 +248,253 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Uploads one or more assets to a release that matches a tag or title by the given {@link name}.
+	 * @param name The tag or title of the release to upload the asset to.
+	 * @param filePaths One or more relative or fully qualified paths of files to upload.
+	 * @param options Various options to use when uploading the asset.
+	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
+	 * @returns An asynchronous promise of the operation.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async uploadAssetsByReleaseName(name: string, filePaths: string | string[]): Promise<void> {
+		const funcName = "uploadAssetsByReleaseName";
+		Guard.isNothing(name, funcName, "name");
+		Guard.isNothing(filePaths, funcName, "filePaths");
+
+		name = name.trim();
+
+		if (!(await this.releaseExists(name))) {
+			const errorMsg = `A release with the tag '${name}' for the repository '${this.repoName}' could not be found.`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		const filesToUpload = Array.isArray(filePaths) ? filePaths.map((p) => p.trim()) : [filePaths.trim()];
+
+		const invalidPaths = filesToUpload.filter((filePath: string) => Utils.isNotFilePath(filePath));
+
+		if (invalidPaths.length > 0) {
+			const fileList = invalidPaths.length > 1 ? invalidPaths.join("\n\t") : invalidPaths[0];
+			const errorMsg = `The following file paths are not valid file:\n${fileList}`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		const nonExistentPaths = filesToUpload.filter((filePath: string) => !existsSync(filePath));
+
+		if (nonExistentPaths.length > 0) {
+			const fileList = nonExistentPaths.length > 1 ? nonExistentPaths.join("\n\t") : nonExistentPaths[0];
+			const errorMsg = `The following file paths do not exist:\n${fileList}`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		const release = await this.getReleaseByName(name);
+
+		// All of the upload work
+		const uploadWork: Promise<void | ReleaseError>[] = [];
+
+		// Gather all of the work to be done
+		for (const filePath of filesToUpload) {
+			uploadWork.push(this.uploadFile(filePath, release.id));
+		}
+
+		// Wait for completion of all the uploads
+		const uploadResults = await Promise.all(uploadWork);
+
+		const errors = uploadResults.filter((result: void | ReleaseError) => result instanceof ReleaseError) as ReleaseError[];
+
+		if (errors.length > 0) {
+			const errorTitle = errors.length > 1
+				? `The following errors occurred uploading the assets:`
+				: "There was an error uploading the asset:";
+
+			const errorList = errors.length > 1
+				? errors.map((error: ReleaseError) => `\n\t${error.message}`).join("")
+				: `\n\t${errors[0].message}`;
+
+			throw new ReleaseError(`${errorTitle}${errorList}`);
+		}
+	}
+
+	/**
+	 * Downloads an asset with an id that matches the given {@link assetId} to the given {@link dirPath}.
+	 * @param assetId The id of the asset to download.
+	 * @param dirPath The directory path to download the asset to.
+	 * @param fileName The name of the file when downloaded.
+	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @remarks The {@link fileName} is the name of the file when downloads.  Not the name of the asset.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the {@link assetId}, {@link dirPath}, or {@link fileName} are undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request is unauthorized.
+	 * 3. A {@link ReleaseError} if the asset could not be downloaded.
+	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
+	 */
+	public async downloadAssetById(assetId: number, dirPath: string, fileName: string, overwrite?: boolean): Promise<void> {
+		Guard.isNothing(assetId);
+		Guard.isNothing(dirPath);
+		Guard.isNothing(fileName);
+
+		if (Utils.isNumber(assetId)) {
+			Guard.isLessThanOne(assetId);
+		}
+
+		dirPath = this.normalizePath(dirPath);
+		fileName = basename(fileName.trim());
+
+		const downloadFilePath = `${dirPath}/${fileName}`;
+
+		if (existsSync(downloadFilePath, { isFile: true })) {
+			if (overwrite === true) {
+				Deno.removeSync(downloadFilePath);
+			} else {
+				throw new ReleaseError(
+					`The file '${downloadFilePath}' already exists.\nUse 'overwrite = true' to overwrite the file.`,
+				);
+			}
+		}
+
+		const url = `https://api.github.com/repos/${this.ownerName}/${this.repoName}/releases/assets/${assetId}`;
+
+		// Change the default 'Accept' header from 'application/vnd.github+json' to 'application/octet-stream'
+		// This is required for download as a file
+		this.updateOrAddHeader("Accept", "application/octet-stream");
+
+		const response = await this.requestGET(url);
+
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status !== GitHubHttpStatusCodes.OK) {
+			const errorMsg = `The asset with the id '${assetId}' could not be downloaded.`;
+			throw new ReleaseError(errorMsg);
+		}
+
+		ensureDirSync(dirPath);
+
+		const data = await response.blob();
+		const arrayBuffer = await data.arrayBuffer();
+		const arrayData = new Uint8Array(arrayBuffer);
+
+		Deno.writeFileSync(downloadFilePath, arrayData);
+	}
+
+	/**
+	 * Downloads all assets for a release with the given {@link tagName} to the given {@link dirPath}.
+	 * @param tagName The name of the release tag.
+	 * @param dirPath The directory path to download the assets to.
+	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @remarks The name of each file will be set to the name of the asset.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the {@link tagName} or {@link dirPath} are undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request is unauthorized.
+	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
+	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
+	 */
+	public async downloadAllAssetsByReleaseTag(tagName: string, dirPath: string, overwrite?: boolean): Promise<void> {
+		Guard.isNothing(tagName);
+
+		dirPath = this.normalizePath(dirPath);
+
+		const assets = await this.getAllAssetsByTag(tagName);
+
+		const downloadWork: Promise<void>[] = [];
+
+		for (const asset of assets) {
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+		}
+
+		await Promise.all(downloadWork);
+	}
+
+	/**
+	 * Downloads all assets for a release with the given {@link tagName} to the given {@link dirPath}.
+	 * @param tagName The name of the release tag.
+	 * @param dirPath The directory path to download the assets to.
+	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @remarks The name of each file will be set to the name of the asset.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the {@link tagName} or {@link dirPath} are undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request is unauthorized.
+	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
+	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
+	 */
+	public async downloadAllAssetsByReleaseName(name: string, dirPath: string, overwrite?: boolean): Promise<void> {
+		Guard.isNothing(name);
+
+		dirPath = this.normalizePath(dirPath);
+
+		const assets = (await this.getReleaseByName(name)).assets;
+
+		const downloadWork: Promise<void>[] = [];
+
+		for (const asset of assets) {
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+		}
+
+		await Promise.all(downloadWork);
+	}
+
+	/**
+	 * Gets all assets for a release with the given {@link releaseTagName}.
+	 * @param releaseTagName The tag name of the release where the asset lives.
+	 * @returns All assets for a release with the given {@link releaseTagName}.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getAllAssetsByTag(releaseTagName: string): Promise<AssetModel[]> {
+		Guard.isNothing(releaseTagName);
+
+		return (await this.getReleaseByTag(releaseTagName)).assets;
+	}
+
+	/**
+	 * Gets a single asset with an id or name that matches the given {@link assetIdOrName},
+	 * for a release with an id or tag that matches the given {@link releaseIdOrTag}.
+	 * @param releaseIdOrTag The release id or tag name.
+	 * @param assetIdOrName The asset id or name.
+	 * @returns The asset with the given {@link assetIdOrName}.
+	 * @throws An {@link AuthError} or {@link ReleaseError}.
+	 */
+	public async getAsset(releaseIdOrTag: number | string, assetIdOrName: number | string): Promise<AssetModel> {
+		Guard.isNothing(releaseIdOrTag);
+		Guard.isNothing(assetIdOrName);
+
+		if (Utils.isNumber(releaseIdOrTag)) {
+			Guard.isLessThanOne(releaseIdOrTag);
+		}
+
+		if (Utils.isNumber(assetIdOrName)) {
+			Guard.isLessThanOne(assetIdOrName);
+		}
+
+		const release = Utils.isNumber(releaseIdOrTag)
+			? await this.getReleaseById(releaseIdOrTag)
+			: await this.getReleaseByTag(releaseIdOrTag);
+
+		const foundAsset = release.assets.find((asset) => {
+			return Utils.isNumber(assetIdOrName) ? asset.id === assetIdOrName : asset.name === assetIdOrName;
+		});
+
+		if (foundAsset === undefined) {
+			const assetType = Utils.isNumber(assetIdOrName) ? "id" : "name";
+			const errorMsg = `An asset with the ${assetType} '${assetIdOrName}' could not be found.`;
+
+			throw new ReleaseError(errorMsg);
+		}
+
+		return foundAsset;
+	}
+
+	/**
+	 * Normalizes the given {@link path} by removing any trailing slashes and converting backslashes to forward slashes.
+	 * @param path The path to normalize.
+	 * @returns The normalized path.
+	 */
+	private normalizePath(path: string): string {
+		path = path.trim();
+		path = path.replace(/\\/g, "/");
+		path = path.endsWith("/") ? path.slice(0, -1) : path;
+
+		return path;
+	}
+
+	/**
 	 * Uploads a file using the given {@link filePath} to a release that matches the given {@link releaseId}.
 	 * @param filePath The path of the file to upload.
 	 * @param releaseId The id of the release to upload the file to.
@@ -212,8 +514,8 @@ export class ReleaseClient extends GitHubClient {
 		const queryParams = `?name=${fileName}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}/assets${queryParams}`;
 
-		this.updateOrAdd("Content-Type", "application/octet-stream");
-		this.updateOrAdd("Content-Length", file.byteLength.toString());
+		this.updateOrAddHeader("Content-Type", "application/octet-stream");
+		this.updateOrAddHeader("Content-Length", file.byteLength.toString());
 
 		const response = await this.requestPOST(url, file);
 

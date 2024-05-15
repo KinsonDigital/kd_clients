@@ -124,7 +124,7 @@ export abstract class WebApiClient {
 	 * @param name The name of the header to set.
 	 * @param value The value of the header to set.
 	 */
-	public updateOrAdd(name: string, value: string): void {
+	public updateOrAddHeader(name: string, value: string): void {
 		if (this.headers.has(name)) {
 			this.headers.set(name, value);
 		} else {

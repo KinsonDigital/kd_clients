@@ -1,3 +1,5 @@
+import { AssetModel } from "./AssetModel.ts";
+
 /**
  * Represents a GitHub release.
  */
@@ -31,4 +33,9 @@ export type ReleaseModel = {
 	 * Gets or sets the URL to the GitHub webpage.
 	 */
 	html_url: string;
+
+	/**
+	 * Gets the list of assets for the release.
+	 */
+	assets: AssetModel[];
 };

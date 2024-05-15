@@ -21,7 +21,7 @@ export class NuGetClient extends WebApiClient {
 	constructor() {
 		super();
 		this.baseUrl = "https://api.nuget.org";
-		this.updateOrAdd("Accept", "json");
+		this.updateOrAddHeader("Accept", "json");
 	}
 
 	/**

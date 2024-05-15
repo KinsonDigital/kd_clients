@@ -37,6 +37,24 @@ export class Utils {
 	}
 
 	/**
+	 * Returns a value indicating if the given {@link value} is a string.
+	 * @param value The value to check.
+	 * @returns True if the value is a string, otherwise false.
+	 */
+	public static isString(value: unknown): value is string {
+		return typeof value === "string";
+	}
+
+	/**
+	 * Returns a value indicating if the given {@link value} is a number.
+	 * @param value The value to check.
+	 * @returns True if the value is a number, otherwise false.
+	 */
+	public static isNumber(value: unknown): value is number {
+		return typeof value === "number";
+	}
+
+	/**
 	 * Splits the given {@link value} by the given {@link separator}.
 	 * @param value The value to split.
 	 * @param separator The separator to split the value by.

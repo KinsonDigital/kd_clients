@@ -6,7 +6,8 @@ Deno.test("getReleases |> with_not_found_response |> throws_error", async () => 
 	// Arrange
 	const ownerName = "KinsonDigital";
 	const repoName = "kd_clients";
-	const client = new ReleaseClient(ownerName, repoName);
+	const token = "test-token";
+	const client = new ReleaseClient(ownerName, repoName, token);
 	const stubbedResponse = new Response("", {
 		status: 404,
 		statusText: "Not Found",
