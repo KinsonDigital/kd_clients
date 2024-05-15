@@ -266,7 +266,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @returns An asynchronous promise of the operation.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	public async uploadAssetsByReleaseTag(tag: string, filePaths: string | string[]): Promise<void> {
+	public async uploadAssetsByReleaseTag(tag: string, filePaths: string[]): Promise<void> {
 		const funcName = "uploadAssetsByReleaseTag";
 		Guard.isNothing(tag, funcName, "tagOrTitle");
 		Guard.isNothing(filePaths, funcName, "filePaths");
@@ -278,7 +278,7 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		const filesToUpload = Array.isArray(filePaths) ? filePaths.map((p) => p.trim()) : [filePaths.trim()];
+		const filesToUpload = filePaths.map((p) => p.trim());
 
 		const invalidPaths = filesToUpload.filter((filePath: string) => Utils.isNotFilePath(filePath));
 
