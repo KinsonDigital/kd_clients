@@ -5,8 +5,8 @@
 - [ ] All of the issues in the assigned milestone are closed.
 - [ ] All issue tasks are checked/marked as complete.
 - [ ] The `🚀Preview Release` label has been added to this issue.
-- [ ] This issue is assigned to a project.
-- [ ] This issue is assigned to a milestone.
+- [ ] This pr is assigned to a project.
+- [ ] This pr is assigned to a milestone.
 - [ ] All of the unit tests have been executed locally and have passed. _(Check out the appropriate branch before running tests)_.
 - [ ] The version has been updated. _(All changes made directly on a 'prev-release' branch)_.
 - [ ] The release notes have been created. _(All changes made directly on a 'prev-release' branch)_.

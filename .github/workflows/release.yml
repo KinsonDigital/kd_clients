@@ -36,14 +36,13 @@ jobs:
 
           $ownerName = "${{ vars.ORGANIZATION_NAME }}".ToLower().Trim($trimChars);
           $scriptBaseUrl = "${{ vars.SCRIPT_BASE_URL }}".ToLower().Trim($trimChars);
-          $infraRepoName = "Infrastructure";
 
           $relativeScriptDirPath = "${{ vars.SCRIPT_RELATIVE_DIR_PATH }}".ToLower().Replace("\", "/");
           $relativeScriptDirPath = $relativeScriptDirPath.Trim($trimChars).Trim("/");
 
-          $fullBaseScriptUrl = "$scriptBaseUrl/$infraRepoName/$relativeScriptDirPath";
-
           $cicdScriptsVersion = "${{ vars.CICD_SCRIPTS_VERSION }}".ToLower().Trim($trimChars);
+
+          $fullBaseScriptUrl = "$scriptBaseUrl/$cicdScriptsVersion/$relativeScriptDirPath";
 
           if ($ownerName -eq "") {
             Write-Host "::error::The 'OWNER_NAME' organization variable is not set.";
@@ -62,11 +61,6 @@ jobs:
             exit 1;
           }
 
-          if ($infraRepoName -eq "") {
-            Write-Host "::error::The 'INFRASTRUCTURE_REPO_NAME' organization variable is not set.";
-            exit 1;
-          }
-
           if ($cicdScriptsVersion -eq "") {
             Write-Host "::error::The 'CICD_SCRIPTS_VERSION' repository variable is not set.";
             exit 1;
@@ -75,7 +69,7 @@ jobs:
           $versionRegex = "^v([1-9]\d*|0)\.([1-9]\d*|0)\.([1-9]\d*|0)(-preview\.([1-9]\d*))?$";
 
           # Validate that the script version is a valid prod or preview version that follows semantic versioning
-          if ($cicdScriptsVersion -match $versionRegex) {
+          if ($cicdScriptsVersion -notmatch $versionRegex) {
             $errorMsg = "::error::The 'CICD_SCRIPTS_VERSION' repository variable is not a valid preview or production version.";
             $errorMsg += "`n`tThe version must match the following regex: $versionRegex";
             Write-Host $errorMsg;
@@ -224,7 +218,7 @@ jobs:
       - name: Send X Announcement
         run: |
           $baseScriptUrl = "${{ needs.construct_infrastructure_url.outputs.url }}";
-          $scriptUrl = "$scriptUrl/send-release-tweet.ts";
+          $scriptUrl = "$baseScriptUrl/send-release-tweet.ts";
 
           <# Deno Args:
             1. Repo owner
