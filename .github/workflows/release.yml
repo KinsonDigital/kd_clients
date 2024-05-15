@@ -171,13 +171,13 @@ jobs:
         with:
           deno-version: ${{ vars.DENO_VERSION }}
 
-      - name: Checkout Repository
+      - name: Checkout Repository (${{ github.repository }})
         uses: actions/checkout@v4
 
-      - name: Run Build
+      - name: Deno Check
         run: deno run --allow-read --allow-run ./.github/cicd/scripts/deno-check.ts
 
-      - name: Run Lint
+      - name: Deno Lint
         run: deno lint
 
       - name: Run Tests
