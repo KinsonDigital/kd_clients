@@ -11,4 +11,4 @@ As with all software, there is always a chance for issues and bugs, especially f
 
 <h2 align="center" style="font-weight: bold;">Bug Fixes 🐛</h2>
 
-1. [#69](https://github.com/KinsonDigital/kd_clients/issues/69) - Fix wrong media content issue
+1. [#69](https://github.com/KinsonDigital/kd_clients/issues/69) - Fixed an issue where getting assets with the `ReleaseClient` after downloading assets with the `ReleaseClient` would cause an error with incorrect media types.
