@@ -259,7 +259,7 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Uploads one or more assets to a release that matches a tag or title by the given {@link tag}.
+	 * Uploads one or more assets to a release with a name that matches the given {@link tag}.
 	 * @param tag The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
 	 * @throws A {@link ReleaseError} if there was an issue uploading the asset.
@@ -325,7 +325,7 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Uploads one or more assets to a release that matches a tag or title by the given {@link name}.
+	 * Uploads one or more assets to a release with a name that matches the given {@link name}.
 	 * @param name The tag or title of the release to upload the asset to.
 	 * @param filePaths One or more relative or fully qualified paths of files to upload.
 	 * @param options Various options to use when uploading the asset.
