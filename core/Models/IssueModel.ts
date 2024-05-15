@@ -5,7 +5,7 @@ import { UserModel } from "./mod.ts";
 /**
  * Represents a GitHub issue.
  */
-export type IssueModel = {
+export interface IssueModel {
 	/**
 	 * Gets or sets the number of the issue.
 	 */
@@ -50,4 +50,4 @@ export type IssueModel = {
 	 * Gets or sets the assignees.
 	 */
 	assignees: UserModel[];
-};
+}

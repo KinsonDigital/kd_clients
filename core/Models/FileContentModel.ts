@@ -1,7 +1,7 @@
 /**
  * Represents the JSON data returned when getting the contents of a GitHub repository file.
  */
-export type FileContentModel = {
+export interface FileContentModel {
 	/**
 	 * Gets or sets the name of the file.
 	 */
@@ -41,4 +41,4 @@ export type FileContentModel = {
 	 * Gets or sets the blob sha of the file.
 	 */
 	sha: string;
-};
+}

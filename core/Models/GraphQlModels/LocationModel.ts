@@ -1,7 +1,7 @@
 /**
  * Represents a location in a file in an error object.
  */
-export type LocationModel = {
+export interface LocationModel {
 	/**
 	 * The line number of the error.
 	 */
@@ -11,4 +11,4 @@ export type LocationModel = {
 	 * The column number of the error.
 	 */
 	column: number;
-};
+}

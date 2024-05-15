@@ -1,7 +1,7 @@
 /**
  * Holds information about a page of data when doing pagination type requests.
  */
-export type PageInfoModel = {
+export interface PageInfoModel {
 	/**
 	 * The start cursor of a single page.
 	 */
@@ -21,4 +21,4 @@ export type PageInfoModel = {
 	 * True if there is a previous page.
 	 */
 	hasPreviousPage: boolean;
-};
+}

@@ -3,7 +3,7 @@ import { AssetModel } from "./AssetModel.ts";
 /**
  * Represents a GitHub release.
  */
-export type ReleaseModel = {
+export interface ReleaseModel {
 	/**
 	 * Gets or sets the release name.
 	 */
@@ -38,4 +38,4 @@ export type ReleaseModel = {
 	 * Gets the list of assets for the release.
 	 */
 	assets: AssetModel[];
-};
+}

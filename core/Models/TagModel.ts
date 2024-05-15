@@ -3,7 +3,7 @@ import { CommitModel } from "./mod.ts";
 /**
  * Represents a GIT tag.
  */
-export type TagModel = {
+export interface TagModel {
 	/**
 	 * Gets or sets the tag name.
 	 */
@@ -28,4 +28,4 @@ export type TagModel = {
 	 * Gets or sets the node id.
 	 */
 	node_id: string;
-};
+}

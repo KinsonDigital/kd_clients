@@ -3,7 +3,7 @@ import { GitHubVarModel } from "./mod.ts";
 /**
  * Represents multiple variables for an organization and/or repository.
  */
-export type GitHubVariablesModel = {
+export interface GitHubVariablesModel {
 	/**
 	 * Gets or sets the total number of organization and/or repository variables.
 	 */
@@ -13,4 +13,4 @@ export type GitHubVariablesModel = {
 	 * Gets or sets the list of variables for an organization and/or repository.
 	 */
 	variables: GitHubVarModel[];
-};
+}

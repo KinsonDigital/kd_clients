@@ -1,7 +1,7 @@
 /**
  * Represents a single GitHub organization or repository variable.
  */
-export type GitHubVarModel = {
+export interface GitHubVarModel {
 	/**
 	 * Gets or sets the name of the variable.
 	 */
@@ -21,4 +21,4 @@ export type GitHubVarModel = {
 	 * Gets or sets the updated date of the variable.
 	 */
 	updated_at: string;
-};
+}

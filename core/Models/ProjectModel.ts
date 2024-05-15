@@ -1,7 +1,7 @@
 /**
  * Represents an GitHub organization repo.
  */
-export type ProjectModel = {
+export interface ProjectModel {
 	/**
 	 * Gets or sets the ID of the repo.
 	 */
@@ -21,4 +21,4 @@ export type ProjectModel = {
 	 * Gets or sets the URL to the repo.
 	 */
 	url: string;
-};
+}
