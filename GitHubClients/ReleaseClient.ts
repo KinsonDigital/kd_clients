@@ -226,7 +226,7 @@ export class ReleaseClient extends GitHubClient {
 
 		// Gather all of the work to be done
 		for (const filePath of filesToUpload) {
-			uploadWork.push(this.uploadFile(filePath, release.id));
+			uploadWork.push(this.uploadAsset(filePath, release.id));
 		}
 
 		// Wait for completion of all the uploads
@@ -293,7 +293,7 @@ export class ReleaseClient extends GitHubClient {
 
 		// Gather all of the work to be done
 		for (const filePath of filesToUpload) {
-			uploadWork.push(this.uploadFile(filePath, release.id));
+			uploadWork.push(this.uploadAsset(filePath, release.id));
 		}
 
 		// Wait for completion of all the uploads
@@ -495,7 +495,7 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
-	 * Uploads a file using the given {@link filePath} to a release that matches the given {@link releaseId}.
+	 * Uploads a file as a release asset at the given {@link filePath} to a release that matches the given {@link releaseId}.
 	 * @param filePath The path of the file to upload.
 	 * @param releaseId The id of the release to upload the file to.
 	 * @param options Various options to use when uploading the file.
@@ -503,7 +503,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @returns An asynchronous promise of the operation.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	private async uploadFile(
+	private async uploadAsset(
 		filePath: string,
 		releaseId: number,
 	): Promise<void> {
