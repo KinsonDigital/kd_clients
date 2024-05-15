@@ -347,6 +347,61 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Deletes an asset with an id or name that matches the given {@link assetIdOrName},
+	 * from a release with an id or tag that matches the given {@link releaseIdOrTag}.
+	 * @param releaseIdOrTag The release id or tag name.
+	 * @param assetIdOrName The asset id or name.
+	 * @param errorWhenNotFound True to throw an error if the asset is not found, otherwise false.
+	 * @throws The following errors:
+	 * 1. An {@link Error} if the {@link releaseIdOrTag} or {@link assetIdOrName} are undefined, null, or empty.
+	 * 2. An {@link AuthError} if the request is unauthorized.
+	 * 3. A {@link ReleaseError} if the asset did not exist.  This only occurs if the {@link errorWhenNotFound} is set to true.
+	 */
+	public async deleteAsset(releaseIdOrTag: number | string, assetIdOrName: number | string, errorWhenNotFound?:boolean): Promise<void> {
+		const funcName = "deleteAsset";
+		Guard.isNothing(releaseIdOrTag, funcName, "releaseIdOrTag");
+		Guard.isNothing(assetIdOrName, funcName, "assetIdOrName");
+
+		if (Utils.isNumber(releaseIdOrTag)) {
+			Guard.isLessThanOne(releaseIdOrTag);
+		}
+
+		if (Utils.isNumber(assetIdOrName)) {
+			Guard.isLessThanOne(assetIdOrName);
+		}
+
+		const release = Utils.isNumber(releaseIdOrTag)
+			? await this.getReleaseById(releaseIdOrTag)
+			: await this.getReleaseByTag(releaseIdOrTag);
+
+		const asset = release.assets.find((a) => {
+			return Utils.isNumber(assetIdOrName) ? a.id === assetIdOrName : a.name === assetIdOrName;
+		});
+
+		if (errorWhenNotFound === true && asset === undefined) {
+			const assetType = Utils.isNumber(assetIdOrName) ? "id" : "name";
+			const errorMsg = `An asset with the ${assetType} '${assetIdOrName}' could not be found.`;
+
+			throw new ReleaseError(errorMsg);
+		}
+			
+		const url = `https://api.github.com/repos/${this.ownerName}/${this.repoName}/releases/assets/${assetIdOrName}`;
+		
+		const response = await this.requestDELETE(url);
+		
+		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
+			throw new AuthError();
+		} else if (response.status === GitHubHttpStatusCodes.NotFound) {
+			return;
+		} else if (response.status !== GitHubHttpStatusCodes.NoContent) {
+			const assetType = Utils.isNumber(assetIdOrName) ? "id" : "name";
+			const errorMsg = `The asset with the ${assetType} '${assetIdOrName}' could not be deleted.`;
+
+			throw new ReleaseError(errorMsg);
+		}
+	}
+
+	/**
 	 * Downloads an asset with an id that matches the given {@link assetId} to the given {@link dirPath}.
 	 * @param assetId The id of the asset to download.
 	 * @param dirPath The directory path to download the asset to.
