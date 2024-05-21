@@ -19,7 +19,7 @@ export class Utils {
 	 * @returns True if the value is null, undefined, or empty, otherwise false.
 	 */
 	public static isNothing<T>(
-		value: undefined | null | string | number | boolean | T[] | (() => T) | object,
+		value: unknown,
 	): value is undefined | null | "" | number | T[] | (() => T) {
 		if (value === undefined || value === null) {
 			return true;
@@ -166,7 +166,11 @@ export class Utils {
 	 * @param issueOrPr The issue or pull request to check.
 	 * @returns True if the given issue or pull request is an issue, otherwise false.
 	 */
-	public static isIssue(issueOrPr: IssueModel | PullRequestModel): issueOrPr is IssueModel {
+	public static isIssue(issueOrPr: unknown): issueOrPr is IssueModel {
+		if (issueOrPr === null || issueOrPr === undefined || typeof issueOrPr !== "object") {
+			return false;
+		}
+
 		return !("pull_request" in issueOrPr);
 	}
 
@@ -175,7 +179,11 @@ export class Utils {
 	 * @param issueOrPr The issue or pull request to check.
 	 * @returns True if the given issue or pull request is a pull request, otherwise false.
 	 */
-	public static isPr(issueOrPr: PullRequestModel | IssueModel): issueOrPr is PullRequestModel {
+	public static isPr(issueOrPr: unknown): issueOrPr is PullRequestModel {
+		if (issueOrPr === null || issueOrPr === undefined || typeof issueOrPr !== "object") {
+			return false;
+		}
+
 		return "pull_request" in issueOrPr;
 	}
 
@@ -276,7 +284,7 @@ export class Utils {
 	 * @param value The value to check.
 	 * @returns True if the value is a valid release type, otherwise false.
 	 */
-	public static invalidReleaseType(value: string): value is ReleaseType {
+	public static invalidReleaseType(value: unknown): value is ReleaseType {
 		return value !== "preview" && value !== "production";
 	}
 
@@ -285,7 +293,7 @@ export class Utils {
 	 * @param value The value to check.
 	 * @returns True if the value is a valid preview release type, otherwise false.
 	 */
-	public static isPreviewRelease(value: string): value is ReleaseType {
+	public static isPreviewRelease(value: unknown): value is ReleaseType {
 		return value === "preview";
 	}
 
@@ -294,7 +302,7 @@ export class Utils {
 	 * @param value The value to check.
 	 * @returns True if the value is a valid production release type, otherwise false.
 	 */
-	public static isProductionRelease(value: string): value is ReleaseType {
+	public static isProductionRelease(value: unknown): value is ReleaseType {
 		return value === "production";
 	}
 
