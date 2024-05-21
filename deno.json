@@ -1,6 +1,6 @@
 {
     "name": "@kinsondigital/kd-clients",
-    "version": "v1.0.0-preview.12",
+    "version": "v1.0.0-preview.13",
     "exports": {
         ".": "./mod.ts",
         "./packaging": "./PackageClients/mod.ts",
