@@ -12,10 +12,12 @@
                 "--inspect-wait",
                 "--allow-all",
             ],
-			"args": [
-				"${env:CICD_TOKEN}",
-				"${workspaceFolder}",
-			],
+			"env": {
+				"OWNER_NAME": "KinsonDigital",
+				"REPO_NAME": "kd_clients",
+				"GITHUB_TOKEN": "${env:CICD_TOKEN}",
+				"WORKING_DIR": "${workspaceFolder}",
+			},
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
 			"outputCapture": "std",
