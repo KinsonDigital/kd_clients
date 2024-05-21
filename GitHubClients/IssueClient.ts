@@ -428,9 +428,7 @@ export class IssueClient extends GitHubClient {
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
 		// REST API Docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
-		const labelList = Utils.isNothing(labels)
-			? labels?.filter((l) => !Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? ""
-			: "";
+		const labelList = labels?.filter((l) => !Utils.isNothing(l)).map((l) => l.trim()).join(",") ?? "";
 
 		const milestoneNumberQueryParam = Utils.isNothing(milestoneNumber) ? "" : `&milestone=${milestoneNumber}`;
 		const labelListQueryParam = labelList.length > 0 ? `&labels=${labelList}` : "";
