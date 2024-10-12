@@ -39,7 +39,7 @@ export class GitClient extends GraphQlClient {
 	/**
 	 * Sets the name of the owner of the repository.
 	 */
-	public set ownerName(v: string) {
+	public override set ownerName(v: string) {
 		Guard.isNothing("ownerName", v, "v");
 		super.ownerName = v.trim();
 
@@ -53,7 +53,7 @@ export class GitClient extends GraphQlClient {
 	/**
 	 * Sets the name of the repository.
 	 */
-	public set repoName(v: string) {
+	public override set repoName(v: string) {
 		Guard.isNothing("repoName", v, "v");
 		super.repoName = v.trim();
 
