@@ -1,22 +1,22 @@
 {
 	"version": "v1.0.0-preview.13",
     "tasks": {
-        "check": "powershell cls && deno run -A ./.github/cicd/scripts/deno-check.ts",
-        "test": "powershell cls && deno test -A ./tests/*Tests.ts",
-        "test-watch": "powershell cls && deno test --watch -A ./tests/*Tests.ts",
-        "lint": "powershell cls && deno lint",
-        "format": "powershell cls && deno fmt",
-        "format-check": "powershell cls && deno fmt --check",
-        "reload-cache": "powershell cls && deno cache --reload --lock=deno.lock --lock-write \"./deps.ts\""
+        "check": "deno check ./**/*.ts",
+        "test": "deno test -A ./tests/*Tests.ts",
+        "test-watch": "deno test --watch -A ./tests/*Tests.ts",
+        "lint": "deno lint",
+        "format": "deno fmt ./**/*.ts",
+        "format-check": "deno fmt ./**/*.ts --check",
+        "reload-cache": "deno cache ./**/*.ts --reload"
     },
 	"lint": {
 		"include": [
-			"core/",
-			"GitHubClients/",
-			"OtherClients/",
-			"PackageClients/",
-			"tests/"
-		]
+			"**/*.ts",
+            ".github/**/*.ts"
+		],
+        "exclude": [
+            ".github/cicd/playground.ts"
+        ]
 	},
 	"fmt": {
 		"include": [

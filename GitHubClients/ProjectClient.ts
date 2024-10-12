@@ -43,7 +43,7 @@ export class ProjectClient extends GraphQlClient {
 	/**
 	 * Sets the name of the owner of the repository.
 	 */
-	public set ownerName(v: string) {
+	public override set ownerName(v: string) {
 		Guard.isNothing("ownerName", v, "v");
 		super.ownerName = v.trim();
 
@@ -58,7 +58,7 @@ export class ProjectClient extends GraphQlClient {
 	/**
 	 * Sets the name of the repository.
 	 */
-	public set repoName(v: string) {
+	public override set repoName(v: string) {
 		Guard.isNothing("repoName", v, "v");
 		super.repoName = v.trim();
 
@@ -124,7 +124,11 @@ export class ProjectClient extends GraphQlClient {
 		try {
 			issue = await this.issueClient.getIssue(issueNumber);
 		} catch (error) {
-			throw new ProjectError(error.message);
+			const errorMsg = error instanceof Error
+				? error.message
+				: "An error occurred while adding the pull request to the project.";
+
+			throw new ProjectError(errorMsg);
 		}
 
 		projectName = projectName.trim();
@@ -170,7 +174,11 @@ export class ProjectClient extends GraphQlClient {
 		try {
 			pr = await this.prClient.getPullRequest(prNumber);
 		} catch (error) {
-			throw new ProjectError(error.message);
+			const errorMsg = error instanceof Error
+				? error.message
+				: "An error occurred while adding the pull request to the project.";
+
+			throw new ProjectError(errorMsg);
 		}
 
 		projectName = projectName.trim();
