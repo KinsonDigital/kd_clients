@@ -41,7 +41,8 @@
             "**/*.json",
             "**/*.js",
             "**/*.yml",
-            "**/*.yaml"
+            "**/*.yaml",
+            ".github/cicd/playground.ts"
         ],
         "useTabs": true,
         "lineWidth": 130,
