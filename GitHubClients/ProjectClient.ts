@@ -88,7 +88,7 @@ export class ProjectClient extends GraphQlClient {
 			throw new ProjectError(errorMsg);
 		}
 
-		return <ProjectModel[]>responseData.data.organization.projectsV2.nodes;
+		return <ProjectModel[]> responseData.data.organization.projectsV2.nodes;
 	}
 
 	/**
@@ -231,7 +231,7 @@ export class ProjectClient extends GraphQlClient {
 			throw new ProjectError(errorMsg);
 		}
 
-		return <ProjectModel[]>responseData.data.repository.issue.projectsV2.nodes;
+		return <ProjectModel[]> responseData.data.repository.issue.projectsV2.nodes;
 	}
 
 	/**
@@ -257,6 +257,6 @@ export class ProjectClient extends GraphQlClient {
 			throw new ProjectError(errorMsg);
 		}
 
-		return <ProjectModel[]>responseData.data.repository.pullRequest.projectsV2.nodes;
+		return <ProjectModel[]> responseData.data.repository.pullRequest.projectsV2.nodes;
 	}
 }

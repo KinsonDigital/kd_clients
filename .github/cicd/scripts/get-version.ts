@@ -15,4 +15,4 @@ if (outputFilePath === "") {
 
 Deno.writeTextFileSync(outputFilePath, `version=${version}`);
 
-console.log(`The output 'version' has been set to '${version}'.`)
+console.log(`The output 'version' has been set to '${version}'.`);

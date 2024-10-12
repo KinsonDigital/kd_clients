@@ -17,9 +17,9 @@ export class VersionPuller {
 			includeDirs: false,
 			exts: [".json"],
 			match: [/.*deno.json.*/gm],
-			skip: [/.*node_modules.*/gm]
+			skip: [/.*node_modules.*/gm],
 		});
-		
+
 		const items = [...entries].map((entry) => entry.path);
 
 		const denoJsonFilePath = items.length > 0 ? items[0] : undefined;
