@@ -176,7 +176,7 @@ jobs:
       - name: Deno Check
         id: deno-check
         continue-on-error: true
-        run: deno run -R --allow-run ./.github/cicd/scripts/deno-check.ts
+        run: deno check ./**/*.ts
 
       - name: Deno Lint
         id: deno-lint
@@ -186,7 +186,7 @@ jobs:
       - name: Deno Format
         id: deno-format
         continue-on-error: true
-        run: deno fmt --check
+        run: deno fmt ./**/*.ts --check
 
       - name: Deno Tests
         id: deno-tests
@@ -219,6 +219,10 @@ jobs:
           if ($lintFailed -or $formatFailed -or $checkFailed -or $testsFailed) {
             exit "${{ inputs.dry-run }}" -eq "true" ? 0 : 1;
           }
+
+      - name: Publish To JSR
+        if: ${{ inputs.dry-run == false }}
+        run: deno publish;
 
       - name: Creating ${{ inputs.release-type }} GitHub Release
         if: ${{ inputs.dry-run == false }}
