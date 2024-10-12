@@ -136,13 +136,11 @@ export abstract class GitHubClient extends WebApiClient {
 
 			totalPages += dataRequests.length;
 		} catch (error) {
-			if (this.isKnownGitHubError(error)) {
-				throw error;
-			} else {
-				let errorMsg = "There was an issue getting all of the data using pagination.";
-				errorMsg += `\n${error.message}`;
-				throw new Error(errorMsg);
-			}
+			const errorMsg = this.isKnownGitHubError(error)
+				? `There was an issue getting all of the data using pagination.\n${error.message}`
+				: "An error occurred while getting all of the data.";
+
+			throw new Error(errorMsg);
 		}
 
 		return allData;
@@ -223,14 +221,11 @@ export abstract class GitHubClient extends WebApiClient {
 
 			return [];
 		} catch (error) {
-			if (this.isKnownGitHubError(error)) {
-				throw error;
-			} else {
-				let errorMsg = "There was an issue getting all of the data using pagination.";
-				errorMsg += `\n${error.message}`;
+			const errorMsg = this.isKnownGitHubError(error)
+				? `There was an issue getting all of the data using pagination.\n${error.message}`
+				: "An error occurred while getting all of the data.";
 
-				throw new Error(errorMsg);
-			}
+			throw new Error(errorMsg);
 		}
 	}
 
@@ -253,8 +248,10 @@ export abstract class GitHubClient extends WebApiClient {
 		try {
 			return filter(await this.getAllData(getData, page, qtyPerPage));
 		} catch (error) {
-			let errorMsg = "There was an issue getting all of the data using pagination.";
-			errorMsg += `\n${error.message}`;
+			const errorMsg = this.isKnownGitHubError(error)
+				? `There was an issue getting all of the data using pagination.\n${error.message}`
+				: "An error occurred while getting all of the data using pagination.";
+
 			throw new Error(errorMsg);
 		}
 	}

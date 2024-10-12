@@ -93,10 +93,8 @@
 			"cwd": "${workspaceFolder}",
             "runtimeArgs": [
                 "run",
+				"-ERW",
                 "--inspect-wait",
-				"--allow-read",
-				"--allow-write",
-				"--allow-env",
             ],
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
@@ -120,7 +118,7 @@
             "runtimeArgs": [
                 "run",
                 "--inspect-wait",
-				"--allow-read",
+				"-E",
             ],
 			"args": [
 				"preview",
@@ -148,7 +146,7 @@
             "runtimeArgs": [
                 "run",
                 "--inspect-wait",
-				"--allow-read",
+				"-E",
 				"--allow-run",
             ],
             "attachSimplePort": 9229,

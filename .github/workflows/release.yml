@@ -99,7 +99,7 @@ jobs:
         run: |
           $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/get-version.ts";
 
-          deno run --allow-read --allow-write --allow-env "$scriptPath";
+          deno run -ERW "$scriptPath";
 
 
   validate_release:
@@ -141,8 +141,7 @@ jobs:
           $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/version-checker.ts";
 
           deno run `
-            --allow-net `
-            --allow-read `
+            -RN `
             "$scriptPath" `
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
@@ -155,7 +154,7 @@ jobs:
           $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
 
           deno run `
-            --allow-read `
+            -R `
             "$scriptPath" `
             "${{ inputs.release-type }}" `
             "${{ needs.get_version.outputs.version }}";
@@ -177,7 +176,7 @@ jobs:
       - name: Deno Check
         id: deno-check
         continue-on-error: true
-        run: deno run --allow-read --allow-run ./.github/cicd/scripts/deno-check.ts
+        run: deno run -R --allow-run ./.github/cicd/scripts/deno-check.ts
 
       - name: Deno Lint
         id: deno-lint
@@ -192,7 +191,7 @@ jobs:
       - name: Deno Tests
         id: deno-tests
         continue-on-error: true
-        run: deno test --allow-read ./tests/*Tests.ts;
+        run: deno test -R ./tests/*Tests.ts;
 
       - name: Validate Checks
         run: |
@@ -246,7 +245,7 @@ jobs:
             3. PAT
           #>
           deno run `
-            --allow-read --allow-net `
+            -RN `
             "$scriptUrl" `
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
@@ -270,7 +269,7 @@ jobs:
             8. PAT
           #>
           deno run `
-            --allow-read --allow-net --allow-env `
+            -ERN `
             "$scriptUrl" `
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `

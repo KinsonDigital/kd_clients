@@ -31,7 +31,7 @@ export class Directory {
 	 * @param recursive True to search recursively, otherwise false.
 	 * @returns {string[]} A list of files in the given {@link dirPath}.
 	 */
-	public static getFiles(dirPath: string, extension:string, recursive = false): string[] {
+	public static getFiles(dirPath: string, extension: string, recursive = false): string[] {
 		let files: string[] = [];
 
 		extension = extension.trim();
@@ -42,7 +42,7 @@ export class Directory {
 
 			if (!extension.startsWith(".") || extension.length === 1) {
 				const errorMsg = `The extension '${extension}' is not supported.\n` +
-									`Must be a value of '*.*' or '*.<extension>'.`;
+					`Must be a value of '*.*' or '*.<extension>'.`;
 				console.log(errorMsg);
 				throw new Error(errorMsg);
 			}
@@ -57,9 +57,7 @@ export class Directory {
 		dirPath = dirPath === "." || dirPath === "./" ? Deno.cwd() : dirPath;
 
 		for (const dirEntry of Deno.readDirSync(dirPath)) {
-			const entry = dirPath === "/"
-				? dirPath + dirEntry.name
-				: dirPath + "/" + dirEntry.name;
+			const entry = dirPath === "/" ? dirPath + dirEntry.name : dirPath + "/" + dirEntry.name;
 
 			if (recursive && dirEntry.isDirectory) {
 				files = [...files, ...(Directory.getFiles(entry, extension, recursive))];

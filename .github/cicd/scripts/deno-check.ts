@@ -3,12 +3,12 @@ import { CLI } from "../core/CLI.ts";
 
 const ignoreDirectories = [
 	"./vendor/",
-	"./node_modules/"
+	"./node_modules/",
 ];
 
 const files: string[] = Directory
 	.getFiles("./", ".ts", true)
-	.filter(f => ignoreDirectories.every(ignoreDir => !f.startsWith(ignoreDir)));
+	.filter((f) => ignoreDirectories.every((ignoreDir) => !f.startsWith(ignoreDir)));
 
 const cli: CLI = new CLI();
 
@@ -33,25 +33,24 @@ const checkFile = async (file: string): Promise<CheckResult> => {
 	const checkResult: CheckResult = {
 		file: file,
 		result: "",
-		hasPassed: true // Default to passed
+		hasPassed: true, // Default to passed
 	};
-	
+
 	checkResult.result += `Checking ${file}`;
-	
+
 	const result = await cli.runAsync(`deno check ${file}`);
-	
+
 	let commandResult = "";
-	
+
 	// If the result is an error type
-	if (result instanceof Error)
-	{
+	if (result instanceof Error) {
 		checkResult.hasPassed = false;
 		commandResult = "❌\n";
 
 		const lines = result.message.split("\n");
 
 		// Prefix each command output line with 3 spaces
-		lines.forEach(line => {
+		lines.forEach((line) => {
 			commandResult += `   ${line}\n`;
 		});
 	} else {
@@ -63,21 +62,21 @@ const checkFile = async (file: string): Promise<CheckResult> => {
 	Deno.stdout.writeSync(new TextEncoder().encode(checkResult.result));
 
 	return checkResult;
-}
+};
 
 const filesToCheck: Promise<CheckResult>[] = [];
 
 // Perform a deno check on all of the files
 for await (const file of files) {
-	filesToCheck.push(checkFile(file));	
-};
+	filesToCheck.push(checkFile(file));
+}
 
 // Wait for all of the checks to complete
 const allCheckResults = await Promise.all(filesToCheck);
 
 // Collect the total number of passed and failed checks
-const totalPassed = allCheckResults.filter(r => r.hasPassed).length;
-const totalFailed = allCheckResults.filter(r => !r.hasPassed).length;
+const totalPassed = allCheckResults.filter((r) => r.hasPassed).length;
+const totalFailed = allCheckResults.filter((r) => !r.hasPassed).length;
 
 const resultsMsg = new TextEncoder().encode(`\nTotal Checks Passed✅: ${totalPassed}\nTotal Checks Failed❌: ${totalFailed}\n`);
 Deno.stdout.writeSync(resultsMsg);

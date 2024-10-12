@@ -14,14 +14,12 @@ export class CLI {
 			Deno.exit(1);
 		}
 
-		command = command.includes("'")
-			? command.replace(/'/g, '"')
-			: command;
+		command = command.includes("'") ? command.replace(/'/g, '"') : command;
 
 		const sections: string[] = command.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) ?? [];
 
 		const app = sections[0] === "deno" ? Deno.execPath() : sections[0];
-		const args = sections.slice(1).map(arg => arg.replace(/"/g, ''));
+		const args = sections.slice(1).map((arg) => arg.replace(/"/g, ""));
 
 		const cmd = new Deno.Command(app, { args: args });
 
