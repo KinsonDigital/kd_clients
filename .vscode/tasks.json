@@ -7,9 +7,8 @@
 			"type": "shell",
 			"args": [
 				"run",
-				"--allow-read",
+				"-RS",
 				"--allow-run",
-				"--allow-sys",
 				"${workspaceFolder}/.github/cicd/scripts/deno-check.ts"
 			],
 			"problemMatcher": [
