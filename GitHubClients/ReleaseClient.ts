@@ -1,8 +1,8 @@
 import { basename, ensureDirSync, existsSync } from "../deps.ts";
 import { GitHubHttpStatusCodes, Guard, Utils } from "../deps.ts";
 import { GitHubClient } from "../deps.ts";
-import { AssetModel, ReleaseModel } from "../deps.ts";
 import { AuthError, ReleaseError } from "../deps.ts";
+import type { AssetModel, ReleaseModel } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.

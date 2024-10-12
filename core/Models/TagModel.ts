@@ -1,4 +1,4 @@
-import { CommitModel } from "./mod.ts";
+import type { CommitModel } from "./mod.ts";
 
 /**
  * Represents a GIT tag.

@@ -1,15 +1,15 @@
 import { AuthError, GraphQlClient } from "../deps.ts";
 import { createGetBranchesQuery } from "../core/GraphQl/Queries/GetBranchesQuery.ts";
 import { Guard } from "../core/Guard.ts";
-import { PageInfoModel } from "../deps.ts";
-import { GitBranchModel } from "../deps.ts";
-import { RawRefsGetBranchModel } from "../deps.ts";
-import { RawGitBranchModel } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { RepoClient } from "./RepoClient.ts";
 import { getCreateBranchMutation } from "../core/GraphQl/Mutations/CreateBranchMutation.ts";
 import { addCommitMutation } from "../core/GraphQl/Mutations/AddCommitMutation.ts";
 import { GitError } from "../deps.ts";
+import type { PageInfoModel } from "../deps.ts";
+import type { GitBranchModel } from "../deps.ts";
+import type { RawRefsGetBranchModel } from "../deps.ts";
+import type { RawGitBranchModel } from "../deps.ts";
 
 /**
  * Provides a client for to perform git operations for a GitHub repository.

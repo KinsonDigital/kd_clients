@@ -1,9 +1,10 @@
-import { AuthError, LabelModel } from "../deps.ts";
+import { AuthError } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
 import { LabelError } from "../deps.ts";
+import type { LabelModel } from "../deps.ts";
 
 /**
  * Provides a client for interacting with labels.

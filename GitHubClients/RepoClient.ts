@@ -3,11 +3,11 @@ import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { Guard } from "../core/Guard.ts";
 import { Utils } from "../deps.ts";
-import { FileContentModel } from "../deps.ts";
-import { RepoModel } from "../deps.ts";
-import { GitHubVarModel } from "../deps.ts";
-import { GitHubVariablesModel } from "../deps.ts";
-import { RepoError } from "../deps.ts";
+import type { FileContentModel } from "../deps.ts";
+import type { RepoModel } from "../deps.ts";
+import type { GitHubVarModel } from "../deps.ts";
+import type { GitHubVariablesModel } from "../deps.ts";
+import type { RepoError } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.

@@ -1,7 +1,7 @@
-import { GraphQlRequestResponseModel } from "./Models/GraphQlModels/mod.ts";
 import { Utils } from "../deps.ts";
 import { Guard } from "./Guard.ts";
 import { AuthError } from "../GitHubClients/Errors/AuthError.ts";
+import type { GraphQlRequestResponseModel } from "./Models/GraphQlModels/mod.ts";
 
 /**
  * Provides a base class for HTTP clients.

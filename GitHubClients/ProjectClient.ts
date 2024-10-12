@@ -7,9 +7,9 @@ import { createGetIssueProjectsQuery } from "../core/GraphQl/Queries/GetIssuePro
 import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
 import { ProjectError } from "../deps.ts";
 import { IssueClient, PullRequestClient } from "./mod.ts";
-import { ProjectModel } from "../deps.ts";
-import { IssueModel } from "../deps.ts";
-import { PullRequestModel } from "../deps.ts";
+import type { ProjectModel } from "../deps.ts";
+import type { IssueModel } from "../deps.ts";
+import type { PullRequestModel } from "../deps.ts";
 
 /**
  * Gets or saves data related to GitHub organization V2 projects.

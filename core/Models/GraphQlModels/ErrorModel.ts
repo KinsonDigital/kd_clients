@@ -1,4 +1,4 @@
-import { LocationModel } from "./mod.ts";
+import type { LocationModel } from "./mod.ts";
 
 /**
  * Represents an error.

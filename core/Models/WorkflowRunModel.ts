@@ -1,4 +1,4 @@
-import { PullRequestModel } from "./mod.ts";
+import type { PullRequestModel } from "./mod.ts";
 
 /**
  * Represents a single workflow run.

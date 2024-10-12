@@ -1,4 +1,4 @@
-import { WorkflowRunModel } from "./mod.ts";
+import type { WorkflowRunModel } from "./mod.ts";
 
 /**
  * Represents a list of workflow runs.

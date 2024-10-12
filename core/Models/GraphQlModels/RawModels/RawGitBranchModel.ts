@@ -1,4 +1,4 @@
-import { RawGetBranchTargetModel } from "./mod.ts";
+import type { RawGetBranchTargetModel } from "./mod.ts";
 
 /**
  * Represents a raw git branch model that is unchanged from the GraphQL query.

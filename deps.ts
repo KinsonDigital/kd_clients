@@ -13,7 +13,7 @@ import { GitHubClient } from "./core/GitHubClient.ts";
 import { GraphQlClient } from "./core/GraphQlClient.ts";
 
 // Local Core Models
-import {
+import type {
 	AssetModel,
 	CommitModel,
 	FileContentModel,
@@ -35,7 +35,7 @@ import {
 } from "./core/Models/mod.ts";
 
 // Local GraphQL Models
-import {
+import type {
 	ErrorModel,
 	GitBranchModel,
 	GraphQlRequestResponseModel,

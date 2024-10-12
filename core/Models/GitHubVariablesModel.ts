@@ -1,4 +1,4 @@
-import { GitHubVarModel } from "./mod.ts";
+import type { GitHubVarModel } from "./mod.ts";
 
 /**
  * Represents multiple variables for an organization and/or repository.

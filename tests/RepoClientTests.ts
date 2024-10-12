@@ -1,7 +1,7 @@
 import { RepoError } from "../GitHubClients/Errors/RepoError.ts";
-import { FileContentModel, RepoModel } from "../core/Models/mod.ts";
 import { assertEquals, assertRejects, assertSpyCalls, stub } from "../deps.ts";
 import { RepoClient } from "../mod.ts";
+import type { FileContentModel, RepoModel } from "../core/Models/mod.ts";
 
 Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	// Arrange
