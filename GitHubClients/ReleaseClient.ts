@@ -154,6 +154,29 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Updates a release with the given {@link text} where the release has the given {@link id}.
+	 * @param id The id of the release to update.
+	 * @param text The text to update the release with.
+	 */
+	public async updateReleaseById(id: number, text: string): Promise<void> {
+		Guard.isLessThanOne(id, "updateReleaseById", "id");
+
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${id}`;
+
+		text = Utils.isNothing(text) ? "" : text.trim();
+
+		const response = await this.requestPATCH(url, JSON.stringify({ body: text }));
+
+		if (response.status !== GitHubHttpStatusCodes.OK) {
+			if (response.status === GitHubHttpStatusCodes.NotFound) {
+				throw new ReleaseError(`A release with the release if of '${id}' does not exist.`);
+			} else {
+				throw new Error(`Status Code: ${response.status} - ${response.statusText}`);
+			}
+		}
+	}
+
+	/**
 	 * Returns a value indicating whether or not a release is tied to a tag that matches the given {@link tagName},
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
