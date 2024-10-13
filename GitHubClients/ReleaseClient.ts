@@ -609,6 +609,23 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Downloads all assets for the latest non-prerelease and non-draft release, to the given {@link dirPath}.
+	 * @param dirPath The directory path to download the assets to.
+	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 */
+	public async downloadAllLatestReleaseAssets(dirPath: string, overwrite?: boolean): Promise<void> {
+		const release = await this.getLatestRelease();
+
+		const downloadWork: Promise<void>[] = [];
+
+		for (const asset of release.assets) {
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+		}
+
+		await Promise.all(downloadWork);
+	}
+
+	/**
 	 * Gets all assets for a release with the given {@link releaseTagName}.
 	 * @param releaseTagName The tag name of the release where the asset lives.
 	 * @returns All assets for a release with the given {@link releaseTagName}.
