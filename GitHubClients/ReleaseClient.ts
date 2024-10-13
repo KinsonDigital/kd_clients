@@ -177,6 +177,17 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Updates a release with the given {@link text} where the release is for the given {@link tag}.
+	 * @param tag The tag of the release to update.
+	 * @param text The text to update the release with.
+	 */
+	public async updateReleaseByTag(tag: string, text: string): Promise<void> {
+		const release = await this.getReleaseByTag(tag);
+
+		await this.updateReleaseById(release.id, text);
+	}
+
+	/**
 	 * Returns a value indicating whether or not a release is tied to a tag that matches the given {@link tagName},
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
@@ -729,6 +740,6 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		return [<ReleaseModel[]> await this.getResponseData(response), response];
+		return [<ReleaseModel[]>await this.getResponseData(response), response];
 	}
 }
