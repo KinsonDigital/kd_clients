@@ -490,6 +490,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @param dirPath The directory path to download the asset to.
 	 * @param fileName The name of the file when downloaded.
 	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @param onProgress A callback function that is called when an asset is downloaded.
 	 * @remarks The {@link fileName} is the name of the file when downloads.  Not the name of the asset.
 	 * @throws The following errors:
 	 * 1. An {@link Error} if the {@link assetId}, {@link dirPath}, or {@link fileName} are undefined, null, or empty.
@@ -497,7 +498,13 @@ export class ReleaseClient extends GitHubClient {
 	 * 3. A {@link ReleaseError} if the asset could not be downloaded.
 	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
 	 */
-	public async downloadAssetById(assetId: number, dirPath: string, fileName: string, overwrite?: boolean): Promise<void> {
+	public async downloadAssetById(
+		assetId: number,
+		dirPath: string,
+		fileName: string,
+		overwrite?: boolean,
+		onProgress?: (assetId: number, filePath: string) => void,
+	): Promise<void> {
 		Guard.isNothing(assetId);
 		Guard.isNothing(dirPath);
 		Guard.isNothing(fileName);
@@ -550,6 +557,10 @@ export class ReleaseClient extends GitHubClient {
 		const arrayData = new Uint8Array(arrayBuffer);
 
 		Deno.writeFileSync(downloadFilePath, arrayData);
+
+		if (!Utils.isNothing(onProgress)) {
+			onProgress(assetId, downloadFilePath);
+		}
 	}
 
 	/**
@@ -557,6 +568,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @param tagName The name of the release tag.
 	 * @param dirPath The directory path to download the assets to.
 	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @param onProgress A callback function that is called when an asset is downloaded.
 	 * @remarks The name of each file will be set to the name of the asset.
 	 * @throws The following errors:
 	 * 1. An {@link Error} if the {@link tagName} or {@link dirPath} are undefined, null, or empty.
@@ -564,7 +576,12 @@ export class ReleaseClient extends GitHubClient {
 	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
 	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
 	 */
-	public async downloadAllAssetsByReleaseTag(tagName: string, dirPath: string, overwrite?: boolean): Promise<void> {
+	public async downloadAllAssetsByReleaseTag(
+		tagName: string,
+		dirPath: string,
+		overwrite?: boolean,
+		onProgress?: (assetId: number, filePath: string) => void,
+	): Promise<void> {
 		Guard.isNothing(tagName);
 
 		dirPath = this.normalizePath(dirPath);
@@ -574,7 +591,7 @@ export class ReleaseClient extends GitHubClient {
 		const downloadWork: Promise<void>[] = [];
 
 		for (const asset of assets) {
-			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite, onProgress));
 		}
 
 		await Promise.all(downloadWork);
@@ -585,6 +602,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @param tagName The name of the release tag.
 	 * @param dirPath The directory path to download the assets to.
 	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @param onProgress A callback function that is called when an asset is downloaded.
 	 * @remarks The name of each file will be set to the name of the asset.
 	 * @throws The following errors:
 	 * 1. An {@link Error} if the {@link tagName} or {@link dirPath} are undefined, null, or empty.
@@ -592,7 +610,12 @@ export class ReleaseClient extends GitHubClient {
 	 * 3. A {@link ReleaseError} if the assets could not be downloaded.
 	 * 4. A {@link ReleaseError} if the file already exists and {@link overwrite} is not set to false.
 	 */
-	public async downloadAllAssetsByReleaseName(name: string, dirPath: string, overwrite?: boolean): Promise<void> {
+	public async downloadAllAssetsByReleaseName(
+		name: string,
+		dirPath: string,
+		overwrite?: boolean,
+		onProgress?: (assetId: number, filePath: string) => void,
+	): Promise<void> {
 		Guard.isNothing(name);
 
 		dirPath = this.normalizePath(dirPath);
@@ -602,7 +625,7 @@ export class ReleaseClient extends GitHubClient {
 		const downloadWork: Promise<void>[] = [];
 
 		for (const asset of assets) {
-			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite, onProgress));
 		}
 
 		await Promise.all(downloadWork);
@@ -612,14 +635,19 @@ export class ReleaseClient extends GitHubClient {
 	 * Downloads all assets for the latest non-prerelease and non-draft release, to the given {@link dirPath}.
 	 * @param dirPath The directory path to download the assets to.
 	 * @param overwrite True to overwrite the file if it exists, otherwise false.
+	 * @param onProgress A callback function that is called when an asset is downloaded.
 	 */
-	public async downloadAllLatestReleaseAssets(dirPath: string, overwrite?: boolean): Promise<void> {
+	public async downloadAllLatestReleaseAssets(
+		dirPath: string,
+		overwrite?: boolean,
+		onProgress?: (assetId: number, filePath: string) => void,
+	): Promise<void> {
 		const release = await this.getLatestRelease();
 
 		const downloadWork: Promise<void>[] = [];
 
 		for (const asset of release.assets) {
-			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite));
+			downloadWork.push(this.downloadAssetById(asset.id, dirPath, asset.name, overwrite, onProgress));
 		}
 
 		await Promise.all(downloadWork);
