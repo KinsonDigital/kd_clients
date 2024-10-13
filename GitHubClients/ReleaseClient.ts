@@ -785,6 +785,6 @@ export class ReleaseClient extends GitHubClient {
 			throw new ReleaseError(errorMsg);
 		}
 
-		return [<ReleaseModel[]>await this.getResponseData(response), response];
+		return [<ReleaseModel[]> await this.getResponseData(response), response];
 	}
 }
