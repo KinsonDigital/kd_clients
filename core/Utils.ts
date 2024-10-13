@@ -1,10 +1,10 @@
 import { Guard } from "./Guard.ts";
-import { ReleaseType } from "./Enums.ts";
 import { basename, extname } from "../deps.ts";
-import { IssueModel } from "../deps.ts";
-import { PullRequestModel } from "../deps.ts";
-import { GraphQlRequestResponseModel } from "../deps.ts";
-import { ErrorModel } from "../deps.ts";
+import type { ReleaseType } from "./Enums.ts";
+import type { IssueModel } from "../deps.ts";
+import type { PullRequestModel } from "../deps.ts";
+import type { GraphQlRequestResponseModel } from "../deps.ts";
+import type { ErrorModel } from "../deps.ts";
 
 /**
  * Provides utility functions.

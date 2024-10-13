@@ -1,11 +1,11 @@
 // ----IMPORTS----
 
 // Official Deno Modules
-import { ensureDirSync, exists, existsSync, walkSync } from "https://deno.land/std@0.224.0/fs/mod.ts";
-import { basename, extname, isAbsolute } from "https://deno.land/std@0.224.0/path/mod.ts";
-import { decodeBase64, encodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
-import { assert, assertEquals, assertRejects, assertThrows, equal } from "https://deno.land/std@0.224.0/assert/mod.ts";
-import { assertSpyCall, assertSpyCalls, returnsArg, returnsNext, spy, stub } from "https://deno.land/std@0.224.0/testing/mock.ts";
+import { ensureDirSync, exists, existsSync, walkSync } from "@std/fs";
+import { basename, extname, isAbsolute } from "@std/path";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
+import { assert, assertEquals, assertRejects, assertThrows, equal } from "@std/assert";
+import { assertSpyCall, assertSpyCalls, returnsArg, returnsNext, spy, stub } from "@std/testing/mock";
 import { oauth1a } from "jsr:@nexterias/twitter-api-fetch@3.0.1";
 
 // Local Core Types
@@ -13,7 +13,7 @@ import { GitHubClient } from "./core/GitHubClient.ts";
 import { GraphQlClient } from "./core/GraphQlClient.ts";
 
 // Local Core Models
-import {
+import type {
 	AssetModel,
 	CommitModel,
 	FileContentModel,
@@ -35,7 +35,7 @@ import {
 } from "./core/Models/mod.ts";
 
 // Local GraphQL Models
-import {
+import type {
 	ErrorModel,
 	GitBranchModel,
 	GraphQlRequestResponseModel,

@@ -1,4 +1,4 @@
-import { AssetModel } from "./AssetModel.ts";
+import type { AssetModel } from "./AssetModel.ts";
 
 /**
  * Represents a GitHub release.

@@ -1,9 +1,10 @@
 import { Guard } from "../core/Guard.ts";
-import { AuthError, TagModel } from "../deps.ts";
+import { AuthError } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { TagError } from "../deps.ts";
+import type { TagModel } from "../deps.ts";
 
 /**
  * Provides a client for interacting with GitHub GIT tags.

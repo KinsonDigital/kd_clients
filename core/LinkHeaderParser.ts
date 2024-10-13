@@ -1,6 +1,6 @@
-import { LinkHeader } from "./LinkHeader.ts";
-import { PageInfo } from "./PageInfo.ts";
 import { Utils } from "../deps.ts";
+import type { LinkHeader } from "./LinkHeader.ts";
+import type { PageInfo } from "./PageInfo.ts";
 
 /**
  * Parses link headers to collect pagination information.

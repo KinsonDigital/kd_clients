@@ -1,5 +1,15 @@
 {
-	"version": "v1.0.0-preview.13",
+    "name": "@kinsondigital/kd-clients",
+    "version": "1.0.0-preview.13",
+    "exports": {
+        ".": "./mod.ts",
+        "./packaging": "./PackageClients/mod.ts",
+        "./social": "./OtherClients/mod.ts",
+        "./github": "./GitHubClients/mod.ts",
+        "./core": "./core/mod.ts",
+        "./github/errors": "./GitHubClients/Errors/mod.ts",
+        "./github/models": "./core/Models/mod.ts"
+    },
     "tasks": {
         "check": "deno check ./**/*.ts",
         "test": "deno test -A ./tests/*Tests.ts",
@@ -9,34 +19,42 @@
         "format-check": "deno fmt ./**/*.ts --check",
         "reload-cache": "deno cache ./**/*.ts --reload"
     },
-	"lint": {
-		"include": [
-			"**/*.ts",
+    "lint": {
+        "include": [
+            "**/*.ts",
             ".github/**/*.ts"
-		],
+        ],
         "exclude": [
             ".github/cicd/playground.ts"
         ]
-	},
-	"fmt": {
-		"include": [
-			"core/",
-			"GitHubClients/",
-			"OtherClients/",
-			"PackageClients/",
-			"tests/"
-		],
-		"exclude": [
-			"**/*.md",
-			"**/*.json",
-			"**/*.js",
-			"**/*.yml",
-			"**/*.yaml"
-		],
-		"useTabs": true,
-		"lineWidth": 130,
-		"indentWidth": 4,
-		"semiColons": true,
-		"singleQuote": false
-	}
+    },
+    "fmt": {
+        "include": [
+            "core/",
+            "GitHubClients/",
+            "OtherClients/",
+            "PackageClients/",
+            "tests/"
+        ],
+        "exclude": [
+            "**/*.md",
+            "**/*.json",
+            "**/*.js",
+            "**/*.yml",
+            "**/*.yaml",
+            ".github/cicd/playground.ts"
+        ],
+        "useTabs": true,
+        "lineWidth": 130,
+        "indentWidth": 4,
+        "semiColons": true,
+        "singleQuote": false
+    },
+    "imports": {
+        "@std/fs": "jsr:@std/fs@0.224.0",
+        "@std/path": "jsr:@std/path@0.224.0",
+        "@std/encoding": "jsr:@std/encoding@0.224.0",
+        "@std/assert": "jsr:@std/assert@0.224.0",
+        "@std/testing": "jsr:@std/testing@0.224.0"
+    }
 }

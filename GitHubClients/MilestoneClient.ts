@@ -1,14 +1,15 @@
 import { Guard } from "../core/Guard.ts";
-import { AuthError, IssueModel } from "../deps.ts";
-import { MilestoneModel } from "../deps.ts";
-import { PullRequestModel } from "../deps.ts";
+import { AuthError } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
 import { IssueClient } from "./IssueClient.ts";
 import { PullRequestClient } from "./PullRequestClient.ts";
-import { IssueOrPR } from "../core/Types.ts";
 import { MilestoneError } from "../deps.ts";
+import type { IssueModel } from "../deps.ts";
+import type { MilestoneModel } from "../deps.ts";
+import type { PullRequestModel } from "../deps.ts";
+import type { IssueOrPR } from "../core/Types.ts";
 
 /**
  * Provides a client for interacting with milestones.

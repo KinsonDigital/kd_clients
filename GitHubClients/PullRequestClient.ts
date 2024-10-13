@@ -1,11 +1,12 @@
 import { Guard } from "../core/Guard.ts";
 import { LabelClient } from "./LabelClient.ts";
-import { AuthError, PullRequestModel } from "../deps.ts";
+import { AuthError } from "../deps.ts";
 import { Utils } from "../deps.ts";
 import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
 import { GitHubClient } from "../deps.ts";
-import { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
 import { PullRequestError } from "../deps.ts";
+import type { PullRequestModel } from "../deps.ts";
+import type { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
 
 /**
  * Provides a client for interacting with pull requests.
