@@ -26,7 +26,6 @@ Deno.test("getReleases |> with_not_found_response |> throws_error", async () => 
 	await assertRejects(act, ReleaseError, expectedMsg);
 });
 
-
 Deno.test("updateReleaseById |> with_not_found_response |> throws_error", async () => {
 	// Arrange
 	const ownerName = "KinsonDigital";
@@ -40,7 +39,7 @@ Deno.test("updateReleaseById |> with_not_found_response |> throws_error", async 
 		statusText: "Not Found",
 	});
 
-	const expectedMsg = `A release with the release if of '${releaseId}' does not exist.`
+	const expectedMsg = `A release with the release if of '${releaseId}' does not exist.`;
 
 	stub(client, "requestPATCH", (_) => Promise.resolve(stubbedResponse));
 
@@ -50,7 +49,6 @@ Deno.test("updateReleaseById |> with_not_found_response |> throws_error", async 
 	// Assert
 	await assertRejects(act, ReleaseError, expectedMsg);
 });
-
 
 Deno.test("updateReleaseById |> when_not_ok_or_not_found_response |> throws_error", async () => {
 	// Arrange
@@ -76,7 +74,6 @@ Deno.test("updateReleaseById |> when_not_ok_or_not_found_response |> throws_erro
 	await assertRejects(act, Error, expectedMsg);
 });
 
-
 Deno.test("updateReleaseById |> when_updating_release |> updates_the_release", async () => {
 	// Arrange
 	const ownerName = "KinsonDigital";
@@ -97,5 +94,5 @@ Deno.test("updateReleaseById |> when_updating_release |> updates_the_release", a
 	// Assert
 	assertEquals(spyRequestPATCH.calls.length, 1);
 	assertEquals(spyRequestPATCH.calls[0].args[0], "https://api.github.com/repos/KinsonDigital/kd_clients/releases/123");
-	assertEquals(spyRequestPATCH.calls[0].args[1], JSON.stringify({ body: text}));
+	assertEquals(spyRequestPATCH.calls[0].args[1], JSON.stringify({ body: text }));
 });
