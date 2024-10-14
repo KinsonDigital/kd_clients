@@ -429,8 +429,8 @@ export class RepoClient extends GitHubClient {
 
 	/**
 	 * Gets the content of a file in a repository with a name that matches the given {@link RepoClient}.{@link repoName},
-	 * on a branch with a name that matches the given {@link branchName} at the given {@link relativeFilePath}.
-	 * @param branchName The name of the branch.
+	 * on a branch with a name that matches the given {@link ref} at the given {@link relativeFilePath}.
+	 * @param ref The name of the branch.
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns The content of the file and a boolean flag indicating whether or not the file exists.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
@@ -440,11 +440,11 @@ export class RepoClient extends GitHubClient {
 	 * 3. The {@link RepoError} if the file does not exist or a problem getting the file content.
 	 */
 	private async getFileContentInternal(
-		branchName: string,
+		ref: string,
 		relativeFilePath: string,
 	): Promise<FileContentModel> {
 		const funcName = "getFileContentResult";
-		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(ref, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		if (isAbsolute(relativeFilePath)) {
@@ -459,7 +459,7 @@ export class RepoClient extends GitHubClient {
 
 		relativeFilePath = relativeFilePath.startsWith("./") ? relativeFilePath.substring(2) : relativeFilePath;
 
-		const queryParams = `?ref=${branchName}`;
+		const queryParams = `?ref=${ref}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
