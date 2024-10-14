@@ -142,12 +142,12 @@ export class RepoClient extends GitHubClient {
 	 * 2. An {@link AuthError} if there was a problem with the authentication.
 	 * 3. The {@link RepoError} if the file content does not exist.
 	 */
-	public async getFileContent(branchName: string, relativeFilePath: string): Promise<string> {
+	public async getFileContent(ref: string, relativeFilePath: string): Promise<string> {
 		const funcName = "getFileContent";
-		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(ref, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
-		const fileContentModel = await this.getFileContentInternal(branchName, relativeFilePath);
+		const fileContentModel = await this.getFileContentInternal(ref, relativeFilePath);
 
 		const decodedContent = decodeBase64(fileContentModel.content);
 
