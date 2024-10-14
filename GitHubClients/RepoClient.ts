@@ -186,8 +186,10 @@ export class RepoClient extends GitHubClient {
 			throw new RepoError(errorMsg);
 		}
 
+		relativeFilePath = relativeFilePath.startsWith("./") ? relativeFilePath.substring(2) : relativeFilePath;
+
 		const queryParams = `?ref=${branchName}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents${relativeFilePath}${queryParams}`;
+		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
 
