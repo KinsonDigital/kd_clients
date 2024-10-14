@@ -88,7 +88,7 @@ Deno.test("fileExists |> when-path-param-is-not-valid-file-path |> throws-error"
 
 Deno.test("fileExists |> when-other-http-error-occurs |> throws-error", async () => {
 	// Arrange
-	const expectedErrorMsg = "There was a problem checking if the file './dirA/test-file.txt' exists in the" +
+	const expectedErrorMsg = "There was a problem checking if the file 'dirA/test-file.txt' exists in the" +
 		" repository 'test-repo' in the branch 'test-branch'.";
 
 	const sut = new RepoClient("test-owner", "test-repo", "test-token");
