@@ -129,9 +129,7 @@ export class GitClient extends GraphQlClient {
 			for (let i = 0; i < branches.length; i++) {
 				const branch = branches[i];
 
-				const stopPulling: boolean = untilPredicate !== null &&
-					untilPredicate !== undefined &&
-					untilPredicate(branch);
+				const stopPulling: boolean = !Utils.isNothing(untilPredicate) && untilPredicate(branch);
 
 				result.push(branch);
 
@@ -142,6 +140,14 @@ export class GitClient extends GraphQlClient {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Gets all branches for the repository.
+	 * @returns All branches for the repository.
+	 */
+	public async getAllBranches(): Promise<GitBranchModel[]> {
+		return await this.getBranches();
 	}
 
 	/**
