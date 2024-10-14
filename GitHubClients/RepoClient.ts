@@ -160,7 +160,7 @@ export class RepoClient extends GitHubClient {
 	/**
 	 * Gets a value indicating whether or not a file exists at the given {@link relativeFilePath}
 	 * in a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
-	 * @param branchName The name of the branch to check.
+	 * @param ref The name of the branch to check.
 	 * @param relativeFilePath The relative path of the file.
 	 * @returns True if the file exists; otherwise, false.
 	 * @remarks The {@link relativeFilePath} is relative to the root of the repository.
@@ -169,9 +169,9 @@ export class RepoClient extends GitHubClient {
 	 * 2. An {@link AuthError} if there was a problem with the authentication.
 	 * 3. The {@link RepoError} if the there was a problem checking if the file exists or if the file path is invalid.
 	 */
-	public async fileExists(branchName: string, relativeFilePath: string): Promise<boolean> {
+	public async fileExists(ref: string, relativeFilePath: string): Promise<boolean> {
 		const funcName = "fileExists";
-		Guard.isNothing(branchName, funcName, "branchName");
+		Guard.isNothing(ref, funcName, "branchName");
 		Guard.isNothing(relativeFilePath, funcName, "relativeFilePath");
 
 		relativeFilePath = relativeFilePath.trim();
@@ -188,7 +188,7 @@ export class RepoClient extends GitHubClient {
 
 		relativeFilePath = relativeFilePath.startsWith("./") ? relativeFilePath.substring(2) : relativeFilePath;
 
-		const queryParams = `?ref=${branchName}`;
+		const queryParams = `?ref=${ref}`;
 		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/contents/${relativeFilePath}${queryParams}`;
 
 		const response: Response = await this.requestGET(url);
@@ -201,7 +201,7 @@ export class RepoClient extends GitHubClient {
 			} else {
 				const errorMsg = this.buildErrorMsg(
 					`There was a problem checking if the file '${relativeFilePath}' exists in the` +
-						` repository '${this.repoName}' in the branch '${branchName}'.`,
+						` repository '${this.repoName}' in the branch '${ref}'.`,
 					response,
 				);
 
