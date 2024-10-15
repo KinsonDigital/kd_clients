@@ -7,6 +7,11 @@ import type { PullRequestModel } from "../deps.ts";
 export type ItemType = "issue" | "pull-request";
 
 /**
+ * Represents the state of a GitHub issue or pull request.
+ */
+export type State = "open" | "closed";
+
+/**
  * Represents a GitHub issue or pull request.
  */
 export type IssueOrPR = IssueModel | PullRequestModel;

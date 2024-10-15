@@ -1,3 +1,4 @@
+import type { State } from "../Types.ts";
 import type { LabelModel } from "./mod.ts";
 import type { MilestoneModel } from "./mod.ts";
 import type { PullRequestHeadOrBaseModel } from "./mod.ts";
@@ -51,7 +52,7 @@ export interface PullRequestModel {
 	/**
 	 * Gets or sets the state of the pull request.
 	 */
-	state?: string;
+	state?: State;
 
 	/**
 	 * Gets or sets the URL to the pull request.

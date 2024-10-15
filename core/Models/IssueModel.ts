@@ -1,3 +1,4 @@
+import type { State } from "../Types.ts";
 import type { LabelModel } from "./mod.ts";
 import type { MilestoneModel } from "./mod.ts";
 import type { UserModel } from "./mod.ts";
@@ -29,7 +30,7 @@ export interface IssueModel {
 	/**
 	 * Gets or sets the state of the issue.
 	 */
-	state?: string;
+	state?: State;
 
 	/**
 	 * Gets or sets the URL to the html page of the issue.
