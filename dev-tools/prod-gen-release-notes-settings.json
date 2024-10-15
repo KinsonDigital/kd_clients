@@ -19,7 +19,9 @@
         "Enhancements 💎": "💎enhancement",
         "Bug Fixes 🐛": "🐛bug",
         "Breaking Changes 🧨": "🧨breaking-changes",
-        "Dependency Updates 📦": "📦dependency-update"
+        "Dependency Updates 📦": "📦dependency-update",
+        "Configuration 🛠️": "⚙️config",
+        "Technical Debt 🧽": "tech-debt"
     },
     "prCategoryLabelMappings": {
         "Dependency Updates 📦": "📦dependency-update"
