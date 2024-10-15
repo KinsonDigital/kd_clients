@@ -54,6 +54,23 @@ export class ReleaseClient extends GitHubClient {
 	}
 
 	/**
+	 * Gets all releases for a repository.
+	 * @returns All of the releases.
+	 */
+	public async getAllReleases(): Promise<ReleaseModel[]> {
+		const releases = await this.getAllDataUntil(
+			async (page: number, qtyPerPage?: number) => {
+				return await this.getReleasesInternal(page, qtyPerPage ?? 100);
+			},
+			1, // Start page
+			100, // Qty per page
+			(_: ReleaseModel[]) => true,
+		);
+
+		return releases;
+	}
+
+	/**
 	 * Gets the latest release.
 	 * @returns The current latest release.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
