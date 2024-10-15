@@ -25,33 +25,6 @@ export class NuGetClient extends WebApiClient {
 	}
 
 	/**
-	 * Checks if a package that matches the given {@link packageName} exists in the NuGet registry.
-	 * @param packageName The name of the NuGet package.
-	 * @returns True if the package exists, otherwise false.
-	 * @throws The {@link NuGetError} if there was an issue checking for the package.
-	 */
-	public async packageExists(packageName: string): Promise<boolean> {
-		Guard.isNothing(packageName, "packageExists", "packageName");
-
-		packageName = packageName.trim().toLowerCase();
-		const url = this.buildUrl(packageName);
-
-		const response: Response = await this.requestGET(url);
-		const statusCode: NuGetHttpStatusCodes = response.status as NuGetHttpStatusCodes;
-
-		if (this.statusCodeValid(statusCode)) {
-			return statusCode === NuGetHttpStatusCodes.SuccessWithResponseBody;
-		} else {
-			const errorMsg = this.buildErrorMsg(
-				`There was an issue checking for the '${packageName}' NuGet package.`,
-				response,
-			);
-
-			throw new NuGetError(errorMsg);
-		}
-	}
-
-	/**
 	 * Gets all of the versions for a NuGet package that matches the given {@link packageName}.
 	 * @param packageName The name of the NuGet package.
 	 * @returns The versions of the given NuGet package.
