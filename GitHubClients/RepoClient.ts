@@ -8,6 +8,8 @@ import type { FileContentModel } from "../deps.ts";
 import type { RepoModel } from "../deps.ts";
 import type { GitHubVarModel } from "../deps.ts";
 import type { GitHubVariablesModel } from "../deps.ts";
+import type { VariableOptions } from "./VariableOptions.ts";
+import type { TransformType } from "../core/Types.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.
@@ -214,12 +216,13 @@ export class RepoClient extends GitHubClient {
 
 	/**
 	 * Gets a list of all the variables for a repository with a name that matches the given {@link RepoClient}.{@link repoName}.
+	 * @param options The options to use when getting the variables.
 	 * @returns A list of all repositories variables.
 	 * @throws The following errors:
 	 * 1. An {@link AuthError} if there was a problem with the authentication.
 	 * 2. The {@link RepoError} if the there was a problem getting all of the repository variables.
 	 */
-	public async getVariables(): Promise<GitHubVarModel[]> {
+	public async getVariables(options?: VariableOptions | VariableOptions[]): Promise<GitHubVarModel[]> {
 		return await this.getAllData<GitHubVarModel>(async (page: number, qtyPerPage?: number) => {
 			const queryString = `?page=${page}&per_page=${qtyPerPage}`;
 			const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/actions/variables${queryString}`;
@@ -238,6 +241,35 @@ export class RepoClient extends GitHubClient {
 			}
 
 			const vars = await this.getResponseData<GitHubVariablesModel>(response);
+
+			const transform = (trimType: TransformType, value: string): string => {
+				switch (trimType) {
+					case "TrimStart":
+						return value.trimStart();
+					case "TrimEnd":
+						return value.trimEnd();
+					case "TrimBoth":
+						return value.trim();
+					case "UpperCase":
+						return value.toUpperCase();
+					case "LowerCase":
+						return value.toLowerCase();
+					default:
+						return Utils.isNothing(value) ? "" : value;
+				}
+			};
+
+			vars.variables.forEach((variable) => {
+				if (!Utils.isNothing(options)) {
+					if (Array.isArray(options.transformType)) {
+						options.transformType.forEach((transformType) => {
+							variable.value = transform(transformType, variable.value);
+						});
+					} else {
+						variable.value = transform(options.transformType, variable.value);
+					}
+				}
+			});
 
 			return [vars.variables, response];
 		});

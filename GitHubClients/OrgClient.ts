@@ -6,6 +6,8 @@ import { OrganizationError } from "../deps.ts";
 import type { GitHubVarModel } from "../deps.ts";
 import type { GitHubVariablesModel } from "../deps.ts";
 import type { UserModel } from "../deps.ts";
+import type { VariableOptions } from "./VariableOptions.ts";
+import type { TransformType } from "../core/Types.ts";
 
 /**
  * Represents the type of member visibility in a GitHub organization.
@@ -236,10 +238,11 @@ export class OrgClient extends GitHubClient {
 
 	/**
 	 * Gets a list of all the variables for an organization that matches the {@link OrgClient}.{@link ownerName}.
+	 * @param options The options to use when getting the variables.
 	 * @returns A list of all the organization's variables.
 	 * @throws An {@link AuthError} or {@link OrganizationError}.
 	 */
-	public async getVariables(): Promise<GitHubVarModel[]> {
+	public async getVariables(options?: VariableOptions | VariableOptions[]): Promise<GitHubVarModel[]> {
 		return await this.getAllData<GitHubVarModel>(async (page: number, qtyPerPage?: number) => {
 			const queryString = `?page=${page}&per_page=${qtyPerPage}`;
 			const url = `${this.baseUrl}/orgs/${this.ownerName}/actions/variables${queryString}`;
@@ -258,6 +261,35 @@ export class OrgClient extends GitHubClient {
 			}
 
 			const vars = await this.getResponseData<GitHubVariablesModel>(response);
+
+			const transform = (trimType: TransformType, value: string): string => {
+				switch (trimType) {
+					case "TrimStart":
+						return value.trimStart();
+					case "TrimEnd":
+						return value.trimEnd();
+					case "TrimBoth":
+						return value.trim();
+					case "UpperCase":
+						return value.toUpperCase();
+					case "LowerCase":
+						return value.toLowerCase();
+					default:
+						return Utils.isNothing(value) ? "" : value;
+				}
+			};
+
+			vars.variables.forEach((variable) => {
+				if (!Utils.isNothing(options)) {
+					if (Array.isArray(options.transformType)) {
+						options.transformType.forEach((transformType) => {
+							variable.value = transform(transformType, variable.value);
+						});
+					} else {
+						variable.value = transform(options.transformType, variable.value);
+					}
+				}
+			});
 
 			return [vars.variables, response];
 		});

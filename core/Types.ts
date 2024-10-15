@@ -40,3 +40,27 @@ export type BadCredentials = {
 	 */
 	message: string;
 };
+
+/**
+ * Represents different string transformations.
+ */
+export type TransformType =
+	/**
+	 * Removes the trailing white space and line terminator characters from a string.
+	 */
+	| "TrimStart"
+	| /**
+	 * Trims new line characters from the start.
+	 */ "TrimEnd"
+	| /**
+	 * Removes the leading and trailing white space and line terminator characters from a string.
+	 */ "TrimBoth"
+	| /**
+	 * Converts the value to all uppercase.
+	 */ "UpperCase"
+	| /**
+	 * Converts the value to all lowercase.
+	 */ "LowerCase"
+	| /**
+	 * No transformation will be performed.
+	 */ "None";
