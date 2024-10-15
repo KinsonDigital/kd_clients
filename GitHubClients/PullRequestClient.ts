@@ -384,7 +384,7 @@ export class PullRequestClient extends GitHubClient {
 	 * 1. The {@link AuthError} when the request is unauthorized.
 	 * 2. The {@link PullRequestError} when something goes wrong with getting all of the pull requests.
 	 */
-	public async closedPullRequestExists(prNumber: number): Promise<boolean> {
+	public async closedExists(prNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(prNumber, "closedPullRequestExists", "issueNumber");
 
 		return await this.openOrClosedPullRequestExists(prNumber, IssueOrPRState.closed);
