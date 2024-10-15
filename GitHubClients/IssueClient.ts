@@ -310,7 +310,7 @@ export class IssueClient extends GitHubClient {
 	 * @returns True if the issue exists and is open, otherwise false.
 	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
-	public async openIssueExists(issueNumber: number): Promise<boolean> {
+	public async openExists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "openIssueExist", "issueNumber");
 
 		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.open);
