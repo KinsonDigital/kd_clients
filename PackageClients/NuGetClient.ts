@@ -2,6 +2,7 @@ import { WebApiClient } from "../core/WebApiClient.ts";
 import { Guard } from "../core/Guard.ts";
 import { NuGetHttpStatusCodes } from "../core/Enums.ts";
 import { NuGetError } from "./Errors/NuGetError.ts";
+import { Utils } from "../deps.ts";
 
 /**
  * References:
@@ -60,13 +61,17 @@ export class NuGetClient extends WebApiClient {
 	 * @returns True if the package exists with the given version, otherwise false.
 	 * @throws The {@link NuGetError} if there was an issue checking for a specific package version.
 	 */
-	public async packageWithVersionExists(packageName: string, version: string): Promise<boolean> {
+	public async exists(packageName: string, version?: string): Promise<boolean> {
 		const funcName = "packageWithVersionExists";
 		Guard.isNothing(packageName, funcName, "packageName");
 		Guard.isNothing(packageName, funcName, "version");
 
 		packageName = packageName.trim().toLowerCase();
-		version = version.trim().toLowerCase();
+
+		if (!Utils.isNothing(version)) {
+			version = version.trim().toLowerCase();
+			version = version.startsWith("v") ? version.slice(1) : version;
+		}
 
 		const url = this.buildUrl(packageName);
 
@@ -75,6 +80,10 @@ export class NuGetClient extends WebApiClient {
 
 		if (this.statusCodeValid(statusCode)) {
 			if (statusCode === NuGetHttpStatusCodes.SuccessWithResponseBody) {
+				if (Utils.isNothing(version)) {
+					return true;
+				}
+
 				const versions = <string[]> (await this.getResponseData<{ versions: string[] }>(response))
 					.versions.map((v: string) => v.toLowerCase());
 
