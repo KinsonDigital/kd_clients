@@ -207,7 +207,7 @@ export class IssueClient extends GitHubClient {
 		Guard.isLessThanOne(issueNumber, "addLabel", "issueNumber");
 
 		// First check that the label trying to be added exists in the repo
-		const labelDoesNotExist = !(await this.labelClient.labelExists(label));
+		const labelDoesNotExist = !(await this.labelClient.exists(label));
 
 		if (labelDoesNotExist) {
 			const labelsUrl = `https://github.com/KinsonDigital/${super.repoName}/labels`;

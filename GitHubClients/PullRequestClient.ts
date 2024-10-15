@@ -184,7 +184,7 @@ export class PullRequestClient extends GitHubClient {
 		}
 
 		// First check that the label trying to be added exists in the repo
-		const labelDoesNotExist = !(await this.labelClient.labelExists(label));
+		const labelDoesNotExist = !(await this.labelClient.exists(label));
 
 		if (labelDoesNotExist) {
 			const labelsUrl = Utils.buildLabelsUrl(this.ownerName, this.repoName);

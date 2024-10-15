@@ -85,7 +85,7 @@ export class LabelClient extends GitHubClient {
 	 * @remarks Does not require authentication.
 	 * @throws An {@link AuthError} or {@link LabelError}.
 	 */
-	public async labelExists(label: string): Promise<boolean> {
+	public async exists(label: string): Promise<boolean> {
 		Guard.isNothing(label, "labelExists", "label");
 
 		const foundLabels = await this.getAllDataUntil(
