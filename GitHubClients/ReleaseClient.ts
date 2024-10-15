@@ -39,7 +39,7 @@ export class ReleaseClient extends GitHubClient {
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async getReleases(page: number, qtyPerPage: number): Promise<ReleaseModel[]> {
-		const [result, response] = await this.getAllReleases(page, qtyPerPage);
+		const [result, response] = await this.getReleasesInternal(page, qtyPerPage);
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
@@ -133,7 +133,7 @@ export class ReleaseClient extends GitHubClient {
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getAllReleases(page, qtyPerPage ?? 100);
+				return await this.getReleasesInternal(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -202,7 +202,7 @@ export class ReleaseClient extends GitHubClient {
 
 		const releases = await this.getAllDataUntil<ReleaseModel>(
 			async (page: number, qtyPerPage?: number) => {
-				return await this.getAllReleases(page, qtyPerPage ?? 100);
+				return await this.getReleasesInternal(page, qtyPerPage ?? 100);
 			},
 			1, // Start page
 			100, // Qty per page
@@ -766,7 +766,7 @@ export class ReleaseClient extends GitHubClient {
 	 * be set to 1, if greater than 100, the value will be set to 100.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
-	private async getAllReleases(page: number, qtyPerPage: number): Promise<[ReleaseModel[], Response]> {
+	private async getReleasesInternal(page: number, qtyPerPage: number): Promise<[ReleaseModel[], Response]> {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
