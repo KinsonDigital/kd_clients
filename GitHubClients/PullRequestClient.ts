@@ -236,7 +236,7 @@ export class PullRequestClient extends GitHubClient {
 	 * 1. The {@link AuthError} when the request is unauthorized.
 	 * 2. The {@link PullRequestError} when something goes wrong with getting all of the pull requests.
 	 */
-	public async pullRequestExists(prNumber: number): Promise<boolean> {
+	public async exists(prNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(prNumber, "pullRequestExists", "prNumber");
 
 		// REST API Docs: https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests
@@ -294,7 +294,7 @@ export class PullRequestClient extends GitHubClient {
 	public async updatePullRequest(prNumber: number, prRequestData: IssueOrPRRequestData): Promise<void> {
 		Guard.isLessThanOne(prNumber, "updatePullRequest", "prNumber");
 
-		const prDoesNotExist = !(await this.pullRequestExists(prNumber));
+		const prDoesNotExist = !(await this.exists(prNumber));
 
 		if (prDoesNotExist) {
 			const errorMsg = `A pull request with the number '${prNumber}' does not exist in the repo '${this.repoName}'.`;
