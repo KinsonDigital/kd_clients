@@ -279,7 +279,7 @@ export class PullRequestClient extends GitHubClient {
 	public async openExists(prNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(prNumber, "openPullRequestExists", "issueNumber");
 
-		return await this.openOrClosedPullRequestExists(prNumber, IssueOrPRState.open);
+		return await this.openOrClosedExists(prNumber, IssueOrPRState.open);
 	}
 
 	/**
@@ -387,7 +387,7 @@ export class PullRequestClient extends GitHubClient {
 	public async closedExists(prNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(prNumber, "closedPullRequestExists", "issueNumber");
 
-		return await this.openOrClosedPullRequestExists(prNumber, IssueOrPRState.closed);
+		return await this.openOrClosedExists(prNumber, IssueOrPRState.closed);
 	}
 
 	/**
@@ -453,7 +453,7 @@ export class PullRequestClient extends GitHubClient {
 	 * 1. The {@link AuthError} when the request is unauthorized.
 	 * 2. The {@link PullRequestError} when something goes wrong with getting all of the pull requests.
 	 */
-	private async openOrClosedPullRequestExists(
+	private async openOrClosedExists(
 		prNumber: number,
 		state: IssueOrPRState,
 	): Promise<boolean> {
