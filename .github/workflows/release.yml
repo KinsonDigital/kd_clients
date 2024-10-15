@@ -164,6 +164,8 @@ jobs:
     name: Run ${{ inputs.release-type }} Release
     runs-on: ubuntu-latest
     needs: [get_version, validate_release, construct_infrastructure_url]
+    permissions:
+      id-token: write
     steps:
       - name: Setup Deno (${{ vars.DENO_VERSION }})
         uses: denoland/setup-deno@v1
@@ -229,9 +231,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with: 
           name: "🚀${{ inputs.release-type }} Release - ${{ needs.get_version.outputs.version }}" 
-          body_path: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-${{ needs.get_version.outputs.version }}.md"
-          files: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-${{ needs.get_version.outputs.version }}.md"
-          tag_name: "${{ needs.get_version.outputs.version }}"
+          body_path: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
+          files: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
+          tag_name: "v${{ needs.get_version.outputs.version }}"
           prerelease: ${{ inputs.release-type == 'Preview' }}
           draft: false
 

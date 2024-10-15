@@ -1,6 +1,6 @@
 {PROJECT_NAME} {VERSION} just dropped!! 🚀
 Check it out & take it for a spin & help support development. 🤘🏼
 Release: https://github.com/{REPO_OWNER}/{PROJECT_NAME}/releases/tag/{VERSION}
-Deno Module: https://deno.land/x/{PROJECT_NAME}@{VERSION}
+JSR Package: https://jsr.io/@kinsondigital/kd-clients@{VERSION}
 Discord: https://discord.gg/{DISCORD_INVITE_CODE}
 Project: https://github.com/{REPO_OWNER}/{PROJECT_NAME}
