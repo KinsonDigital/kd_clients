@@ -247,7 +247,7 @@ export class MilestoneClient extends GitHubClient {
 	 * @remarks Does not require authentication.|
 	 * @throws An {@link AuthError} or {@link MilestoneError}.
 	 */
-	public async milestoneExists(milestoneName: string): Promise<boolean> {
+	public async exists(milestoneName: string): Promise<boolean> {
 		Guard.isNothing(milestoneName, "milestoneExists", "milestoneName");
 
 		milestoneName = milestoneName.trim();

@@ -130,7 +130,7 @@ export class TagClient extends GitHubClient {
 	 * 2. An {@link AuthError} if the request was unauthorized.
 	 * 3. The {@link TagError} if there was an issue getting the tags.
 	 */
-	public async tagExists(tagName: string): Promise<boolean> {
+	public async exists(tagName: string): Promise<boolean> {
 		Guard.isNothing(tagName, "tagExists", "tagName");
 
 		tagName = tagName.trim();

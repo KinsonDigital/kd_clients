@@ -2,6 +2,7 @@ import { WebApiClient } from "../core/WebApiClient.ts";
 import { Guard } from "../core/Guard.ts";
 import { NuGetHttpStatusCodes } from "../core/Enums.ts";
 import { NuGetError } from "./Errors/NuGetError.ts";
+import { Utils } from "../deps.ts";
 
 /**
  * References:
@@ -22,33 +23,6 @@ export class NuGetClient extends WebApiClient {
 		super();
 		this.baseUrl = "https://api.nuget.org";
 		this.updateOrAddHeader("Accept", "json");
-	}
-
-	/**
-	 * Checks if a package that matches the given {@link packageName} exists in the NuGet registry.
-	 * @param packageName The name of the NuGet package.
-	 * @returns True if the package exists, otherwise false.
-	 * @throws The {@link NuGetError} if there was an issue checking for the package.
-	 */
-	public async packageExists(packageName: string): Promise<boolean> {
-		Guard.isNothing(packageName, "packageExists", "packageName");
-
-		packageName = packageName.trim().toLowerCase();
-		const url = this.buildUrl(packageName);
-
-		const response: Response = await this.requestGET(url);
-		const statusCode: NuGetHttpStatusCodes = response.status as NuGetHttpStatusCodes;
-
-		if (this.statusCodeValid(statusCode)) {
-			return statusCode === NuGetHttpStatusCodes.SuccessWithResponseBody;
-		} else {
-			const errorMsg = this.buildErrorMsg(
-				`There was an issue checking for the '${packageName}' NuGet package.`,
-				response,
-			);
-
-			throw new NuGetError(errorMsg);
-		}
 	}
 
 	/**
@@ -87,13 +61,17 @@ export class NuGetClient extends WebApiClient {
 	 * @returns True if the package exists with the given version, otherwise false.
 	 * @throws The {@link NuGetError} if there was an issue checking for a specific package version.
 	 */
-	public async packageWithVersionExists(packageName: string, version: string): Promise<boolean> {
+	public async exists(packageName: string, version?: string): Promise<boolean> {
 		const funcName = "packageWithVersionExists";
 		Guard.isNothing(packageName, funcName, "packageName");
 		Guard.isNothing(packageName, funcName, "version");
 
 		packageName = packageName.trim().toLowerCase();
-		version = version.trim().toLowerCase();
+
+		if (!Utils.isNothing(version)) {
+			version = version.trim().toLowerCase();
+			version = version.startsWith("v") ? version.slice(1) : version;
+		}
 
 		const url = this.buildUrl(packageName);
 
@@ -102,6 +80,10 @@ export class NuGetClient extends WebApiClient {
 
 		if (this.statusCodeValid(statusCode)) {
 			if (statusCode === NuGetHttpStatusCodes.SuccessWithResponseBody) {
+				if (Utils.isNothing(version)) {
+					return true;
+				}
+
 				const versions = <string[]> (await this.getResponseData<{ versions: string[] }>(response))
 					.versions.map((v: string) => v.toLowerCase());
 

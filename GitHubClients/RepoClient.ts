@@ -253,7 +253,7 @@ export class RepoClient extends GitHubClient {
 	 * 2. An {@link AuthError} if there was a problem with the authentication.
 	 * 3. The {@link RepoError} if the there was a problem getting all of the repository variables.
 	 */
-	public async repoVariableExists(variableName: string): Promise<boolean> {
+	public async variableExists(variableName: string): Promise<boolean> {
 		Guard.isNothing(variableName, "repoVariableExists", "variableName");
 
 		const variables = await this.getVariables();
@@ -277,7 +277,7 @@ export class RepoClient extends GitHubClient {
 		Guard.isNothing(variableName, funcName, "variableName");
 		Guard.isNothing(variableValue, funcName, "variableValue");
 
-		if (!(await this.repoVariableExists(variableName))) {
+		if (!(await this.variableExists(variableName))) {
 			throw new RepoError(`The variable '${variableName}' does not exist for the repository '${this.repoName}'.`);
 		}
 

@@ -207,7 +207,7 @@ export class IssueClient extends GitHubClient {
 		Guard.isLessThanOne(issueNumber, "addLabel", "issueNumber");
 
 		// First check that the label trying to be added exists in the repo
-		const labelDoesNotExist = !(await this.labelClient.labelExists(label));
+		const labelDoesNotExist = !(await this.labelClient.exists(label));
 
 		if (labelDoesNotExist) {
 			const labelsUrl = `https://github.com/KinsonDigital/${super.repoName}/labels`;
@@ -297,7 +297,7 @@ export class IssueClient extends GitHubClient {
 	 * @returns True if the issue exists, otherwise false.
 	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
-	public async issueExists(issueNumber: number): Promise<boolean> {
+	public async exists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "issueExists", "issueNumber");
 
 		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.any);
@@ -310,7 +310,7 @@ export class IssueClient extends GitHubClient {
 	 * @returns True if the issue exists and is open, otherwise false.
 	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
-	public async openIssueExists(issueNumber: number): Promise<boolean> {
+	public async openExists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "openIssueExist", "issueNumber");
 
 		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.open);
@@ -323,7 +323,7 @@ export class IssueClient extends GitHubClient {
 	 * @returns True if the issue exists and is open, otherwise false.
 	 * @throws An {@link AuthError} or {@link IssueError}.
 	 */
-	public async closedIssueExists(issueNumber: number): Promise<boolean> {
+	public async closedExists(issueNumber: number): Promise<boolean> {
 		Guard.isLessThanOne(issueNumber, "closedIssueExist", "issueNumber");
 
 		return await this.openOrClosedIssueExists(issueNumber, IssueOrPRState.closed);
