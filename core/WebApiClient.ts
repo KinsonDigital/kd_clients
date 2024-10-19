@@ -6,18 +6,13 @@ import { Guard } from "./Guard.ts";
 export abstract class WebApiClient {
 	private readonly headers: Headers = new Headers();
 	protected baseUrl = "";
+	private totalRequestsRunning = 0;
 
 	/**
-	 * Gets the data from an HTTP response.
-	 * @param response The HTTP response to get the data from.
-	 * @returns The data from the response.
+	 * Gets the total number of requests running.
 	 */
-	protected async getResponseData<T>(response: Response): Promise<T> {
-		const responseText: string = await response.text();
-
-		const acceptHeaderValue = this.getHeader("Accept") ?? "";
-
-		return acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json") ? await JSON.parse(responseText) : responseText;
+	public get TotalRequestsRunning(): number {
+		return this.totalRequestsRunning;
 	}
 
 	/**
@@ -28,10 +23,16 @@ export abstract class WebApiClient {
 	public async requestGET(url: string): Promise<Response> {
 		Guard.isNothing(url, "fetchGET", "url");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "GET",
 			headers: this.headers,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -53,11 +54,17 @@ export abstract class WebApiClient {
 			requestBody = typeof body === "string" ? body : JSON.stringify(body);
 		}
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "POST",
 			headers: this.headers,
 			body: requestBody,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -71,11 +78,17 @@ export abstract class WebApiClient {
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "PATCH",
 			headers: this.headers,
 			body: body,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -86,10 +99,16 @@ export abstract class WebApiClient {
 	public async requestDELETE(url: string): Promise<Response> {
 		Guard.isNothing(url, "fetchDELETE", "url");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "DELETE",
 			headers: this.headers,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -103,11 +122,17 @@ export abstract class WebApiClient {
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "PUT",
 			headers: this.headers,
 			body: body,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -148,6 +173,19 @@ export abstract class WebApiClient {
 	 */
 	public containsHeader(name: string): boolean {
 		return this.headers.has(name);
+	}
+
+	/**
+	 * Gets the data from an HTTP response.
+	 * @param response The HTTP response to get the data from.
+	 * @returns The data from the response.
+	 */
+	protected async getResponseData<T>(response: Response): Promise<T> {
+		const responseText: string = await response.text();
+
+		const acceptHeaderValue = this.getHeader("Accept") ?? "";
+
+		return acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json") ? await JSON.parse(responseText) : responseText;
 	}
 
 	/**
