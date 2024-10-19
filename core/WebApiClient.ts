@@ -8,19 +8,6 @@ export abstract class WebApiClient {
 	protected baseUrl = "";
 
 	/**
-	 * Gets the data from an HTTP response.
-	 * @param response The HTTP response to get the data from.
-	 * @returns The data from the response.
-	 */
-	protected async getResponseData<T>(response: Response): Promise<T> {
-		const responseText: string = await response.text();
-
-		const acceptHeaderValue = this.getHeader("Accept") ?? "";
-
-		return acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json") ? await JSON.parse(responseText) : responseText;
-	}
-
-	/**
 	 * Gets a resource by performing an HTTP request using the GET method.
 	 * @param url The URL of the request.
 	 * @returns The response from the request.
@@ -148,6 +135,19 @@ export abstract class WebApiClient {
 	 */
 	public containsHeader(name: string): boolean {
 		return this.headers.has(name);
+	}
+
+	/**
+	 * Gets the data from an HTTP response.
+	 * @param response The HTTP response to get the data from.
+	 * @returns The data from the response.
+	 */
+	protected async getResponseData<T>(response: Response): Promise<T> {
+		const responseText: string = await response.text();
+
+		const acceptHeaderValue = this.getHeader("Accept") ?? "";
+
+		return acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json") ? await JSON.parse(responseText) : responseText;
 	}
 
 	/**
