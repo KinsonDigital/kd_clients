@@ -18,6 +18,7 @@ import { LinkHeaderParser } from "./LinkHeaderParser.ts";
 import { WebApiClient } from "./WebApiClient.ts";
 import { Guard } from "./Guard.ts";
 import { AuthError } from "../GitHubClients/Errors/AuthError.ts";
+import { sleep } from "./Sleep.ts";
 
 /**
  * Provides a base class for HTTP clients.
@@ -26,6 +27,8 @@ export abstract class GitHubClient extends WebApiClient {
 	private headerParser: LinkHeaderParser = new LinkHeaderParser();
 	private _repoName = "";
 	private _ownerName = "";
+	private readonly defaultWaitTime = 1000 * 60; // Default 1 minute
+	private primaryLimitAccumulatorMs = this.defaultWaitTime;
 
 	/**
 	 * Initializes a new instance of the {@link WebAPIClient} class.
@@ -77,6 +80,13 @@ export abstract class GitHubClient extends WebApiClient {
 	public set repoName(v: string) {
 		Guard.isNothing(v, "repoName", "v");
 		this._repoName = v.trim();
+	}
+
+	/**
+	 * Resets the wait time to 60 seconds for use when the GitHub primary rate limit is reached.
+	 */
+	public resetLimitWaitTime(): void {
+		this.primaryLimitAccumulatorMs = this.defaultWaitTime;
 	}
 
 	/**
@@ -254,6 +264,159 @@ export abstract class GitHubClient extends WebApiClient {
 
 			throw new Error(errorMsg);
 		}
+	}
+
+	/**
+	 * @inheritdoc
+	 * @remarks Intercepts the request process primary and secondary rate limits.
+	 */
+	public override async requestGET(url: string): Promise<Response> {
+		while (this.TotalRequestsRunning >= 100) {
+			await sleep(5000);
+		}
+
+		const response = await super.requestGET(url);
+		await this.processRateLimits(response);
+
+		return response;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @remarks Intercepts the request process primary and secondary rate limits.
+	 */
+	public override async requestPOST(url: string, body: string | object | Uint8Array): Promise<Response> {
+		while (this.TotalRequestsRunning >= 100) {
+			await sleep(1000);
+		}
+
+		const response = await super.requestPOST(url, body);
+
+		await this.processRateLimits(response);
+
+		return response;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @remarks Intercepts the request process primary and secondary rate limits.
+	 */
+	public override async requestPATCH(url: string, body: string): Promise<Response> {
+		while (this.TotalRequestsRunning >= 100) {
+			await sleep(1000);
+		}
+
+		const response = await super.requestPATCH(url, body);
+		await this.processRateLimits(response);
+
+		return response;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @remarks Intercepts the request process primary and secondary rate limits.
+	 */
+	public override async requestDELETE(url: string): Promise<Response> {
+		while (this.TotalRequestsRunning >= 100) {
+			await sleep(1000);
+		}
+
+		const response = await super.requestDELETE(url);
+		await this.processRateLimits(response);
+
+		return response;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @remarks Intercepts the request process primary and secondary rate limits.
+	 */
+	public override async requestPUT(url: string, body: string): Promise<Response> {
+		while (this.TotalRequestsRunning >= 100) {
+			await sleep(1000);
+		}
+
+		const response = await super.requestPUT(url, body);
+		await this.processRateLimits(response);
+
+		return response;
+	}
+
+	/**
+	 * Processes any rate limits that are returned in the response headers.
+	 * @param response The response to process the rate limits for.
+	 * @returns A promise that resolves when the rate limits have been processed.
+	 */
+	private async processRateLimits(response: Response): Promise<void> {
+		const rateLimit = response.headers.get("x-ratelimit-limit");
+		const rateRemaining = response.headers.get("x-ratelimit-remaining");
+		const rateResetEpochSeconds = response.headers.get("x-ratelimit-reset");
+		const rateResource = response.headers.get("x-ratelimit-resource");
+		const rateUsed = response.headers.get("x-ratelimit-used");
+		const retryAfter = response.headers.get("retry-after");
+
+		if (retryAfter !== null) {
+			const retryAfterMs = parseInt(retryAfter) * 1000;
+
+			this.showRateLimitWarning(response);
+
+			await sleep(retryAfterMs);
+
+			return;
+		}
+
+		// If any of the header values are null, throw an exception
+		if (
+			rateLimit === null || rateRemaining === null || rateResetEpochSeconds === null || rateResource === null ||
+			rateUsed === null
+		) {
+			throw new Error("There was an issue processing the rate limit headers.");
+		}
+
+		const primaryLimitReached = rateRemaining === "0" && (response.status === 403 || response.status === 429);
+
+		if (primaryLimitReached) {
+			this.showRateLimitWarning(response);
+
+			await sleep(this.primaryLimitAccumulatorMs);
+
+			// Next time, wait for an additional 20%
+			this.primaryLimitAccumulatorMs += this.primaryLimitAccumulatorMs * 0.20;
+		}
+	}
+
+	/**
+	 * Uses the response to show a warning about the rate limit being reached.
+	 * @param response The response containing the rate limit headers.
+	 */
+	private showRateLimitWarning(response: Response): void {
+		const rateLimit = response.headers.get("x-ratelimit-limit");
+		const rateRemaining = response.headers.get("x-ratelimit-remaining");
+		const rateResetEpochSeconds = response.headers.get("x-ratelimit-reset");
+		const rateResource = response.headers.get("x-ratelimit-resource");
+		const rateUsed = response.headers.get("x-ratelimit-used");
+
+		// If any of the header values are null, throw an exception
+		if (
+			rateLimit === null || rateRemaining === null || rateResetEpochSeconds === null || rateResource === null ||
+			rateUsed === null
+		) {
+			throw new Error("There was an issue processing the rate limit headers.");
+		}
+
+		const resetSec = Math.abs(parseInt(rateResetEpochSeconds) - Math.floor(Date.now() / 1000)).toFixed(1);
+
+		const warning = "%cGitHub Rate Limit Reached!" +
+			`\nWaiting for ${this.primaryLimitAccumulatorMs / 1000} seconds before continuing.` +
+			"\nMore info: https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28" +
+			"\n\thttps://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api?apiVersion=2022-11-28" +
+			`\nRate Limit: ${rateLimit}` +
+			`\nRemaining: ${rateRemaining}` +
+			`\nReset Time(s): ${resetSec}` +
+			`\nResource: ${rateResource}` +
+			`\nUsed: ${rateUsed}`;
+
+		console.warn(`%c${warning}`, "color: yellow");
 	}
 
 	/**
