@@ -6,6 +6,14 @@ import { Guard } from "./Guard.ts";
 export abstract class WebApiClient {
 	private readonly headers: Headers = new Headers();
 	protected baseUrl = "";
+	private totalRequestsRunning = 0;
+
+	/**
+	 * Gets the total number of requests running.
+	 */
+	public get TotalRequestsRunning(): number {
+		return this.totalRequestsRunning;
+	}
 
 	/**
 	 * Gets a resource by performing an HTTP request using the GET method.
@@ -15,10 +23,16 @@ export abstract class WebApiClient {
 	public async requestGET(url: string): Promise<Response> {
 		Guard.isNothing(url, "fetchGET", "url");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "GET",
 			headers: this.headers,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -40,11 +54,17 @@ export abstract class WebApiClient {
 			requestBody = typeof body === "string" ? body : JSON.stringify(body);
 		}
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "POST",
 			headers: this.headers,
 			body: requestBody,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -58,11 +78,17 @@ export abstract class WebApiClient {
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "PATCH",
 			headers: this.headers,
 			body: body,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -73,10 +99,16 @@ export abstract class WebApiClient {
 	public async requestDELETE(url: string): Promise<Response> {
 		Guard.isNothing(url, "fetchDELETE", "url");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "DELETE",
 			headers: this.headers,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
@@ -90,11 +122,17 @@ export abstract class WebApiClient {
 		Guard.isNothing(url, funcName, "url");
 		Guard.isNothing(body, funcName, "body");
 
-		return await fetch(url, {
+		this.totalRequestsRunning += 1;
+
+		const response = await fetch(url, {
 			method: "PUT",
 			headers: this.headers,
 			body: body,
 		});
+
+		this.totalRequestsRunning -= 1;
+
+		return response;
 	}
 
 	/**
