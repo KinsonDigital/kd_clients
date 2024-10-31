@@ -17,7 +17,8 @@
         "lint": "deno lint",
         "format": "deno fmt ./**/*.ts",
         "format-check": "deno fmt ./**/*.ts --check",
-        "reload-cache": "deno cache ./**/*.ts --reload"
+        "reload-cache": "deno cache ./**/*.ts --reload",
+        "check-all": "deno task check && deno task lint && deno task format-check"
     },
     "lint": {
         "include": [
