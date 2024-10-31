@@ -1,4 +1,4 @@
-import { Utils } from "../../../deps.ts";
+import { Utils } from "@core/Utils.ts";
 
 /**
  * Get the value of an environment variable after checking if it exists.

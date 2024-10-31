@@ -1,15 +1,17 @@
-import { AuthError, decodeBase64, encodeBase64, isAbsolute } from "../deps.ts";
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { GitHubClient } from "../deps.ts";
-import { Guard } from "../core/Guard.ts";
-import { Utils } from "../deps.ts";
-import { RepoError } from "../deps.ts";
-import type { FileContentModel } from "../deps.ts";
-import type { RepoModel } from "../deps.ts";
-import type { GitHubVarModel } from "../deps.ts";
-import type { GitHubVariablesModel } from "../deps.ts";
-import type { VariableOptions } from "./VariableOptions.ts";
-import type { TransformType } from "../core/Types.ts";
+import { isAbsolute } from "@std/path";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
+import { GitHubHttpStatusCodes } from "@core/Enums.ts";
+import { GitHubClient } from "@gh-clients/GitHubClient.ts";
+import { Guard } from "@core/Guard.ts";
+import { Utils } from "@core/Utils.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { RepoError } from "@gh-errors/RepoError.ts";
+import type { FileContentModel } from "@gh-rest-models/FileContentModel.ts";
+import type { RepoModel } from "@gh-rest-models/RepoModel.ts";
+import type { GitHubVarModel } from "@gh-rest-models/GitHubVarModel.ts";
+import type { GitHubVariablesModel } from "@gh-rest-models/GitHubVariablesModel.ts";
+import type { VariableOptions } from "@gh-clients/VariableOptions.ts";
+import type { TransformType } from "@core/Types.ts";
 
 /**
  * Provides a client for interacting with GitHub repositories.

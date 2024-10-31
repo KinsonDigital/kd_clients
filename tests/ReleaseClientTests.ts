@@ -1,6 +1,7 @@
-import { ReleaseError } from "../GitHubClients/Errors/ReleaseError.ts";
-import { ReleaseClient } from "../GitHubClients/ReleaseClient.ts";
-import { assertRejects, stub } from "../deps.ts";
+import { ReleaseError } from "@gh-errors/ReleaseError.ts";
+import { ReleaseClient } from "@gh-clients/ReleaseClient.ts";
+import { assertRejects } from "@std/assert";
+import { stub } from "@std/testing/mock";
 import { assertEquals } from "@std/assert/assert-equals";
 
 Deno.test("getReleases |> with_not_found_response |> throws_error", async () => {

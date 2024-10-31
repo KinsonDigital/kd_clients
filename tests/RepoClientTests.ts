@@ -1,7 +1,9 @@
-import { RepoError } from "../GitHubClients/Errors/RepoError.ts";
-import { assertEquals, assertRejects, assertSpyCalls, stub } from "../deps.ts";
-import { RepoClient } from "../mod.ts";
-import type { FileContentModel, RepoModel } from "../core/Models/mod.ts";
+import { RepoError } from "@gh-errors/RepoError.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { assertSpyCalls, stub } from "@std/testing/mock";
+import { RepoClient } from "@gh-clients/RepoClient.ts";
+import type { FileContentModel } from "@gh-rest-models/FileContentModel.ts";
+import type { RepoModel } from "@gh-rest-models/RepoModel.ts";
 
 Deno.test("getRepo |> when-invoked |> gets-repository", async () => {
 	// Arrange

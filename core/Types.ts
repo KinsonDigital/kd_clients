@@ -1,5 +1,5 @@
-import type { IssueModel } from "../deps.ts";
-import type { PullRequestModel } from "../deps.ts";
+import type { IssueModel } from "@gh-rest-models/IssueModel.ts";
+import type { PullRequestModel } from "@gh-rest-models/PullRequestModel.ts";
 
 /**
  * Represents a GitHub issue or pull request.

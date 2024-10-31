@@ -1,5 +1,5 @@
-import getJsrPkgMetaData from "../core/get-jsr-pkg-meta-data.ts";
-import getEnvVar from "../core/GetEnvVar.ts";
+import getJsrPkgMetaData from "@cicd/core/get-jsr-pkg-meta-data.ts";
+import getEnvVar from "@cicd/core/GetEnvVar.ts";
 
 const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 

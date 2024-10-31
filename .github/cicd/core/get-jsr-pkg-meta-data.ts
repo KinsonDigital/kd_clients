@@ -1,4 +1,4 @@
-import type { JsrMetaModel } from "./models/jsr-meta-model.ts";
+import type { JsrMetaModel } from "@cicd/core/models/jsr-meta-model.ts";
 
 /**
  * Gets the meta data for a package with the given {@link scope} and {@link pkgName}.

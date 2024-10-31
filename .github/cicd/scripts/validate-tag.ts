@@ -1,7 +1,7 @@
 import { TagClient } from "@kd/clients";
-import { Utils } from "../../../core/Utils.ts";
-import getEnvVar from "../core/GetEnvVar.ts";
-import { validateOrgExists, validateRepoExists, validateUserExists } from "../core/Validators.ts";
+import { Utils } from "@core/Utils.ts";
+import getEnvVar from "@cicd/core/GetEnvVar.ts";
+import { validateOrgExists, validateRepoExists, validateUserExists } from "@cicd/core/Validators.ts";
 
 const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 

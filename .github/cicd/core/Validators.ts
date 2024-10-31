@@ -1,6 +1,9 @@
-import { Utils } from "../../../deps.ts";
-import { MilestoneClient, OrgClient, RepoClient, UsersClient } from "../../../GitHubClients/mod.ts";
-import getEnvVar from "./GetEnvVar.ts";
+import { Utils } from "@core/Utils.ts";
+import { MilestoneClient } from "@gh-clients/MilestoneClient.ts";
+import { OrgClient } from "@gh-clients/OrgClient.ts";
+import { RepoClient } from "@gh-clients/RepoClient.ts";
+import { UsersClient } from "@gh-clients/UsersClient.ts";
+import getEnvVar from "@cicd/core/GetEnvVar.ts";
 
 /**
  * Validates that a GitHub user exists.

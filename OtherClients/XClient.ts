@@ -1,8 +1,8 @@
-import { Guard } from "../core/Guard.ts";
-import { oauth1a } from "../deps.ts";
-import { WebApiClient } from "../core/WebApiClient.ts";
-import { XError } from "../deps.ts";
-import type { XAuthValues } from "./XAuthValues.ts";
+import { Guard } from "@core/Guard.ts";
+import { oauth1a } from "@oauth1";
+import { WebApiClient } from "@core/WebApiClient.ts";
+import { XError } from "@other-errors/XError.ts";
+import type { XAuthValues } from "@other-clients/XAuthValues.ts";
 
 /**
  * Provides twitter functionality.

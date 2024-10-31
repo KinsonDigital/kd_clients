@@ -1,24 +1,22 @@
-import type { GetDataFunc } from "./Types.ts";
-import {
-	GitError,
-	IssueError,
-	LabelError,
-	MilestoneError,
-	OrganizationError,
-	ProjectError,
-	PullRequestError,
-	ReleaseError,
-	RepoError,
-	TagError,
-	UsersError,
-	Utils,
-	WorkflowError,
-} from "../deps.ts";
-import { LinkHeaderParser } from "./LinkHeaderParser.ts";
-import { WebApiClient } from "./WebApiClient.ts";
-import { Guard } from "./Guard.ts";
-import { AuthError } from "../GitHubClients/Errors/AuthError.ts";
-import { sleep } from "./Sleep.ts";
+import { GitError } from "@gh-errors/GitError.ts";
+import { IssueError } from "@gh-errors/IssueError.ts";
+import { LabelError } from "@gh-errors/LabelError.ts";
+import { MilestoneError } from "@gh-errors/MilestoneError.ts";
+import { OrganizationError } from "@gh-errors/OrganizationError.ts";
+import { ProjectError } from "@gh-errors/ProjectError.ts";
+import { PullRequestError } from "@gh-errors/PullRequestError.ts";
+import { ReleaseError } from "@gh-errors/ReleaseError.ts";
+import { RepoError } from "@gh-errors/RepoError.ts";
+import { TagError } from "@gh-errors/TagError.ts";
+import { UsersError } from "@gh-errors/UsersError.ts";
+import { WorkflowError } from "@gh-errors/WorkflowError.ts";
+import { Utils } from "@core/Utils.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { LinkHeaderParser } from "@core/LinkHeaderParser.ts";
+import { WebApiClient } from "@core/WebApiClient.ts";
+import { Guard } from "@core/Guard.ts";
+import { sleep } from "@core/Sleep.ts";
+import type { GetDataFunc } from "@core/Types.ts";
 
 /**
  * Provides a base class for HTTP clients.

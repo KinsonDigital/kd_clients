@@ -1,9 +1,9 @@
-import type { State } from "../Types.ts";
-import type { LabelModel } from "./mod.ts";
-import type { MilestoneModel } from "./mod.ts";
-import type { PullRequestHeadOrBaseModel } from "./mod.ts";
-import type { PullRequestInfoModel } from "./mod.ts";
-import type { UserModel } from "./mod.ts";
+import type { State } from "@core/Types.ts";
+import type { LabelModel } from "@gh-rest-models/LabelModel.ts";
+import type { MilestoneModel } from "@gh-rest-models/MilestoneModel.ts";
+import type { PullRequestHeadOrBaseModel } from "@gh-rest-models/PullRequestHeadOrBaseModel.ts";
+import type { PullRequestInfoModel } from "@gh-rest-models/PullRequestInfoModel.ts";
+import type { UserModel } from "@gh-rest-models/UserModel.ts";
 
 /**
  * Represents a GitHub pull request.

@@ -1,8 +1,9 @@
-import { Guard } from "../core/Guard.ts";
-import { GitHubHttpStatusCodes } from "../core/Enums.ts";
-import { AuthError, GitHubClient } from "../deps.ts";
-import { UsersError } from "../deps.ts";
-import type { UserModel } from "../deps.ts";
+import { Guard } from "@core/Guard.ts";
+import { GitHubHttpStatusCodes } from "@core/Enums.ts";
+import { GitHubClient } from "@gh-clients/GitHubClient.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { UsersError } from "@gh-errors/UsersError.ts";
+import type { UserModel } from "@gh-rest-models/UserModel.ts";
 
 /**
  * Provides a client for interacting with users.

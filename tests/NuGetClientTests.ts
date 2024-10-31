@@ -1,5 +1,5 @@
-import { assertEquals } from "../deps.ts";
-import { NuGetClient } from "../mod.ts";
+import { assertEquals } from "@std/assert";
+import { NuGetClient } from "@pkg-clients/NuGetClient.ts";
 
 Deno.test("ctor |> when-invoked |> creates-and-sets-accept-header", () => {
 	// Arrange

@@ -1,15 +1,16 @@
-import { AuthError, GraphQlClient } from "../deps.ts";
-import { createGetBranchesQuery } from "../core/GraphQl/Queries/GetBranchesQuery.ts";
-import { Guard } from "../core/Guard.ts";
-import { Utils } from "../deps.ts";
-import { RepoClient } from "./RepoClient.ts";
-import { getCreateBranchMutation } from "../core/GraphQl/Mutations/CreateBranchMutation.ts";
-import { addCommitMutation } from "../core/GraphQl/Mutations/AddCommitMutation.ts";
-import { GitError } from "../deps.ts";
-import type { PageInfoModel } from "../deps.ts";
-import type { GitBranchModel } from "../deps.ts";
-import type { RawRefsGetBranchModel } from "../deps.ts";
-import type { RawGitBranchModel } from "../deps.ts";
+import { GraphQlClient } from "@gh-clients/GraphQlClient.ts";
+import { createGetBranchesQuery } from "@core/GraphQl/Queries/GetBranchesQuery.ts";
+import { Guard } from "@core/Guard.ts";
+import { Utils } from "@core/Utils.ts";
+import { RepoClient } from "@gh-clients/RepoClient.ts";
+import { getCreateBranchMutation } from "@core/GraphQl/Mutations/CreateBranchMutation.ts";
+import { addCommitMutation } from "@core/GraphQl/Mutations/AddCommitMutation.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { GitError } from "@gh-errors/GitError.ts";
+import type { PageInfoModel } from "@gh-ql-models/PageInfoModel.ts";
+import type { GitBranchModel } from "@gh-ql-models/GitBranchModel.ts";
+import type { RawRefsGetBranchModel } from "@gh-ql-models/RawModels/RawRefsGetBranchModel.ts";
+import type { RawGitBranchModel } from "@gh-ql-models/RawModels/RawGitBranchModel.ts";
 
 /**
  * Provides a client for to perform git operations for a GitHub repository.
