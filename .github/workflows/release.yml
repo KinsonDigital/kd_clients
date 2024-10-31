@@ -300,24 +300,18 @@ jobs:
 
       - name: Close Milestone ${{ needs.get_version.outputs.version }}
         if: ${{ inputs.dry-run == false }}
+        env:
+          OWNER_NAME: ${{ vars.ORGANIZATION_NAME }}
+          REPO_NAME: ${{ vars.PROJECT_NAME }}
+          MILESTONE_NAME: ${{ needs.get_version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
         run: |
           $baseScriptUrl = "${{ needs.construct_infrastructure_url.outputs.url }}";
           $scriptUrl = "$baseScriptUrl/close-milestone.ts";
 
           Write-Host "::notice::Close milestone script URL: $scriptUrl";
 
-          <# Deno Args:
-            1. Project name
-            2. Milestone name - This is the version
-            3. PAT
-          #>
-          deno run `
-            -RN `
-            "$scriptUrl" `
-            "${{ vars.ORGANIZATION_NAME }}" `
-            "${{ vars.PROJECT_NAME }}" `
-            "${{ needs.get_version.outputs.version }}" `
-            "${{ secrets.CICD_TOKEN }}";
+          deno run -RN "$scriptUrl";
 
       - name: Send X Announcement
         if: ${{ inputs.dry-run == false }}
