@@ -208,7 +208,7 @@ export class ReleaseClient extends GitHubClient {
 	 * Returns a value indicating whether or not a release is tied to a tag that matches the given {@link tagName},
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
-	 * @returns The release for the given repository and name.
+	 * @returns True if the release exists, otherwise false.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async releaseExists(tagName: string): Promise<boolean> {
