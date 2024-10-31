@@ -85,4 +85,4 @@ const validateMilestoneExists = async (milestoneTitle: string, scriptFileName?: 
 	}
 };
 
-export { validateUserExists, validateMilestoneExists, validateOrgExists, validateRepoExists };
+export { validateMilestoneExists, validateOrgExists, validateRepoExists, validateUserExists };

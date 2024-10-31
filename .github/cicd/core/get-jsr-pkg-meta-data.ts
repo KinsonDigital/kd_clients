@@ -1,9 +1,9 @@
 import type { JsrMetaModel } from "./models/jsr-meta-model.ts";
 
 /**
- * 
- * @param scope 
- * @param pkgName 
+ * Gets the meta data for a package with the given {@link scope} and {@link pkgName}.
+ * @param scope The scope of the package.
+ * @param pkgName The name of the package.
  */
 export default async function getJsrPkgMetaData(scope: string, pkgName: string): Promise<string[]> {
 	scope = scope.toLowerCase();
@@ -17,8 +17,8 @@ export default async function getJsrPkgMetaData(scope: string, pkgName: string):
 
 	if (response.status !== 200) {
 		const errorMsg = `An error occurred while fetching the meta data for the package '@${scope}/${pkgName}'.` +
-			`\n${response.status} - ${response.statusText}`
-		
+			`\n${response.status} - ${response.statusText}`;
+
 		console.log(`%c${errorMsg}`, "color: indianred");
 		Deno.exit();
 	}
