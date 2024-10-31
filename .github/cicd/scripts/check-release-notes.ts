@@ -1,44 +1,23 @@
-import { Utils } from "../../../core/Utils.ts";
-import { File } from "../core/File.ts";
+import { existsSync } from "@std/fs/exists";
+import { Utils } from "@core/Utils.ts";
+import getEnvVar from "@cicd/core/GetEnvVar.ts";
 
-if (Deno.args.length !== 2) {
-	let errorMsg = `The required number of arguments is 2 but received ${Deno.args.length}.`;
-	errorMsg += `\nPlease provide the following arguments: version type, version.`;
-	Utils.printError(errorMsg);
-	Deno.exit(100);
-}
+const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 
-const versionType = Deno.args[0].trim().toLowerCase();
-let version = Deno.args[1].trim().toLowerCase();
-
-if (Utils.invalidReleaseType(versionType)) {
-	Utils.printError(`The version type must be either 'preview' or 'release' but received '${versionType}'.`);
-	Deno.exit(200);
-}
+const versionType = getEnvVar("VERSION_TYPE", scriptFileName).toLowerCase();
+let version = getEnvVar("VERSION", scriptFileName);
 
 version = version.startsWith("v") ? version : `v${version}`;
 
-let releaseNotesDirName = "";
-
-if (Utils.isPreviewRelease(versionType)) {
-	if (Utils.isNotValidPreviewVersion(version)) {
-		Utils.printError(`The preview version '${version}' is not valid.`);
-		Deno.exit(300);
-	}
-
-	releaseNotesDirName = "PreviewReleases";
-} else if (Utils.isProductionRelease(versionType)) {
-	if (Utils.isNotValidProdVersion(version)) {
-		Utils.printError(`The production version '${version}' is not valid.`);
-		Deno.exit(400);
-	}
-
-	releaseNotesDirName = "ProductionReleases";
+if (versionType !== "preview" && versionType !== "production") {
+	const errorMsg = `The version type '${versionType}' is not valid. Valid values are 'preview' or 'production' version type.`;
+	Utils.printError(errorMsg);
+	Deno.exit(1);
 }
 
-const releaseNotesDirPath = `./ReleaseNotes/${releaseNotesDirName}/Release-Notes-${version}.md`;
+const releaseNotesDirPath = `./ReleaseNotes/${versionType}-releases/Release-Notes-${version}.md`;
 
-if (File.DoesNotExist(releaseNotesDirPath)) {
+if (!existsSync(releaseNotesDirPath, { isFile: true })) {
 	Utils.printError(`The release notes '${releaseNotesDirPath}' does not exist.`);
 	Deno.exit(500);
 }

@@ -1,15 +1,16 @@
-import { createOrgProjectsQuery } from "../core/GraphQl/Queries/GetOrgProjectsQueries.ts";
-import { GraphQlClient } from "../deps.ts";
-import { Guard } from "../core/Guard.ts";
-import { Utils } from "../deps.ts";
-import { createLinkItemToProjectMutation } from "../core/GraphQl/Mutations/AddToProjectMutation.ts";
-import { createGetIssueProjectsQuery } from "../core/GraphQl/Queries/GetIssueProjectsQuery.ts";
-import { createGetPullRequestProjectsQuery } from "../core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
-import { ProjectError } from "../deps.ts";
-import { IssueClient, PullRequestClient } from "./mod.ts";
-import type { ProjectModel } from "../deps.ts";
-import type { IssueModel } from "../deps.ts";
-import type { PullRequestModel } from "../deps.ts";
+import { createOrgProjectsQuery } from "@core/GraphQl/Queries/GetOrgProjectsQueries.ts";
+import { GraphQlClient } from "@gh-clients/GraphQlClient.ts";
+import { Guard } from "@core/Guard.ts";
+import { Utils } from "@core/Utils.ts";
+import { createLinkItemToProjectMutation } from "@core/GraphQl/Mutations/AddToProjectMutation.ts";
+import { createGetIssueProjectsQuery } from "@core/GraphQl/Queries/GetIssueProjectsQuery.ts";
+import { createGetPullRequestProjectsQuery } from "@core/GraphQl/Queries/GetPullRequestProjectsQuery.ts";
+import { ProjectError } from "@gh-errors/ProjectError.ts";
+import { IssueClient } from "@gh-clients/IssueClient.ts";
+import { PullRequestClient } from "@gh-clients/PullRequestClient.ts";
+import type { ProjectModel } from "@gh-rest-models/ProjectModel.ts";
+import type { IssueModel } from "@gh-rest-models/IssueModel.ts";
+import type { PullRequestModel } from "@gh-rest-models/PullRequestModel.ts";
 
 /**
  * Gets or saves data related to GitHub organization V2 projects.

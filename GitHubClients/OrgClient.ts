@@ -1,13 +1,14 @@
-import { GitHubHttpStatusCodes, OrgMemberRole } from "../core/Enums.ts";
-import { AuthError, GitHubClient } from "../deps.ts";
-import { Guard } from "../core/Guard.ts";
-import { Utils } from "../deps.ts";
-import { OrganizationError } from "../deps.ts";
-import type { GitHubVarModel } from "../deps.ts";
-import type { GitHubVariablesModel } from "../deps.ts";
-import type { UserModel } from "../deps.ts";
-import type { VariableOptions } from "./VariableOptions.ts";
-import type { TransformType } from "../core/Types.ts";
+import { GitHubHttpStatusCodes, OrgMemberRole } from "@core/Enums.ts";
+import { GitHubClient } from "@gh-clients/GitHubClient.ts";
+import { Guard } from "@core/Guard.ts";
+import { Utils } from "@core/Utils.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { OrganizationError } from "@gh-errors/OrganizationError.ts";
+import type { GitHubVarModel } from "@gh-rest-models/GitHubVarModel.ts";
+import type { GitHubVariablesModel } from "@gh-rest-models/GitHubVariablesModel.ts";
+import type { UserModel } from "@gh-rest-models/UserModel.ts";
+import type { VariableOptions } from "@gh-clients/VariableOptions.ts";
+import type { TransformType } from "@core/Types.ts";
 
 /**
  * Represents the type of member visibility in a GitHub organization.

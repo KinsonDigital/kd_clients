@@ -1,4 +1,4 @@
-export { GitHubClient } from "./GitHubClient.ts";
+export { GitHubClient } from "../GitHubClients/GitHubClient.ts";
 export type { IssueOrPRRequestData } from "./IssueOrPRRequestData.ts";
 export type { ItemType } from "./Types.ts";
 export type { State } from "./Types.ts";

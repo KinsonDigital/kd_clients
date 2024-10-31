@@ -80,13 +80,14 @@ jobs:
 
           "base-url=$fullBaseScriptUrl" >> $env:GITHUB_OUTPUT;
 
+
   get_version:
     name: Get Version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
-      - name: Setup Deno
+      - name: Setup Deno (${{ vars.DENO_VERSION }})
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ vars.DENO_VERSION }}
@@ -128,7 +129,7 @@ jobs:
             exit 1;
           }
 
-      - name: Setup Deno
+      - name: Setup Deno (${{ vars.DENO_VERSION }})
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ vars.DENO_VERSION }}
@@ -136,28 +137,88 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Version Does Not Exist
-        run: |
-          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/version-checker.ts";
+      - name: Validate Tag
+        id: validate-tag
+        continue-on-error: true
+        env:
+          OWNER_NAME: ${{ vars.ORGANIZATION_NAME }}
+          REPO_NAME: ${{ vars.PROJECT_NAME }}
+          VERSION: ${{ needs.get_version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
+        run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/validate-tag.ts";
 
-          deno run `
-            -RN `
-            "$scriptPath" `
-            "${{ vars.ORGANIZATION_NAME }}" `
-            "${{ vars.PROJECT_NAME }}" `
-            "${{ inputs.release-type }}" `
-            "${{ needs.get_version.outputs.version }}" `
-            "${{ secrets.CICD_TOKEN }}";
+      - name: JSR Package Does Not Exist
+        id: jsr-package-does-not-exist
+        continue-on-error: true
+        env:
+          SCOPE: ${{ vars.JSR_SCOPE }}
+          PACKAGE_NAME: ${{ vars.JSR_PACKAGE_NAME }}
+          VERSION: ${{ needs.get_version.outputs.version }}
+        run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/jsr-pkg-version-does-not-exist.ts";
 
       - name: Release Notes Exist
-        run: |
-          $scriptPath = "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
+        id: release-notes-exist
+        continue-on-error: true
+        env:
+          VERSION_TYPE: ${{ inputs.release-type }}
+          VERSION: ${{ needs.get_version.outputs.version }}
+        run: deno run -R "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
 
-          deno run `
-            -R `
-            "$scriptPath" `
-            "${{ inputs.release-type }}" `
-            "${{ needs.get_version.outputs.version }}";
+      - name: GitHub Release Does Not Exist
+        id: github-release-does-not-exist
+        continue-on-error: true
+        env:
+          OWNER_NAME: ${{ vars.ORGANIZATION_NAME }}
+          REPO_NAME: ${{ vars.PROJECT_NAME }}
+          TAG_NAME: ${{ needs.get_version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
+        run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/github-release-does-not-exist.ts";
+
+      - name: Milestone Exists
+        id: milestone-exists
+        continue-on-error: true
+        env:
+          OWNER_NAME: ${{ vars.ORGANIZATION_NAME }}
+          REPO_NAME: ${{ vars.PROJECT_NAME }}
+          TAG_NAME: ${{ needs.get_version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
+        run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/github-release-does-not-exist.ts";
+
+      - name: Process Step Resulsts
+        run: |
+          $validateTagFailed = "${{ steps.validate-tag.outcome == 'failure' }}";
+          $jsrPkgDoesNotExistFailed = "${{ steps.jsr-package-does-not-exist.outcome == 'failure' }}";
+          $releaseNotesExistFailed = "${{ steps.release-notes-exist.outcome == 'failure' }}";
+          $githubReleaseDoesNotExistFailed = "${{ steps.github-release-does-not-exist.outcome == 'failure' }}";
+          $milestoneExistsFailed = "${{ steps.milestone-exists.outcome == 'failure' }}";
+
+          if ($validateTagFailed -eq "true") {
+            Write-Host "::error::The tag is invalid.";
+          }
+
+          if ($jsrPkgDoesNotExistFailed -eq "true") {
+            Write-Host "::error::The JSR package already exists.";
+          }
+
+          if ($releaseNotesExistFailed -eq "true") {
+            Write-Host "::error::The release notes do not exist.";
+          }
+
+          if ($githubReleaseDoesNotExistFailed -eq "true") {
+            Write-Host "::error::The GitHub release already exists.";
+          }
+
+          if ($milestoneExistsFailed -eq "true") {
+            Write-Host "::error::The milestone does not exist.";
+          }
+
+          if ($validateTagFailed -eq "true" `
+              -or $jsrPkgDoesNotExistFailed -eq "true" `
+              -or $releaseNotesExistFailed -eq "true" `
+              -or $githubReleaseDoesNotExistFailed -eq "true" `
+              -or $milestoneExistsFailed -eq "true") {
+            exit 1;
+          }
 
 
   release:
@@ -239,24 +300,18 @@ jobs:
 
       - name: Close Milestone ${{ needs.get_version.outputs.version }}
         if: ${{ inputs.dry-run == false }}
+        env:
+          OWNER_NAME: ${{ vars.ORGANIZATION_NAME }}
+          REPO_NAME: ${{ vars.PROJECT_NAME }}
+          MILESTONE_NAME: ${{ needs.get_version.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
         run: |
           $baseScriptUrl = "${{ needs.construct_infrastructure_url.outputs.url }}";
           $scriptUrl = "$baseScriptUrl/close-milestone.ts";
 
           Write-Host "::notice::Close milestone script URL: $scriptUrl";
 
-          <# Deno Args:
-            1. Project name
-            2. Milestone name - This is the version
-            3. PAT
-          #>
-          deno run `
-            -RN `
-            "$scriptUrl" `
-            "${{ vars.ORGANIZATION_NAME }}" `
-            "${{ vars.PROJECT_NAME }}" `
-            "${{ needs.get_version.outputs.version }}" `
-            "${{ secrets.CICD_TOKEN }}";
+          deno run -RN "$scriptUrl";
 
       - name: Send X Announcement
         if: ${{ inputs.dry-run == false }}

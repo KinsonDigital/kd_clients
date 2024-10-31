@@ -1,5 +1,5 @@
-import { assertEquals } from "../deps.ts";
-import { Utils } from "../deps.ts";
+import { assertEquals } from "@std/assert";
+import { Utils } from "@core/Utils.ts";
 import type { TestDataArgs } from "./TestTypes.ts";
 
 Deno.test("clamp |> when-num-is-larger-than-max |> returns-max-value", () => {

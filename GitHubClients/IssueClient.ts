@@ -1,12 +1,13 @@
-import type { IssueModel, LabelModel } from "../deps.ts";
-import type { IssueOrPRRequestData } from "../core/IssueOrPRRequestData.ts";
-import { Guard } from "../core/Guard.ts";
-import { LabelClient } from "./LabelClient.ts";
-import { Utils } from "../deps.ts";
-import { GitHubHttpStatusCodes, IssueOrPRState } from "../core/Enums.ts";
-import { GitHubClient } from "../deps.ts";
-import { IssueError } from "../deps.ts";
-import { AuthError } from "./Errors/AuthError.ts";
+import type { IssueModel } from "@gh-rest-models/IssueModel.ts";
+import type { LabelModel } from "@gh-rest-models/LabelModel.ts";
+import type { IssueOrPRRequestData } from "@core/IssueOrPRRequestData.ts";
+import { Guard } from "@core/Guard.ts";
+import { LabelClient } from "@gh-clients/LabelClient.ts";
+import { Utils } from "@core/Utils.ts";
+import { GitHubHttpStatusCodes, IssueOrPRState } from "@core/Enums.ts";
+import { GitHubClient } from "@gh-clients/GitHubClient.ts";
+import { IssueError } from "@gh-errors/IssueError.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
 
 /**
  * Provides a client for interacting with issues.

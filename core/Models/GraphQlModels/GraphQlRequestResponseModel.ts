@@ -1,4 +1,4 @@
-import type { ErrorModel } from "./mod.ts";
+import type { ErrorModel } from "@gh-ql-models/ErrorModel.ts";
 
 /**
  * Represents a request response from a GraphQL request.

@@ -1,10 +1,10 @@
-import { Guard } from "./Guard.ts";
-import { basename, extname } from "../deps.ts";
-import type { ReleaseType } from "./Enums.ts";
-import type { IssueModel } from "../deps.ts";
-import type { PullRequestModel } from "../deps.ts";
-import type { GraphQlRequestResponseModel } from "../deps.ts";
-import type { ErrorModel } from "../deps.ts";
+import { Guard } from "@core/Guard.ts";
+import { basename, extname } from "@std/path";
+import type { ReleaseType } from "@core/Enums.ts";
+import type { IssueModel } from "@gh-rest-models/IssueModel.ts";
+import type { PullRequestModel } from "@gh-rest-models/PullRequestModel.ts";
+import type { GraphQlRequestResponseModel } from "@gh-ql-models/GraphQlRequestResponseModel.ts";
+import type { ErrorModel } from "@gh-ql-models/ErrorModel.ts";
 
 /**
  * Provides utility functions.

@@ -1,4 +1,4 @@
-import type { WorkflowRunModel } from "./mod.ts";
+import type { WorkflowRunModel } from "@gh-rest-models/WorkflowRunModel.ts";
 
 /**
  * Represents a list of workflow runs.

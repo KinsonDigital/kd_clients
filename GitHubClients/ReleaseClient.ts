@@ -1,8 +1,13 @@
-import { basename, ensureDirSync, existsSync } from "../deps.ts";
-import { GitHubHttpStatusCodes, Guard, Utils } from "../deps.ts";
-import { GitHubClient } from "../deps.ts";
-import { AuthError, ReleaseError } from "../deps.ts";
-import type { AssetModel, ReleaseModel } from "../deps.ts";
+import { ensureDirSync, existsSync } from "@std/fs";
+import { basename } from "@std/path";
+import { GitHubHttpStatusCodes } from "@core/Enums.ts";
+import { Guard } from "@core/Guard.ts";
+import { Utils } from "@core/Utils.ts";
+import { GitHubClient } from "@gh-clients/GitHubClient.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { ReleaseError } from "@gh-errors/ReleaseError.ts";
+import type { AssetModel } from "@gh-rest-models/AssetModel.ts";
+import type { ReleaseModel } from "@gh-rest-models/ReleaseModel.ts";
 
 /**
  * Provides a client for interacting with GitHub releases.
@@ -208,7 +213,7 @@ export class ReleaseClient extends GitHubClient {
 	 * Returns a value indicating whether or not a release is tied to a tag that matches the given {@link tagName},
 	 * for a repository with a name that matches the given {@link ReleaseClient}.{@link this.repoName}.
 	 * @param tagName The name of the tag tied to the release.
-	 * @returns The release for the given repository and name.
+	 * @returns True if the release exists, otherwise false.
 	 * @throws An {@link AuthError} or {@link ReleaseError}.
 	 */
 	public async releaseExists(tagName: string): Promise<boolean> {

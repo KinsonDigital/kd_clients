@@ -1,4 +1,4 @@
-import type { TransformType } from "../core/Types.ts";
+import type { TransformType } from "@core/Types.ts";
 
 /**
  * Represents various options when getting GitHub organization or repository variables.

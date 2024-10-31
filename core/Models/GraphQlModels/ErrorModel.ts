@@ -1,4 +1,4 @@
-import type { LocationModel } from "./mod.ts";
+import type { LocationModel } from "@gh-rest-models/GraphQlModels/LocationModel.ts";
 
 /**
  * Represents an error.

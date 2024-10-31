@@ -1,4 +1,4 @@
-import type { PullRequestModel } from "./mod.ts";
+import type { PullRequestModel } from "@gh-rest-models/PullRequestModel.ts";
 
 /**
  * Represents a single workflow run.

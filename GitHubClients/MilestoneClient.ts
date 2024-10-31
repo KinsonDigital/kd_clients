@@ -1,15 +1,15 @@
-import { Guard } from "../core/Guard.ts";
-import { AuthError } from "../deps.ts";
-import { Utils } from "../deps.ts";
-import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "../core/Enums.ts";
-import { GitHubClient } from "../deps.ts";
-import { IssueClient } from "./IssueClient.ts";
-import { PullRequestClient } from "./PullRequestClient.ts";
-import { MilestoneError } from "../deps.ts";
-import type { IssueModel } from "../deps.ts";
-import type { MilestoneModel } from "../deps.ts";
-import type { PullRequestModel } from "../deps.ts";
-import type { IssueOrPR } from "../core/Types.ts";
+import { Guard } from "@core/Guard.ts";
+import { Utils } from "@core/Utils.ts";
+import { GitHubHttpStatusCodes, IssueOrPRState, MergeState } from "@core/Enums.ts";
+import { GitHubClient } from "@gh-clients/GitHubClient.ts";
+import { IssueClient } from "@gh-clients/IssueClient.ts";
+import { PullRequestClient } from "@gh-clients/PullRequestClient.ts";
+import { AuthError } from "@gh-errors/AuthError.ts";
+import { MilestoneError } from "@gh-errors/MilestoneError.ts";
+import type { IssueModel } from "@gh-rest-models/IssueModel.ts";
+import type { MilestoneModel } from "@gh-rest-models/MilestoneModel.ts";
+import type { PullRequestModel } from "@gh-rest-models/PullRequestModel.ts";
+import type { IssueOrPR } from "@core/Types.ts";
 
 /**
  * Provides a client for interacting with milestones.

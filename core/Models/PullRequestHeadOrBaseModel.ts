@@ -1,4 +1,4 @@
-import type { RepoModel } from "./mod.ts";
+import type { RepoModel } from "@gh-rest-models/RepoModel.ts";
 
 /**
  * Holds information about a pull requests head or base branches.
