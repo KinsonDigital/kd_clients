@@ -54,24 +54,53 @@
                 "runtimeExecutable": "${userHome}/.deno/bin/deno"
             },
         },
-		{ // VERSION CHECKER
-            "name": "Version Checker",
+		{ // VALIDATE TAG
+            "name": "Validate Tag",
             "request": "launch",
             "type": "node",
-            "program": "${workspaceFolder}/.github/cicd/scripts/version-checker.ts",
+            "program": "${workspaceFolder}/.github/cicd/scripts/validate-tag.ts",
 			"cwd": "${workspaceFolder}",
             "runtimeArgs": [
                 "run",
+                "-EN",
                 "--inspect-wait",
-                "--allow-net"
             ],
-			"args": [
-				"KinsonDigital",
-				"kd_clients",
-				"preview",
-				"v0.0.6",
-				"${env:CICD_TOKEN}"
-			],
+			"env": {
+				"OWNER_NAME": "KinsonDigital",
+				"REPO_NAME": "kd_clients",
+				"VERSION": "v1.0.0-preview.14",
+				"GITHUB_TOKEN": "${env:CICD_TOKEN}"
+			},
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+        },
+		{ // MILESTONE EXISTS
+            "name": "Milestone Exists",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/milestone-exists.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+                "-EN",
+                "--inspect-wait",
+            ],
+			"env": {
+				"OWNER_NAME": "KinsonDigital",
+				"REPO_NAME": "kd_clients",
+				"VERSION": "v1.0.0-preview.14",
+				"GITHUB_TOKEN": "${env:CICD_TOKEN}"
+			},
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
 			"outputCapture": "std",
@@ -118,12 +147,99 @@
             "runtimeArgs": [
                 "run",
                 "--inspect-wait",
-				"-E",
+				"-ER",
             ],
-			"args": [
-				"preview",
-				"v1.0.0-preview.1"
-			],
+			"env": {
+				"VERSION_TYPE": "preview",
+				"VERSION": "1.0.0-preview.1"
+			},
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+		},
+		{ // VALIDATE VERSION
+            "name": "Validate Version",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/validate-version.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+				"-E",
+                "--inspect-wait",
+            ],
+			"env": {
+				"VERSION_TYPE": "preview",
+				"VERSION": "1.0.0-preview.15"
+			},
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+		},
+		{ // JSR PKG VERSION DOES NOT EXIST
+            "name": "JSR Pkg Version Does Not Exist",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/jsr-pkg-version-does-not-exist.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+				"-EN",
+                "--inspect-wait",
+            ],
+			"env": {
+				"SCOPE": "kinsondigital",
+				"PACKAGE_NAME": "kd-clients",
+				"VERSION": "1.0.0-preview.15"
+			},
+            "attachSimplePort": 9229,
+            "runtimeExecutable": "npm",
+			"outputCapture": "std",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "windows": {
+                "runtimeExecutable": "${userHome}\\.deno\\bin\\deno.exe"
+            },
+            "linux": {
+                "runtimeExecutable": "${userHome}/.deno/bin/deno"
+            },
+		},
+		{ // GITHUB RELEASE DOES NOT EXIST
+            "name": "GitHub Release Does Not Exist",
+            "request": "launch",
+            "type": "node",
+            "program": "${workspaceFolder}/.github/cicd/scripts/github-release-does-not-exist.ts",
+			"cwd": "${workspaceFolder}",
+            "runtimeArgs": [
+                "run",
+				"-EN",
+                "--inspect-wait",
+            ],
+			"env": {
+				"OWNER_NAME": "KinsonDigital",
+				"REPO_NAME": "kd_clients",
+				"TAG_NAME": "v1.0.0-preview.14",
+				"GITHUB_TOKEN": "${env:CICD_TOKEN}"
+			},
             "attachSimplePort": 9229,
             "runtimeExecutable": "npm",
 			"outputCapture": "std",
