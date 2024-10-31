@@ -1,20 +1,11 @@
 import { Utils } from "../../../core/Utils.ts";
 import { File } from "../core/File.ts";
+import getEnvVar from "../core/GetEnvVar.ts";
 
-if (Deno.args.length !== 2) {
-	let errorMsg = `The required number of arguments is 2 but received ${Deno.args.length}.`;
-	errorMsg += `\nPlease provide the following arguments: version type, version.`;
-	Utils.printError(errorMsg);
-	Deno.exit(100);
-}
+const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 
-const versionType = Deno.args[0].trim().toLowerCase();
-let version = Deno.args[1].trim().toLowerCase();
-
-if (Utils.invalidReleaseType(versionType)) {
-	Utils.printError(`The version type must be either 'preview' or 'release' but received '${versionType}'.`);
-	Deno.exit(200);
-}
+const versionType = getEnvVar("VERSION_TYPE", scriptFileName);
+let version = getEnvVar("VERSION", scriptFileName);
 
 version = version.startsWith("v") ? version : `v${version}`;
 

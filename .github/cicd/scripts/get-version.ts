@@ -1,18 +1,10 @@
-import { Utils } from "../../../core/Utils.ts";
-import { VersionPuller } from "../core/VersionPuller.ts";
+import getEnvVar from "../core/GetEnvVar.ts";
+import DenoConfig from "../../../deno.json" with { type: "json" };
 
-const versionPuller: VersionPuller = new VersionPuller();
+const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 
-const version = versionPuller.getVersion("./deno.json");
+const outputFilePath = getEnvVar("GITHUB_OUTPUT", scriptFileName);
 
-const outputFilePath = Deno.env.get("GITHUB_OUTPUT") ?? "";
+Deno.writeTextFileSync(outputFilePath, `version=${DenoConfig.version}\n`);
 
-if (outputFilePath === "") {
-	const errorMsg = `The environment variable 'GITHUB_OUTPUT' does not exist or is not set.`;
-	Utils.printError(errorMsg);
-	Deno.exit(1);
-}
-
-Deno.writeTextFileSync(outputFilePath, `version=${version}`);
-
-console.log(`The output 'version' has been set to '${version}'.`);
+console.log(`The output 'version' has been set to '${DenoConfig.version}'.`);
