@@ -1,6 +1,25 @@
 import { Utils } from "../../../deps.ts";
-import { MilestoneClient, OrgClient, RepoClient } from "../../../GitHubClients/mod.ts";
+import { MilestoneClient, OrgClient, RepoClient, UsersClient } from "../../../GitHubClients/mod.ts";
 import getEnvVar from "./GetEnvVar.ts";
+
+/**
+ * Validates that a GitHub user exists.
+ * @param scriptFileName The name of the script file.
+ * @remarks The owner, repo name, and token are retrieved from the environment variables 'OWNER_NAME', 'REPO_NAME', and 'GITHUB_TOKEN'.
+ */
+const validateUserExists = async (scriptFileName?: string): Promise<void> => {
+	const ownerName = getEnvVar("OWNER_NAME", scriptFileName);
+	const repoName = getEnvVar("REPO_NAME", scriptFileName);
+	const token = getEnvVar("GITHUB_TOKEN", scriptFileName);
+
+	const userCLient = new UsersClient(ownerName, repoName, token);
+
+	if (!await userCLient.userExists(ownerName)) {
+		const errorMsg = `The user '${ownerName}' does not exist.`;
+		Utils.printError(errorMsg);
+		Deno.exit(1);
+	}
+};
 
 /**
  * Validates that a GitHub organization exists.
@@ -66,4 +85,4 @@ const validateMilestoneExists = async (milestoneTitle: string, scriptFileName?: 
 	}
 };
 
-export { validateMilestoneExists, validateOrgExists, validateRepoExists };
+export { validateUserExists, validateMilestoneExists, validateOrgExists, validateRepoExists };
