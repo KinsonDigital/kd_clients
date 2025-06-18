@@ -24,7 +24,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Setup Deno
-      uses: denoland/setup-deno@v1
+      uses: denoland/setup-deno@v2
       with:
         deno-version: ${{ vars.DENO_VERSION }}
 

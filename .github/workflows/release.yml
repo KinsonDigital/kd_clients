@@ -88,7 +88,7 @@ jobs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Setup Deno (${{ vars.DENO_VERSION }})
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ vars.DENO_VERSION }}
 
@@ -130,7 +130,7 @@ jobs:
           }
 
       - name: Setup Deno (${{ vars.DENO_VERSION }})
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ vars.DENO_VERSION }}
 
@@ -162,7 +162,7 @@ jobs:
         env:
           VERSION_TYPE: ${{ inputs.release-type }}
           VERSION: ${{ needs.get_version.outputs.version }}
-        run: deno run -R "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
+        run: deno run -ER "${{ github.workspace }}/.github/cicd/scripts/check-release-notes.ts";
 
       - name: GitHub Release Does Not Exist
         id: github-release-does-not-exist
@@ -184,7 +184,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
         run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/github-release-does-not-exist.ts";
 
-      - name: Process Step Resulsts
+      - name: Process Step Results
         run: |
           $validateTagFailed = "${{ steps.validate-tag.outcome == 'failure' }}";
           $jsrPkgDoesNotExistFailed = "${{ steps.jsr-package-does-not-exist.outcome == 'failure' }}";
@@ -229,7 +229,7 @@ jobs:
       id-token: write
     steps:
       - name: Setup Deno (${{ vars.DENO_VERSION }})
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ vars.DENO_VERSION }}
 
