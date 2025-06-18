@@ -187,7 +187,7 @@ export class ReleaseClient extends GitHubClient {
 
 		text = Utils.isNothing(text) ? "" : text.trim();
 
-		const response = await this.requestPATCH(url, JSON.stringify({ body: text }));
+		const response = await this.requestPATCH(url, JSON.stringify({ body: text }), true);
 
 		if (response.status !== GitHubHttpStatusCodes.OK) {
 			if (response.status === GitHubHttpStatusCodes.NotFound) {
@@ -752,14 +752,14 @@ export class ReleaseClient extends GitHubClient {
 		const file = Deno.readFileSync(filePath);
 		const fileName = basename(filePath);
 
-		this.baseUrl = "https://uploads.github.com";
+		const baseUrl = "https://uploads.github.com";
 		const queryParams = `?name=${fileName}`;
-		const url = `${this.baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}/assets${queryParams}`;
+		const url = `${baseUrl}/repos/${this.ownerName}/${this.repoName}/releases/${releaseId}/assets${queryParams}`;
 
 		this.updateOrAddHeader("Content-Type", "application/octet-stream");
 		this.updateOrAddHeader("Content-Length", file.byteLength.toString());
 
-		const response = await this.requestPOST(url, file);
+		const response = await this.requestPOST(url, file, true);
 
 		if (response.status === GitHubHttpStatusCodes.Unauthorized) {
 			throw new AuthError();
