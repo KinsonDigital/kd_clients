@@ -281,31 +281,33 @@ export abstract class GitHubClient extends WebApiClient {
 
 	/**
 	 * @inheritdoc
+	 * @param [skipRateLimits=false] True to skip processing the rate limits.
 	 * @remarks Intercepts the request process primary and secondary rate limits.
 	 */
-	public override async requestPOST(url: string, body: string | object | Uint8Array): Promise<Response> {
+	public override async requestPOST(url: string, body: string | object | Uint8Array, skipRateLimits = false): Promise<Response> {
 		while (this.TotalRequestsRunning >= 100) {
 			await sleep(1000);
 		}
 
 		const response = await super.requestPOST(url, body);
 
-		await this.processRateLimits(response);
+		await this.processRateLimits(response, skipRateLimits);
 
 		return response;
 	}
 
 	/**
 	 * @inheritdoc
+	 * @param [skipRateLimits=false] True to skip processing the rate limits.
 	 * @remarks Intercepts the request process primary and secondary rate limits.
 	 */
-	public override async requestPATCH(url: string, body: string): Promise<Response> {
+	public override async requestPATCH(url: string, body: string, skipRateLimits = false): Promise<Response> {
 		while (this.TotalRequestsRunning >= 100) {
 			await sleep(1000);
 		}
 
 		const response = await super.requestPATCH(url, body);
-		await this.processRateLimits(response);
+		await this.processRateLimits(response, skipRateLimits);
 
 		return response;
 	}
@@ -345,7 +347,11 @@ export abstract class GitHubClient extends WebApiClient {
 	 * @param response The response to process the rate limits for.
 	 * @returns A promise that resolves when the rate limits have been processed.
 	 */
-	private async processRateLimits(response: Response): Promise<void> {
+	private async processRateLimits(response: Response, skipRateLimits = false): Promise<void> {
+		if (skipRateLimits) {
+			return;
+		}
+
 		const rateLimit = response.headers.get("x-ratelimit-limit");
 		const rateRemaining = response.headers.get("x-ratelimit-remaining");
 		const rateResetEpochSeconds = response.headers.get("x-ratelimit-reset");
