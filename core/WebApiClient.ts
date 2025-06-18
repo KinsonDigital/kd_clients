@@ -180,12 +180,16 @@ export abstract class WebApiClient {
 	 * @param response The HTTP response to get the data from.
 	 * @returns The data from the response.
 	 */
-	protected async getResponseData<T>(response: Response): Promise<T> {
+	protected async getResponseData<T = unknown>(response: Response): Promise<T> {
 		const responseText: string = await response.text();
 
 		const acceptHeaderValue = this.getHeader("Accept") ?? "";
 
-		return acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json") ? await JSON.parse(responseText) : responseText;
+		if (acceptHeaderValue.length > 0 && acceptHeaderValue.includes("json")) {
+			return JSON.parse(responseText) as T;
+		} else {
+			return responseText as T;
+		}
 	}
 
 	/**
