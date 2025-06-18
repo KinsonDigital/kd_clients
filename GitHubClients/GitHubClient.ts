@@ -284,7 +284,11 @@ export abstract class GitHubClient extends WebApiClient {
 	 * @param [skipRateLimits=false] True to skip processing the rate limits.
 	 * @remarks Intercepts the request process primary and secondary rate limits.
 	 */
-	public override async requestPOST(url: string, body: string | object | Uint8Array, skipRateLimits = false): Promise<Response> {
+	public override async requestPOST(
+		url: string,
+		body: string | object | Uint8Array,
+		skipRateLimits = false,
+	): Promise<Response> {
 		while (this.TotalRequestsRunning >= 100) {
 			await sleep(1000);
 		}
