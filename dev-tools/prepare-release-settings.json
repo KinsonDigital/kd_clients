@@ -36,5 +36,6 @@
     "githubTokenEnvVarName": "CICD_TOKEN",
     "versionFilePath": "./deno.json",
     "trimFromStartOfVersion": ["v"],
-    "releaseNotesFilePrefix": "Release-Notes-"
+    "releaseNotesFilePrefix": "Release-Notes-",
+    "versionJSONKeyPath": "version"
 }
