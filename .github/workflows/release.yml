@@ -93,7 +93,7 @@ jobs:
           deno-version: ${{ vars.DENO_VERSION }}
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Get Version
         id: get_version
@@ -135,7 +135,7 @@ jobs:
           deno-version: ${{ vars.DENO_VERSION }}
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Validate Tag
         id: validate-tag
@@ -234,7 +234,7 @@ jobs:
           deno-version: ${{ vars.DENO_VERSION }}
 
       - name: Checkout Repository (${{ github.repository }})
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Deno Check
         id: deno-check
