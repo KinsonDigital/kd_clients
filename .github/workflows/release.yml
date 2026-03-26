@@ -323,10 +323,10 @@ jobs:
             1. Repo owner
             2. Project name
             3. Version
-            4. Twitter consumer api key
-            5. Twitter consumer api secret
-            6. Twitter access token
-            7. Twitter access token secret
+            4. X consumer api key
+            5. X consumer api secret
+            6. X access token
+            7. X access token secret
             8. PAT
           #>
           deno run `
@@ -335,8 +335,8 @@ jobs:
             "${{ vars.ORGANIZATION_NAME }}" `
             "${{ vars.PROJECT_NAME }}" `
             "${{ needs.get_version.outputs.version }}" `
-            "${{ secrets.TWITTER_CONSUMER_API_KEY }}" `
-            "${{ secrets.TWITTER_CONSUMER_API_SECRET }}" `
-            "${{ secrets.TWITTER_ACCESS_TOKEN }}" `
-            "${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}" `
+            "${{ secrets.X_CONSUMER_API_KEY }}" `
+            "${{ secrets.X_CONSUMER_API_SECRET }}" `
+            "${{ secrets.X_ACCESS_TOKEN_KEY }}" `
+            "${{ secrets.X_ACCESS_TOKEN_SECRET }}" `
             "${{ secrets.CICD_TOKEN }}";
