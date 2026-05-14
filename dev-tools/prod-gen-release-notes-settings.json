@@ -15,8 +15,8 @@
         "🔬"
     ],
     "issueCategoryLabelMappings": {
-        "Breaking Changes 🧨": "🧨breaking-changes",
-        "Dependency Updates 📦": "📦dependency-update"
+        "breaking-changes": "Breaking Changes 🧨",
+        "dependency-update": "Dependency Updates 📦"
     },
     "issueCategoryIssueTypeMappings": {
         "CICD": "CICD ⚙️",
@@ -29,10 +29,10 @@
         "Tech-Debt": "Tech Debt 📉"
     },
     "prCategoryLabelMappings": {
-        "Dependency Updates 📦": "📦dependency-update"
+        "dependency-update": "Dependency Updates 📦"
     },
     "ignoreLabels": [
-        "🚀production-release"
+        "production-release"
     ],
     "wordReplacements": {
         "chore(deps): ": ""
