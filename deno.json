@@ -18,7 +18,9 @@
         "format": "deno fmt ./**/*.ts",
         "format-check": "deno fmt ./**/*.ts --check",
         "reload-cache": "deno cache ./**/*.ts --reload",
-        "check-all": "deno task check && deno task lint && deno task format-check"
+        "check-all": "deno task check && deno task lint && deno task format-check",
+        "create-pr": "deno run -A jsr:@kinsondigital/sprocket@3.0.0 run-job ./dev-tools/sprocket-config.ts --job-name Create-PR",
+        "prep-prev-release": "deno run -A jsr:@kinsondigital/sprocket@3.0.0 run-job ./dev-tools/sprocket-config.ts --job-name Prep-Prev-Release"
     },
     "lint": {
         "include": [
