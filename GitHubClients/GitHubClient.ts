@@ -111,38 +111,46 @@ export abstract class GitHubClient extends WebApiClient {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		let totalPages = 0;
-
 		try {
 			// Get data for the current page
 			const [dataItems, response] = await getData(page, qtyPerPage);
 
-			totalPages += 1;
 			// Push the first page of data
 			allData.push(...dataItems);
 
 			const linkHeader = this.headerParser.toLinkHeader(response);
 			const totalPagesLeft = linkHeader === null ? 1 : linkHeader?.totalPages ?? 0;
 
-			const dataRequests: Promise<[T[], Response]>[] = [];
+			if (totalPagesLeft > 0) {
+				const dataRequests: Promise<[T[], Response]>[] = [];
 
-			// Gather all of the requests promises
-			for (let i = 2; i <= totalPagesLeft; i++) {
-				const request = getData(i, qtyPerPage);
+				// Gather all of the requests promises
+				for (let i = page + 1; i <= totalPagesLeft; i++) {
+					const request = getData(i, qtyPerPage);
 
-				dataRequests.push(request);
+					dataRequests.push(request);
+				}
+
+				const responses: [T[], Response][] = await Promise.all(dataRequests);
+
+				// Add the rest of the pages of data
+				for (let i = 0; i < responses.length; i++) {
+					const [pageData] = responses[i];
+
+					allData.push(...pageData);
+				}
+			} else if (linkHeader !== null && linkHeader.nextPage > 0) {
+				let nextPage = linkHeader.nextPage;
+
+				while (nextPage > 0) {
+					const [pageData, nextResponse] = await getData(nextPage, qtyPerPage);
+
+					allData.push(...pageData);
+
+					const nextLinkHeader = this.headerParser.toLinkHeader(nextResponse);
+					nextPage = nextLinkHeader?.nextPage ?? 0;
+				}
 			}
-
-			const responses: [T[], Response][] = await Promise.all(dataRequests);
-
-			// Add the rest of the pages of data
-			for (let i = 0; i < responses.length; i++) {
-				const [pageData] = responses[i];
-
-				allData.push(...pageData);
-			}
-
-			totalPages += dataRequests.length;
 		} catch (error) {
 			const errorMsg = this.isKnownGitHubError(error)
 				? `There was an issue getting all of the data using pagination.\n${error.message}`
@@ -183,48 +191,64 @@ export abstract class GitHubClient extends WebApiClient {
 			const linkHeader = this.headerParser.toLinkHeader(response);
 			const totalPagesLeft = linkHeader?.totalPages ?? 0;
 
-			let [groupA, groupB] = this.createAlternatePagesGroups(totalPagesLeft);
+			if (totalPagesLeft > 0) {
+				let [groupA, groupB] = this.createAlternatePagesGroups(totalPagesLeft);
 
-			// Remove the first page, this has already been pulled
-			groupA = groupA.filter((i) => i !== 1);
-			groupB = groupB.filter((i) => i !== 1);
+				// Remove the starting page and any pages before it, these have already been pulled
+				groupA = groupA.filter((i) => i > page);
+				groupB = groupB.filter((i) => i > page);
 
-			const maxLen = Math.max(groupA.length, groupB.length);
+				const maxLen = Math.max(groupA.length, groupB.length);
 
-			const requests: Promise<[T[], Response]>[] = [];
+				const requests: Promise<[T[], Response]>[] = [];
 
-			for (let i = 0; i < maxLen; i++) {
-				if (i <= groupA.length - 1) {
-					const currentPageA = groupA[i];
+				for (let i = 0; i < maxLen; i++) {
+					if (i <= groupA.length - 1) {
+						const currentPageA = groupA[i];
 
-					requests.push(getData(currentPageA, qtyPerPage));
+						requests.push(getData(currentPageA, qtyPerPage));
+					}
+
+					if (i <= groupB.length - 1) {
+						const currentPageB = groupB[i];
+
+						requests.push(getData(currentPageB, qtyPerPage));
+					}
+
+					// Wait for both requests from each group to finish
+					const [groupResultA, groupResultB] = await Promise.all(requests);
+
+					const groupItemsA = groupResultA === undefined ? [] : groupResultA[0];
+
+					// Does the result from group A contain the data
+					if (groupItemsA.length > 0 && until(groupItemsA)) {
+						return groupItemsA;
+					}
+
+					const groupItemsB = groupResultB === undefined ? [] : groupResultB[0];
+
+					// Does the result from group B contain the data
+					if (groupItemsB.length > 0 && until(groupItemsB)) {
+						return groupItemsB;
+					}
+
+					// Clear all of the items
+					requests.length = 0;
 				}
+			} else if (linkHeader !== null && linkHeader.nextPage > 0) {
+				// rel="last" is absent (cursor-based pagination): follow rel="next" sequentially
+				let nextPage = linkHeader.nextPage;
 
-				if (i <= groupB.length - 1) {
-					const currentPageB = groupB[i];
+				while (nextPage > 0) {
+					const [pageData, nextResponse] = await getData(nextPage, qtyPerPage);
 
-					requests.push(getData(currentPageB, qtyPerPage));
+					if (until(pageData)) {
+						return pageData;
+					}
+
+					const nextLinkHeader = this.headerParser.toLinkHeader(nextResponse);
+					nextPage = nextLinkHeader?.nextPage ?? 0;
 				}
-
-				// Wait for both requests from each group to finish
-				const [groupResultA, groupResultB] = await Promise.all(requests);
-
-				const groupItemsA = groupResultA === undefined ? [] : groupResultA[0];
-
-				// Does the result from group A contain the data
-				if (groupItemsA.length > 0 && until(groupItemsA)) {
-					return groupItemsA;
-				}
-
-				const groupItemsB = groupResultB === undefined ? [] : groupResultB[0];
-
-				// Does the result from group B contain the data
-				if (groupItemsB.length > 0 && until(groupItemsB)) {
-					return groupItemsB;
-				}
-
-				// Clear all of the items
-				requests.length = 0;
 			}
 
 			return [];
