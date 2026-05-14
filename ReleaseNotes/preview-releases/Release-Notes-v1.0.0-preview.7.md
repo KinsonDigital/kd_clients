@@ -11,4 +11,4 @@ As with all software, there is always a chance for issues and bugs, especially f
 
 <h2 align="center" style="font-weight: bold;">Bug Fixes 🐛</h2>
 
-1. [#28](https://github.com/KinsonDigital/Velaptor/issues/28) - Fixed a bug where getting the repository using the `RepoClient.getRepo()` function only worked with all lowercase repo names.
+1. [#28](https://github.com/KinsonDigital/kd_clients/issues/28) - Fixed a bug where getting the repository using the `RepoClient.getRepo()` function only worked with all lowercase repo names.

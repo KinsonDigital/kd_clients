@@ -11,4 +11,4 @@ As with all software, there is always a chance for issues and bugs, especially f
 
 <h2 align="center" style="font-weight: bold;">Bug Fixes 🐛</h2>
 
-1. [#15](https://github.com/KinsonDigital/Velaptor/issues/15) - Fixed create org client issue.
+1. [#15](https://github.com/KinsonDigital/kd_clients/issues/15) - Fixed create org client issue.
