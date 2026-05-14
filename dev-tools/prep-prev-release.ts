@@ -14,12 +14,7 @@ import {
 	stageFiles,
 	uncommittedChangesExist,
 } from "jsr:@kinsondigital/sprocket@3.0.0/git";
-import {
-	LabelClient,
-	MilestoneClient,
-	ProjectClient,
-	PullRequestClient,
-} from "jsr:@kinsondigital/kd-clients@1.0.0-preview.15";
+import { LabelClient, MilestoneClient, ProjectClient, PullRequestClient } from "jsr:@kinsondigital/kd-clients@1.0.0-preview.15";
 import { printGray } from "jsr:@kinsondigital/sprocket@3.0.0/console";
 import { ReleaseNotesGenerator } from "jsr:@kinsondigital/sprocket@3.0.0/releases";
 import type { IssueOrPRRequestData } from "jsr:@kinsondigital/kd-clients@1.0.0-preview.15/core";
@@ -52,8 +47,7 @@ const releaseType = "Preview";
 const releaseVersion = await Input.prompt({
 	message: "Enter the release version:",
 	validate: (value) => {
-		const prevVersionRegex =
-			/^v([1-9]\d*|0)\.([1-9]\d*|0)\.([1-9]\d*|0)-preview\.([1-9]\d*)$/gm;
+		const prevVersionRegex = /^v([1-9]\d*|0)\.([1-9]\d*|0)\.([1-9]\d*|0)-preview\.([1-9]\d*)$/gm;
 
 		return prevVersionRegex.test(value.trim().toLowerCase());
 	},
@@ -139,8 +133,7 @@ if (await uncommittedChangesExist()) {
 
 printGray("⌛Generating release notes. . .");
 const releaseNotesFileName = `Release-Notes-v${releaseVersion}.md`;
-const releaseNotesFilePath =
-	`${Deno.cwd()}/ReleaseNotes/${releaseType}-releases/${releaseNotesFileName}`;
+const releaseNotesFilePath = `${Deno.cwd()}/ReleaseNotes/${releaseType}-releases/${releaseNotesFileName}`;
 const generator: ReleaseNotesGenerator = new ReleaseNotesGenerator();
 const settingsFileContent = Deno.readTextFileSync(settingsFilePath);
 const settings: GeneratorSettings = JSON.parse(settingsFileContent);
@@ -164,8 +157,7 @@ const assignee = "CalvinWilkinson";
 const githubProjectName = "KD-Team";
 const reviewer = "KinsonDigitalAdmin";
 
-const prevReleasePrTemplateFilePath =
-	`${Deno.cwd()}/templates/prev-prepare-release-template.md`;
+const prevReleasePrTemplateFilePath = `${Deno.cwd()}/templates/prev-prepare-release-template.md`;
 const templateFileContent = Deno.readTextFileSync(
 	prevReleasePrTemplateFilePath,
 );
@@ -208,6 +200,5 @@ const projClient = new ProjectClient(ownerName, repoName, token);
 
 await projClient.addPullRequestToProject(newPr.number, githubProjectName);
 
-const prUrl =
-	`https://github.com/${ownerName}/${repoName}/pull/${newPr.number}`;
+const prUrl = `https://github.com/${ownerName}/${repoName}/pull/${newPr.number}`;
 console.log(`Pull Request: ${prUrl}`);

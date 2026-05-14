@@ -1,6 +1,6 @@
 import { ReleaseClient } from "@kd/clients";
 import getEnvVar from "@cicd/core/GetEnvVar.ts";
-import { validateOrgExists, validateRepoExists, validateUserExists } from "@cicd/core/Validators.ts";
+import { validateOrgExists, validateRepoExists } from "@cicd/core/Validators.ts";
 
 const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 
@@ -10,7 +10,6 @@ let tagName = getEnvVar("TAG_NAME", scriptFileName).toLowerCase();
 const token = getEnvVar("GITHUB_TOKEN", scriptFileName);
 tagName = tagName.startsWith("v") ? tagName : `v${tagName}`;
 
-await validateUserExists(scriptFileName);
 await validateOrgExists(scriptFileName);
 await validateRepoExists(scriptFileName);
 

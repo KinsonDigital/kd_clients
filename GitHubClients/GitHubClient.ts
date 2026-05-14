@@ -397,12 +397,12 @@ export abstract class GitHubClient extends WebApiClient {
 			return;
 		}
 
-		// If any of the header values are null, throw an exception
+		// If any of the header values are null, rate limits cannot be processed
 		if (
 			rateLimit === null || rateRemaining === null || rateResetEpochSeconds === null || rateResource === null ||
 			rateUsed === null
 		) {
-			throw new Error("There was an issue processing the rate limit headers.");
+			return;
 		}
 
 		const primaryLimitReached = rateRemaining === "0" && (response.status === 403 || response.status === 429);
@@ -428,12 +428,12 @@ export abstract class GitHubClient extends WebApiClient {
 		const rateResource = response.headers.get("x-ratelimit-resource");
 		const rateUsed = response.headers.get("x-ratelimit-used");
 
-		// If any of the header values are null, throw an exception
+		// If any of the header values are null, rate limits cannot be shown
 		if (
 			rateLimit === null || rateRemaining === null || rateResetEpochSeconds === null || rateResource === null ||
 			rateUsed === null
 		) {
-			throw new Error("There was an issue processing the rate limit headers.");
+			return;
 		}
 
 		const resetSec = Math.abs(parseInt(rateResetEpochSeconds) - Math.floor(Date.now() / 1000)).toFixed(1);

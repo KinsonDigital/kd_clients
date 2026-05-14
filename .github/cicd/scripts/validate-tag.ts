@@ -1,7 +1,7 @@
-import { TagClient } from "@kd/clients";
+import { TagClient } from "@gh-clients/TagClient.ts";
 import { Utils } from "@core/Utils.ts";
 import getEnvVar from "@cicd/core/GetEnvVar.ts";
-import { validateOrgExists, validateRepoExists, validateUserExists } from "@cicd/core/Validators.ts";
+import { validateOrgExists, validateRepoExists } from "@cicd/core/Validators.ts";
 
 const scriptFileName = new URL(import.meta.url).pathname.split("/").pop();
 
@@ -11,7 +11,6 @@ let version = getEnvVar("VERSION", scriptFileName).toLowerCase();
 const token = getEnvVar("GITHUB_TOKEN", scriptFileName);
 version = version.startsWith("v") ? version : `v${version}`;
 
-await validateUserExists(scriptFileName);
 await validateOrgExists(scriptFileName);
 await validateRepoExists(scriptFileName);
 

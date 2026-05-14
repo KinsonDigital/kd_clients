@@ -178,11 +178,11 @@ jobs:
         id: milestone-exists
         continue-on-error: true
         env:
+          VERSION: ${{ needs.get_version.outputs.version }}
           OWNER_NAME: ${{ vars.ORGANIZATION_NAME }}
           REPO_NAME: ${{ vars.PROJECT_NAME }}
-          TAG_NAME: ${{ needs.get_version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.CICD_TOKEN }}
-        run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/github-release-does-not-exist.ts";
+        run: deno run -EN "${{ github.workspace }}/.github/cicd/scripts/milestone-exists.ts";
 
       - name: Process Step Results
         run: |
@@ -287,13 +287,20 @@ jobs:
         if: ${{ inputs.dry-run == false }}
         run: deno publish;
 
+      - name: Create Release Notes Path
+        id: create-release-notes-path
+        run: |
+          $releaseType = "${{ inputs.release-type }}".ToLower();
+          $releaseNotesDirPath = "${{ github.workspace }}/ReleaseNotes/$releaseType-releases";
+          "release-notes-dir-path=$releaseNotesDirPath" >> $env:GITHUB_OUTPUT;
+
       - name: Creating ${{ inputs.release-type }} GitHub Release
         if: ${{ inputs.dry-run == false }}
         uses: softprops/action-gh-release@v3
         with: 
           name: "🚀${{ inputs.release-type }} Release - ${{ needs.get_version.outputs.version }}" 
-          body_path: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
-          files: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
+          body_path: "${{ steps.create-release-notes-path.outputs.release-notes-dir-path }}/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
+          files: "${{ steps.create-release-notes-path.outputs.release-notes-dir-path }}/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
           tag_name: "v${{ needs.get_version.outputs.version }}"
           prerelease: ${{ inputs.release-type == 'Preview' }}
           draft: false
