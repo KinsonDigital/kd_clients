@@ -289,7 +289,7 @@ jobs:
 
       - name: Creating ${{ inputs.release-type }} GitHub Release
         if: ${{ inputs.dry-run == false }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with: 
           name: "🚀${{ inputs.release-type }} Release - ${{ needs.get_version.outputs.version }}" 
           body_path: "${{ github.workspace }}/ReleaseNotes/${{ inputs.release-type }}Releases/Release-Notes-v${{ needs.get_version.outputs.version }}.md"
