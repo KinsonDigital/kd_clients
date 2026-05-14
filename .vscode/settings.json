@@ -11,6 +11,7 @@
 		"kinsondigital",
 		"nexterias",
 		"ratelimit",
+		"softprops",
 		"tasklist"
 	],
 	"files.exclude": {
