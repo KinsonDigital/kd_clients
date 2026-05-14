@@ -8,13 +8,12 @@
     "jsr:@std/data-structures@^1.0.11": "1.0.11",
     "jsr:@std/encoding@1.0.5": "1.0.5",
     "jsr:@std/encoding@~0.219.1": "0.219.1",
-    "jsr:@std/fs@1.0.5": "1.0.5",
+    "jsr:@std/fs@1.0.23": "1.0.23",
     "jsr:@std/fs@^1.0.23": "1.0.23",
     "jsr:@std/internal@^1.0.12": "1.0.13",
     "jsr:@std/internal@^1.0.13": "1.0.13",
     "jsr:@std/internal@^1.0.4": "1.0.13",
     "jsr:@std/path@1.1.4": "1.1.4",
-    "jsr:@std/path@^1.0.7": "1.1.4",
     "jsr:@std/path@^1.1.4": "1.1.4",
     "jsr:@std/testing@1.0.18": "1.0.18",
     "npm:superjson@1.13.3": "1.13.3"
@@ -50,15 +49,10 @@
     "@std/encoding@1.0.5": {
       "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
     },
-    "@std/fs@1.0.5": {
-      "integrity": "41806ad6823d0b5f275f9849a2640d87e4ef67c51ee1b8fb02426f55e02fd44e",
-      "dependencies": [
-        "jsr:@std/path@^1.0.7"
-      ]
-    },
     "@std/fs@1.0.23": {
       "integrity": "3ecbae4ce4fee03b180fa710caff36bb5adb66631c46a6460aaad49515565a37",
       "dependencies": [
+        "jsr:@std/internal@^1.0.12",
         "jsr:@std/path@^1.1.4"
       ]
     },
@@ -326,7 +320,7 @@
       "jsr:@nexterias/twitter-api-fetch@3.0.1",
       "jsr:@std/assert@1.0.6",
       "jsr:@std/encoding@1.0.5",
-      "jsr:@std/fs@1.0.5",
+      "jsr:@std/fs@1.0.23",
       "jsr:@std/path@1.1.4",
       "jsr:@std/testing@1.0.18"
     ]
