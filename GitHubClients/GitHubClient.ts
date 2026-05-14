@@ -111,13 +111,10 @@ export abstract class GitHubClient extends WebApiClient {
 		page = page < 1 ? 1 : page;
 		qtyPerPage = Utils.clamp(qtyPerPage, 1, 100);
 
-		let totalPages = 0;
-
 		try {
 			// Get data for the current page
 			const [dataItems, response] = await getData(page, qtyPerPage);
 
-			totalPages += 1;
 			// Push the first page of data
 			allData.push(...dataItems);
 
@@ -142,17 +139,13 @@ export abstract class GitHubClient extends WebApiClient {
 
 					allData.push(...pageData);
 				}
-
-				totalPages += dataRequests.length;
 			} else if (linkHeader !== null && linkHeader.nextPage > 0) {
-				// rel="last" is absent (cursor-based pagination): follow rel="next" sequentially
 				let nextPage = linkHeader.nextPage;
 
 				while (nextPage > 0) {
 					const [pageData, nextResponse] = await getData(nextPage, qtyPerPage);
 
 					allData.push(...pageData);
-					totalPages += 1;
 
 					const nextLinkHeader = this.headerParser.toLinkHeader(nextResponse);
 					nextPage = nextLinkHeader?.nextPage ?? 0;
