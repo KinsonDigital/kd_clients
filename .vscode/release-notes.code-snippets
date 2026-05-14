@@ -20,7 +20,7 @@
 		"scope": "markdown",
 		"prefix": "issue-link",
 		"body": [
-			"[#${1:Issue #}](https://github.com/KinsonDigital/Velaptor/issues/${1:Issue #}) - "
+			"[#${1:Issue #}](https://github.com/KinsonDigital/kd_clients/issues/${1:Issue #}) - "
 		],
 		"description": "Link to an issue"
 	},
@@ -28,7 +28,7 @@
 		"scope": "markdown",
 		"prefix": "pr-link",
 		"body": [
-			"[#${1:PR #}](https://github.com/KinsonDigital/Velaptor/pull/${1:PR #}) - "
+			"[#${1:PR #}](https://github.com/KinsonDigital/kd_clients/pull/${1:PR #}) - "
 		],
 		"description": "Link to a pull request"
 	},
@@ -36,7 +36,7 @@
 		"scope": "markdown",
 		"prefix": "issue-dep-update",
 		"body": [
-			"[#${1:Issue #}](https://github.com/KinsonDigital/Velaptor/issues/${1:Issue #}) - Updated **${2:packge name}** from _**v${3:from version}**_ to _**v${4:to version}**_"
+			"[#${1:Issue #}](https://github.com/KinsonDigital/kd_clients/issues/${1:Issue #}) - Updated **${2:packge name}** from _**v${3:from version}**_ to _**v${4:to version}**_"
 		],
 		"description": "Link to an issue for a dependency update."
 	},
@@ -44,7 +44,7 @@
 		"scope": "markdown",
 		"prefix": "pr-dep-update",
 		"body": [
-			"[#${1:PR #}](https://github.com/KinsonDigital/Velaptor/pull/${1:PR #}) - Updated **${2:packge name}** from _**v${3:from version}**_ to _**v${4:to version}**_"
+			"[#${1:PR #}](https://github.com/KinsonDigital/kd_clients/pull/${1:PR #}) - Updated **${2:packge name}** from _**v${3:from version}**_ to _**v${4:to version}**_"
 		],
 		"description": "Link to a pull request for a dependency update."
 	},
