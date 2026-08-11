@@ -54,7 +54,7 @@
         "singleQuote": false
     },
     "imports": {
-        "@std/fs": "jsr:@std/fs@1.0.23",
+        "@std/fs": "jsr:@std/fs@1.0.24",
         "@std/path": "jsr:@std/path@1.1.4",
         "@std/encoding": "jsr:@std/encoding@1.0.10",
         "@std/assert": "jsr:@std/assert@1.0.19",
